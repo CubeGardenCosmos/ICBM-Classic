@@ -55,7 +55,7 @@
 | TODO | icbm/classic/api/data/D3Consumer.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/EntityInteractionFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/EntityTickFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/IBoundBox.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/data/IBoundBox.java | POS 泛型边界盒接口，纯 Java | S1.05（S1.10 复用） |
 | PORTED | icbm/classic/api/data/IWorldPosition.java | Vec3d→Vec3、World→Level、isRemote→isClientSide()、getVec3d→getVec3；S1.01 建立 | S1.01（S1.03/S1.10 复用） |
 | TODO | icbm/classic/api/data/Int3Consumer.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/Int3Looper.java | 其余公共 API 换 26.3 类型 | S1.10 |
@@ -101,15 +101,15 @@
 | TODO | icbm/classic/api/missiles/projectile/IProjectileStack.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/missiles/projectile/IProjectileThrowable.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/missiles/projectile/ProjectileTypes.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/radio/IRadio.java | 同上 | S1.05 |
-| TODO | icbm/classic/api/radio/IRadioChannelAccess.java | 同上 | S1.05 |
-| TODO | icbm/classic/api/radio/IRadioMessage.java | 同上 | S1.05 |
-| TODO | icbm/classic/api/radio/IRadioReceiver.java | 同上 | S1.05 |
-| TODO | icbm/classic/api/radio/IRadioSender.java | 同上 | S1.05 |
+| PORTED | icbm/classic/api/radio/IRadio.java | World→Level，IBoundBox<BlockPos> | S1.05 |
+| PORTED | icbm/classic/api/radio/IRadioChannelAccess.java | @Nonnull→jspecify NonNull | S1.05 |
+| PORTED | icbm/classic/api/radio/IRadioMessage.java | 无类型改动 | S1.05 |
+| PORTED | icbm/classic/api/radio/IRadioReceiver.java | 无类型改动 | S1.05 |
+| PORTED | icbm/classic/api/radio/IRadioSender.java | 无类型改动 | S1.05 |
 | TODO | icbm/classic/api/radio/messages/IIncomingMissileMessage.java | 同上 | S1.05 |
-| TODO | icbm/classic/api/radio/messages/ITargetMessage.java | 同上 | S1.05 |
-| TODO | icbm/classic/api/radio/messages/ITextMessage.java | 同上 | S1.05 |
-| TODO | icbm/classic/api/radio/messages/ITriggerActionMessage.java | 同上 | S1.05 |
+| PORTED | icbm/classic/api/radio/messages/ITargetMessage.java | Vec3d→Vec3，@Nullable→jspecify | S1.05 |
+| PORTED | icbm/classic/api/radio/messages/ITextMessage.java | @Nullable→jspecify | S1.05 |
+| PORTED | icbm/classic/api/radio/messages/ITriggerActionMessage.java | onTriggerCallback 参数 IActionStatus→IRadioTargetAssignable | S1.05 |
 | TODO | icbm/classic/api/refs/ICBMEntities.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/refs/ICBMExplosives.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/reg/IExplosiveCustomization.java | 其余公共 API 换 26.3 类型 | S1.10 |
@@ -499,7 +499,7 @@
 | TODO | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
 | TODO | icbm/classic/lib/colors/ColorB.java |  | — |
 | TODO | icbm/classic/lib/colors/ColorHelper.java |  | — |
-| TODO | icbm/classic/lib/data/BoundBlockPos.java |  | — |
+| PORTED | icbm/classic/lib/data/BoundBlockPos.java | BlockPos/Vec3 边界盒实现 | S1.05（S1.10 复用） |
 | TODO | icbm/classic/lib/data/FaceRotations.java |  | — |
 | TODO | icbm/classic/lib/data/IMachineInfo.java |  | — |
 | TODO | icbm/classic/lib/data/LazyBuilder.java |  | — |
@@ -522,7 +522,7 @@
 | DROPPED（Fabric 网络替代） | icbm/classic/lib/network/IPacketIDReceiver.java | 自定义载荷的 ID 分发由 Fabric 处理，不需要接收器接口 | S1.04 |
 | DROPPED（Fabric 载荷替代） | icbm/classic/lib/network/PacketEvents.java | 旧实现基于 lib/tracker；错误分支改为 IcbmNetwork/IcbmClientNetwork 内 logDebug/logError | S1.04 |
 | PORTED | icbm/classic/lib/network/ex/PacketTileReadException.java | 保留类与构造签名（Location/BlockEntity/BlockState） | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/GeneralCodexs.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
+| PORTED | icbm/classic/lib/network/lambda/GeneralCodexs.java | radioChannel/radioToggleDisable 两个工厂，Identifier + BlockEntity + setChanged | S1.05 |
 | PORTED | icbm/classic/lib/network/lambda/PacketCodex.java | 构建器 API 与语义不变；编解码改 RegistryFriendlyByteBuf，发送走 CodexPayload + IcbmNetwork，新增 codexId/encodeBody/decodeAsSetters/locate | S1.04 |
 | PORTED | icbm/classic/lib/network/lambda/PacketCodexEntry.java | encoder/decoder 由 ByteBuf 改 RegistryFriendlyByteBuf | S1.04 |
 | PORTED | icbm/classic/lib/network/lambda/PacketCodexReg.java | key 改为 Identifier codexId；重复注册抛 RuntimeException | S1.04 |
@@ -555,17 +555,17 @@
 | TODO | icbm/classic/lib/radar/RadarEntity.java | RadarRegistry 按 ResourceKey<Level> 分表 | S1.06 |
 | TODO | icbm/classic/lib/radar/RadarMap.java | RadarRegistry 按 ResourceKey<Level> 分表 | S1.06 |
 | TODO | icbm/classic/lib/radar/RadarRegistry.java | RadarRegistry 按 ResourceKey<Level> 分表 | S1.06 |
-| TODO | icbm/classic/lib/radio/CapabilityRadio.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/RadioMap.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/RadioRegistry.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/imp/Radio.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/imp/RadioTile.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
+| DROPPED（26.3 无 Capability 系统，见 porting-guide §2.6；无线电由类直接实现） | icbm/classic/lib/radio/CapabilityRadio.java | 无线电由类直接实现 IRadio | S1.05 |
+| PORTED | icbm/classic/lib/radio/RadioMap.java | 维度键 ResourceKey<Level>，行为照 1.12 | S1.05 |
+| PORTED | icbm/classic/lib/radio/RadioRegistry.java | Map<ResourceKey<Level>, RadioMap>，提供 clear/clearAll/onLevelUnload，删除 Forge 事件 | S1.05 |
+| PORTED | icbm/classic/lib/radio/imp/Radio.java | INBTSerializable→ISavable，键 channel/disabled 不变 | S1.05 |
+| PORTED | icbm/classic/lib/radio/imp/RadioTile.java | T extends BlockEntity，新增 ensureRegistered/unregister | S1.05 |
 | TODO | icbm/classic/lib/radio/messages/IncomingMissileMessage.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/messages/RadioTranslations.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/messages/TargetMessage.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/messages/TextMessage.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/messages/TriggerActionMessage.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
-| TODO | icbm/classic/lib/radio/messages/TriggerActionTargetMessage.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
+| PORTED | icbm/classic/lib/radio/messages/RadioTranslations.java | 保留旧键字符串 | S1.05 |
+| PORTED | icbm/classic/lib/radio/messages/TargetMessage.java | Vec3d→Vec3 | S1.05 |
+| PORTED | icbm/classic/lib/radio/messages/TextMessage.java | 无类型改动 | S1.05 |
+| PORTED | icbm/classic/lib/radio/messages/TriggerActionMessage.java | 无类型改动 | S1.05 |
+| PORTED | icbm/classic/lib/radio/messages/TriggerActionTargetMessage.java | Vec3d→Vec3 | S1.05 |
 | TODO | icbm/classic/lib/recipe/ConditionOreValue.java |  | — |
 | TODO | icbm/classic/lib/recipe/ExIngredientFactory.java |  | — |
 | TODO | icbm/classic/lib/recipe/ExRecipeFactory.java |  | — |

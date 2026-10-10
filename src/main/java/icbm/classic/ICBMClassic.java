@@ -1,8 +1,11 @@
 package icbm.classic;
 
 import icbm.classic.config.core.ConfigManager;
+import icbm.classic.lib.radio.RadioRegistry;
 import icbm.classic.network.IcbmNetwork;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +24,11 @@ public final class ICBMClassic implements ModInitializer {
         ConfigManager.loadAll();
         // Action system registries (conditions, causes, statuses, actions, potentials), overview §5 item 2.
         IcbmNetwork.registerPayloads();
+
+        // Drop per-level radio state when a level unloads, and everything when the server stops
+        // (docs/architecture/overview.md §5/§7).
+        ServerLevelEvents.UNLOAD.register((server, level) -> RadioRegistry.onLevelUnload(level.dimension()));
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> RadioRegistry.clearAll());
 
         LOGGER.info("ICBM-Classic initializing (26.3 port)");
     }
