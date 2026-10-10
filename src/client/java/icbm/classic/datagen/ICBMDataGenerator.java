@@ -17,5 +17,8 @@ public class ICBMDataGenerator implements DataGeneratorEntrypoint
         }
         final FabricDataGenerator.Pack pack = generator.createPack();
         pack.addProvider(ICBMModelProvider::new);
+        pack.addProvider(ICBMBlockLootProvider::new);
+        final ICBMBlockTagProvider blockTags = pack.addProvider(ICBMBlockTagProvider::new);
+        pack.addProvider((output, registries) -> new ICBMItemTagProvider(output, registries, blockTags));
     }
 }

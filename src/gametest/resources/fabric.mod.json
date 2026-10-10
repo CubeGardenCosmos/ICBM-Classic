@@ -18,7 +18,8 @@
       "icbm.classic.test.reg.SimpleBlocksGameTest",
       "icbm.classic.test.reg.MaterialsGameTest",
       "icbm.classic.test.reg.CreativeTabGameTest",
-      "icbm.classic.test.reg.AssetsGameTest"
+      "icbm.classic.test.reg.AssetsGameTest",
+      "icbm.classic.test.reg.LootAndTagGameTest"
     ]
   },
   "depends": {

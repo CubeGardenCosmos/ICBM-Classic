@@ -1,0 +1,12 @@
+{
+  "values": [
+    "icbmclassic:concrete",
+    "icbmclassic:compact_concrete",
+    "icbmclassic:reinforced_concrete",
+    "icbmclassic:spikes",
+    "icbmclassic:poison_spikes",
+    "icbmclassic:fire_spikes",
+    "icbmclassic:glass_button",
+    "icbmclassic:glass_pressure_plate"
+  ]
+}
