@@ -4,7 +4,19 @@
   "version": "0.0.0",
   "environment": "*",
   "entrypoints": {
-    "fabric-gametest": ["icbm.classic.test.SmokeGameTest", "icbm.classic.test.lib.SaveHandlerGameTest", "icbm.classic.test.network.CodexGameTest", "icbm.classic.test.radio.RadioRegistryGameTest", "icbm.classic.test.radar.RadarRegistryGameTest", "icbm.classic.test.actions.ActionSystemGameTest", "icbm.classic.test.blast.ThreadedBlastFrameworkGameTest", "icbm.classic.test.api.ApiLookupsGameTest"]
+    "fabric-gametest": [
+      "icbm.classic.test.SmokeGameTest",
+      "icbm.classic.test.lib.SaveHandlerGameTest",
+      "icbm.classic.test.network.CodexGameTest",
+      "icbm.classic.test.radio.RadioRegistryGameTest",
+      "icbm.classic.test.radar.RadarRegistryGameTest",
+      "icbm.classic.test.actions.ActionSystemGameTest",
+      "icbm.classic.test.blast.ThreadedBlastFrameworkGameTest",
+      "icbm.classic.test.api.ApiLookupsGameTest",
+      "icbm.classic.test.reg.RegistrySmokeGameTest"
+    ]
   },
-  "depends": { "icbmclassic": "*" }
+  "depends": {
+    "icbmclassic": "*"
+  }
 }

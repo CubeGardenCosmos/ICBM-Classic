@@ -2,6 +2,15 @@ package icbm.classic;
 
 import icbm.classic.config.ConfigThread;
 import icbm.classic.config.core.ConfigManager;
+import icbm.classic.content.reg.ExplosiveInit;
+import icbm.classic.content.reg.ModBlockEntities;
+import icbm.classic.content.reg.ModBlocks;
+import icbm.classic.content.reg.ModCreativeTabs;
+import icbm.classic.content.reg.ModDataComponents;
+import icbm.classic.content.reg.ModEntities;
+import icbm.classic.content.reg.ModItems;
+import icbm.classic.content.reg.ModMenus;
+import icbm.classic.content.reg.ModSounds;
 import icbm.classic.lib.actions.ActionSystem;
 import icbm.classic.lib.lookup.IcbmLookups;
 import icbm.classic.lib.radar.RadarRegistry;
@@ -35,6 +44,18 @@ public final class ICBMClassic implements ModInitializer {
         ActionSystem.setup();
         // API lookups replacing the 1.12 Forge capabilities + data attachments (S1.10, porting-guide §2.6).
         IcbmLookups.init();
+        // Explosive data must be registered and locked before the content that reads it (S2.02).
+        ExplosiveInit.init();
+        // Registration order is fixed by docs/architecture/overview.md §5: sounds and data components
+        // first (items and blocks reference both while being constructed), then content, then the tab.
+        ModSounds.register();
+        ModDataComponents.register();
+        ModBlocks.register();
+        ModItems.register();
+        ModBlockEntities.register();
+        ModEntities.register();
+        ModMenus.register();
+        ModCreativeTabs.register();
         IcbmNetwork.registerPayloads();
 
         // Drop per-level radio state when a level unloads, and everything when the server stops
