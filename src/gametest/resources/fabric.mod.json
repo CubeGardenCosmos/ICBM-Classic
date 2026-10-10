@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "icbmclassic-test",
+  "version": "0.0.0",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": ["icbm.classic.test.SmokeGameTest"]
+  },
+  "depends": { "icbmclassic": "*" }
+}
