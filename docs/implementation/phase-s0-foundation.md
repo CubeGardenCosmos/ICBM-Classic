@@ -4,7 +4,7 @@
 
 目标：在新分支上得到一个**空的、能构建、能跑测试、能被专用服务端加载**的 Fabric 26.3 模组工程，旧代码保留在 `legacy-1.12/` 供参考。
 
-**现状（`prod/1.12` @ `e862b4f15`）**：Forge 1.12.2 构建（ForgeGradle 6、Java 8 toolchain、Gradle wrapper 8.8）；源码 `src/main`（714 个 Java 文件）、`src/test`（54 个）；`libs/` 有两个 1.12 专用 jar；`.github/workflows/gradle.yml` 用 JDK 1.8。
+**现状（`prod/1.12` @ `e862b4f15`）**：Forge 1.12.2 构建（ForgeGradle 6、Java 8 toolchain、Gradle wrapper 8.8）；源码 `src/main/java`（660 个 Java 文件）、`src/test/java`（54 个），合计 714 个；`libs/` 有两个 1.12 专用 jar；`.github/workflows/gradle.yml` 用 JDK 1.8。
 
 所有 Gradle 命令前：`export JAVA_HOME=/usr/lib/jvm/java-25-openjdk`。
 
@@ -21,7 +21,7 @@
 
 1. `git status --short` 必须为空。
 2. `git switch -c port/26.3-fabric`
-3. 记录：`git log -1 --format='%H %s'`、`git branch --show-current`、`ls`、`find src -name '*.java' | wc -l`（期望 main+test 合计 768）、`/usr/lib/jvm/java-25-openjdk/bin/java -version`。
+3. 记录：`git log -1 --format='%H %s'`、`git branch --show-current`、`ls`、`find src -name '*.java' | wc -l`（期望 main+test 合计 714）、`/usr/lib/jvm/java-25-openjdk/bin/java -version`。
 4. **不要**尝试构建 1.12 工程（需要 Java 8 与已停止维护的 Forge 仓库，不是本项目目标）。在证据中写明“未构建 1.12 基线，原因：工具链不在本机，且不在升级范围”。
 
 **验证**：`git branch --show-current` 输出 `port/26.3-fabric`。
@@ -73,7 +73,7 @@
 ```bash
 test -d legacy-1.12/src/main/java/icbm/classic && echo OK-legacy
 test ! -e src && echo OK-root-clean
-find legacy-1.12/src -name '*.java' | wc -l    # 期望 768
+find legacy-1.12/src -name '*.java' | wc -l    # 期望 714（main 660 + test 54）
 ```
 
 **完成判据**：三条输出均符合期望。
@@ -497,7 +497,7 @@ ls build/test-results/test/ | head
 2. 运行 `python3 -I scripts/port_ledger.py generate`，再 `stats`。
 3. 账本状态取值：`TODO`、`PORTED`、`MERGED → <新文件>`、`DROPPED（原因）`。`DROPPED` 必须有原因。
 
-**验证**：`python3 -I scripts/port_ledger.py stats` 显示总数 714；`DROPPED` 数量等于 `mods/`、`datafix/`、`CommonProxy.java` 文件数之和。
+**验证**：`python3 -I scripts/port_ledger.py stats` 显示总数 660（`legacy-1.12/src/main/java`）；`DROPPED` 数量等于 `mods/`、`datafix/`、`CommonProxy.java` 文件数之和。
 
 **完成判据**：账本生成；统计正确；`check` 退出码 1（因为还有 TODO）。
 
