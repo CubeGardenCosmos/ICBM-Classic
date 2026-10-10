@@ -14,7 +14,8 @@
       "icbm.classic.test.blast.ThreadedBlastFrameworkGameTest",
       "icbm.classic.test.api.ApiLookupsGameTest",
       "icbm.classic.test.reg.RegistrySmokeGameTest",
-      "icbm.classic.test.reg.ExplosiveFormsGameTest"
+      "icbm.classic.test.reg.ExplosiveFormsGameTest",
+      "icbm.classic.test.reg.SimpleBlocksGameTest"
     ]
   },
   "depends": {
