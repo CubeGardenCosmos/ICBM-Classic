@@ -1,9 +1,24 @@
 package icbm.classic.content.reg;
 
 import icbm.classic.config.ConfigItems;
+import icbm.classic.content.items.ExplosiveFormItem;
 import icbm.classic.content.items.ItemAntidote;
+import icbm.classic.content.reg.ExplosiveForms.ExplosiveForm;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * Item registration. Renamed from the 1.12 {@code ItemReg} (porting-guide.md §3).
+ * <p>
+ * Holds every item that is not registered by {@link ModBlocks}: the block items (1.12 registered those in
+ * {@code ItemReg} too, see overview.md §5) and the plain items.
+ * <p>
+ * Filled by S2.04 (materials and simple items), S2.05 (flat missile/grenade/bomb cart/bomblet items)
+ * and later steps (tools in S5.08, battery in S6).
+ */
 public final class ModItems
 {
     //=================== S2.04 crafting materials (1.12 ItemCrafting, metadata flattened)
@@ -25,12 +40,28 @@ public final class ModItems
     public static Item POISON_POWDER;
     public static Item ANTIDOTE;
     public static Item EMPTY_BOMBLET;
+    /** Empty missile shell (1.12 {@code missile} explosive id 24, registry-ids.md §3). */
     public static Item MISSILE_MODULE;
+
+    //=================== S2.05 flat explosive items (registry-ids.md §1 forms M/G/C/D)
+    /** Missiles by explosive id (form M). S4.02 replaces the placeholder item with the real missile item. */
+    public static final Map<Identifier, Item> EXPLOSIVE_MISSILES = new LinkedHashMap<>();
+    /** Grenades by explosive id (form G). S4.05 replaces the placeholder item. */
+    public static final Map<Identifier, Item> EXPLOSIVE_GRENADES = new LinkedHashMap<>();
+    /** Bomb carts by explosive id (form C). S4.05 replaces the placeholder item. */
+    public static final Map<Identifier, Item> EXPLOSIVE_BOMB_CARTS = new LinkedHashMap<>();
+    /** Bomblets by explosive id (form D, follows the grenade content). S4.06 replaces the placeholder item. */
+    public static final Map<Identifier, Item> EXPLOSIVE_BOMBLETS = new LinkedHashMap<>();
 
     private ModItems() {}
 
+    /** Registers every item that is not a block. Called from {@code ICBMClassic#onInitialize}. */
     public static void register()
     {
+        //Block items for the blocks registered by ModBlocks (1.12 ItemBlock / ItemBlockSubTypes)
+        // TODO(S2.05) RegHelper.blockItem(<flat explosive blocks>)
+        // TODO(S3.08) RegHelper.blockItem(ModBlocks.RADIOACTIVE_DIRT/STONE)
+        // TODO(S5) RegHelper.blockItem(<machines>)
         RegHelper.blockItem(ModBlocks.CONCRETE);
         RegHelper.blockItem(ModBlocks.COMPACT_CONCRETE);
         RegHelper.blockItem(ModBlocks.REINFORCED_CONCRETE);
@@ -40,7 +71,9 @@ public final class ModItems
         RegHelper.blockItem(ModBlocks.FIRE_SPIKES);
         RegHelper.blockItem(ModBlocks.GLASS_BUTTON);
         RegHelper.blockItem(ModBlocks.GLASS_PRESSURE_PLATE);
+        ModBlocks.EXPLOSIVE_BLOCKS.values().forEach(RegHelper::blockItem);
 
+        //Crafting materials: 1.12 ItemCrafting("ingot", "steel", "copper") and friends, one item per entry
         STEEL_INGOT = material("steel_ingot");
         COPPER_INGOT = material("copper_ingot");
         STEEL_CLUMP = material("steel_clump");
@@ -51,6 +84,7 @@ public final class ModItems
         ELITE_CIRCUIT = material("elite_circuit");
         COPPER_WIRE = material("copper_wire");
         GOLD_WIRE = material("gold_wire");
+        //The 1.12 OreDictionary names (ingotSteel, dustSulfur, ...) become item tags in S2.07
 
         SULFUR_DUST = material("sulfur_dust");
         SALTPETER = material("saltpeter");
@@ -61,6 +95,25 @@ public final class ModItems
 
         ANTIDOTE = RegHelper.item("antidote", ItemAntidote::new,
                 new Item.Properties().food(ItemAntidote.FOOD, ItemAntidote.CONSUMABLE));
+
+        //Flat explosive items: one item per explosive and form instead of the 1.12 metadata containers
+        registerFormItems(ExplosiveForm.MISSILE, EXPLOSIVE_MISSILES);
+        registerFormItems(ExplosiveForm.GRENADE, EXPLOSIVE_GRENADES);
+        registerFormItems(ExplosiveForm.BOMB_CART, EXPLOSIVE_BOMB_CARTS);
+        registerFormItems(ExplosiveForm.BOMBLET, EXPLOSIVE_BOMBLETS);
+
+        // TODO(S4.06 / S5.08 / S6) cluster missile, held item missile, parachute, balloon, tools, battery
+    }
+
+    /** Registers one placeholder item per explosive enabled for the form, plus the matching block item for {@link ExplosiveForm#BLOCK}. */
+    private static void registerFormItems(ExplosiveForm form, Map<Identifier, Item> target)
+    {
+        for (Identifier ex : ExplosiveForms.enabled(form))
+        {
+            final Item item = RegHelper.item(form.idFor(ex),
+                    p -> new ExplosiveFormItem(ex, form, p), new Item.Properties());
+            target.put(ex, item);
+        }
     }
 
     private static Item material(String id)
@@ -68,6 +121,15 @@ public final class ModItems
         return RegHelper.item(id, Item::new, new Item.Properties());
     }
 
+    /**
+     * 1.12 registered the crafting materials only when the matching {@code ConfigItems} switch was on.
+     * 26.3 can not remove an id without breaking the data driven content, so the item is always registered
+     * and only hidden from the creative tab (S2.05). The recipes are generated with the same switch as a
+     * {@code fabric:load_conditions} condition (S2.08).
+     *
+     * @param item item to check
+     * @return true when the item must not be listed in the creative tab
+     */
     public static boolean isHiddenFromCreativeTab(Item item)
     {
         if (!ConfigItems.ENABLE_CRAFTING_ITEMS)
