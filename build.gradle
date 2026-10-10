@@ -35,6 +35,10 @@ fabricApi {
         enableClientGameTests = false
         eula = true
     }
+    configureDataGeneration {
+        client = true
+        addToResources = true
+    }
 }
 
 dependencies {

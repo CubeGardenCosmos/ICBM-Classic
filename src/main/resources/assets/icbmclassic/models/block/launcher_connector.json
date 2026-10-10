@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "icbmclassic:block/silo_connector/disconnected",
+    "up": "icbmclassic:block/silo_connector/disconnected",
+    "north": "icbmclassic:block/silo_connector/disconnected",
+    "east": "icbmclassic:block/silo_connector/disconnected",
+    "south": "icbmclassic:block/silo_connector/disconnected",
+    "west": "icbmclassic:block/silo_connector/disconnected",
+    "particle": "icbmclassic:block/silo_connector/disconnected"
+  }
+}

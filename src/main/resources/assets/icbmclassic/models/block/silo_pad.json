@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "icbmclassic:block/silo_pad/side",
+    "top": "icbmclassic:block/silo_pad/top",
+    "bottom": "icbmclassic:block/silo_pad/bottom",
+    "particle": "icbmclassic:block/silo_pad/side"
+  }
+}

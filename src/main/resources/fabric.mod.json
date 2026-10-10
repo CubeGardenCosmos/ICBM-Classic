@@ -33,6 +33,9 @@
     ],
     "client": [
       "icbm.classic.client.ICBMClassicClient"
+    ],
+    "fabric-datagen": [
+      "icbm.classic.datagen.ICBMDataGenerator"
     ]
   },
   "mixins": [

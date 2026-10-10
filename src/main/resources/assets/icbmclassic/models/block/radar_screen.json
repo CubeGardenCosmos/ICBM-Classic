@@ -1,0 +1,31 @@
+{
+  "parent": "minecraft:block/cube",
+  "display": {
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        135,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    }
+  },
+  "textures": {
+    "particle": "icbmclassic:block/machine_green",
+    "down": "icbmclassic:block/machine_green",
+    "up": "icbmclassic:block/machine_green",
+    "north": "icbmclassic:block/screen/radar",
+    "east": "icbmclassic:block/machine_green",
+    "south": "icbmclassic:block/machine_green",
+    "west": "icbmclassic:block/machine_green"
+  }
+}

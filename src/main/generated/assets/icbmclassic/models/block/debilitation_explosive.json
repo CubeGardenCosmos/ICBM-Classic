@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "icbmclassic:block/explosive/bottom_1",
+    "particle": "icbmclassic:block/explosive/debilitation",
+    "side": "icbmclassic:block/explosive/debilitation",
+    "top": "icbmclassic:block/explosive/bottom_1"
+  }
+}
