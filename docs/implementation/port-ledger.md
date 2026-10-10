@@ -20,9 +20,9 @@
 | TODO | icbm/classic/ICBMClassic.java |  | — |
 | TODO | icbm/classic/ICBMConstants.java |  | — |
 | TODO | icbm/classic/RecipeGeneration.java | 改为 datagen ICBMRecipeProvider | S2.08 |
-| TODO | icbm/classic/api/EnumTier.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/EnumTier.java | StringRepresentable + ChatFormatting；getLocalizedName 改 Component.translatable（LanguageUtility 未移植，getName→getSerializedName） | S1.10 |
 | PORTED | icbm/classic/api/ICBMClassicAPI.java | 动作字段（S1.08）+ 本步补齐 MISSILE_TARGET_DATA/FLIGHT_LOGIC/PROJECTILE_DATA/EXPLOSIVE/EX_*/EXPLOSIVE_CUSTOMIZATION 注册表与 EX_* Identifier 常量；删全部 @CapabilityInject，改指向 IcbmLookups | S1.08、S1.10 |
-| TODO | icbm/classic/api/ICBMClassicHelpers.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/ICBMClassicHelpers.java | 删 hasCapability/getCapability：getMissile 走 instanceof+IcbmLookups.MISSILE；isExplosive/getExplosive(Entity) 走 instanceof；getLauncher 走 IcbmLookups；getExplosive(ItemStack)/getGPSData 待数据组件（TODO S2.02/S2.04） | S1.10 |
 | PORTED | icbm/classic/api/actions/IAction.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/IActionData.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/IActionProvider.java | 动作系统 | S1.08 |
@@ -47,96 +47,96 @@
 | PORTED | icbm/classic/api/actions/listener/IActionListenerHandler.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/status/ActionStatusTypes.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/status/IActionStatus.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/caps/IEMPReceiver.java | 同上 | S1.07 |
-| TODO | icbm/classic/api/caps/IExplosive.java | 同上 | S1.07 |
-| TODO | icbm/classic/api/caps/IGPSData.java | 同上 | S1.07 |
-| TODO | icbm/classic/api/caps/IMissileHolder.java | 同上 | S1.07 |
-| TODO | icbm/classic/api/data/BlockActivateFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/D3Consumer.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/EntityInteractionFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/EntityTickFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/caps/IEMPReceiver.java | World→Level；javadoc 指向 IcbmLookups.EMP_RECEIVER_BLOCK/ENTITY/ITEM | S1.10 |
+| PORTED | icbm/classic/api/caps/IExplosive.java | jspecify 注解；实体/方块实体直接实现，物品走平铺 id + 数据组件（§2.6） | S1.10 |
+| PORTED | icbm/classic/api/caps/IGPSData.java | Vec3d→Vec3、维度改 Identifier（无 DimensionManager，删 getWorld()）；数据组件 icbmclassic:gps_data（S2.04/S5.08） | S1.10 |
+| PORTED | icbm/classic/api/caps/IMissileHolder.java | hasMissile 改走 ICBMClassicHelpers.isMissile(ItemStack)（IcbmLookups.MISSILE_STACK） | S1.10 |
+| PORTED | icbm/classic/api/data/BlockActivateFunction.java | World→Level、EntityPlayer→Player、EnumHand→InteractionHand、EnumFacing→Direction、BlockPos | S1.10 |
+| PORTED | icbm/classic/api/data/D3Consumer.java | 纯 Java，无改动 | S1.10 |
+| PORTED | icbm/classic/api/data/EntityInteractionFunction.java | EntityPlayer→Player、EnumHand→InteractionHand | S1.10 |
+| PORTED | icbm/classic/api/data/EntityTickFunction.java | 类型不变（net.minecraft.world.entity.Entity） | S1.10 |
 | PORTED | icbm/classic/api/data/IBoundBox.java | POS 泛型边界盒接口，纯 Java | S1.05（S1.10 复用） |
 | PORTED | icbm/classic/api/data/IWorldPosition.java | Vec3d→Vec3、World→Level、isRemote→isClientSide()、getVec3d→getVec3；S1.01 建立 | S1.01（S1.03/S1.10 复用） |
-| TODO | icbm/classic/api/data/Int3Consumer.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/Int3Looper.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/WorldEntityIntSupplier.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/WorldPosIntSupplier.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/WorldTickFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/data/Int3Consumer.java | 纯 Java，无改动 | S1.10 |
+| PORTED | icbm/classic/api/data/Int3Looper.java | 纯 Java，无改动 | S1.10 |
+| PORTED | icbm/classic/api/data/WorldEntityIntSupplier.java | 类型不变（Entity） | S1.10 |
+| PORTED | icbm/classic/api/data/WorldPosIntSupplier.java | World→Level | S1.10 |
+| PORTED | icbm/classic/api/data/WorldTickFunction.java | World→Level | S1.10 |
 | PORTED | icbm/classic/api/data/meta/ITypeTaggable.java | 纯 Java，动作/状态元标签基础 | S1.08（S1.10 复用） |
 | PORTED | icbm/classic/api/data/meta/MetaTag.java | 纯 Java（NonNullList 换 net.minecraft.core），动作/状态元标签基础 | S1.08（S1.10 复用） |
 | DROPPED（ADR 0003） | icbm/classic/api/energy/IEnergyBuffer.java | DROPPED（ADR 0003） | S1.07 |
 | DROPPED（ADR 0003） | icbm/classic/api/energy/IEnergyBufferProvider.java | DROPPED（ADR 0003） | S1.07 |
-| TODO | icbm/classic/api/events/BlastBuildEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/BlastEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/EmpEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/ExplosiveDefuseEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/LaserRemoteTriggerEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/LauncherEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/LauncherSetTargetEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/MissileChunkEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/MissileEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/MissileRideEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/RadarGunTraceEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/events/RemoteTriggerEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/IBlast.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/IBlastFactory.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/IBlastIgnore.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/IBlastInit.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/IBlastMovable.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/IBlastRestore.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/IBlastTickable.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/explosion/redmatter/IBlastVelocity.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/launcher/ILauncherSolution.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/launcher/IMissileLauncher.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/ICapabilityMissileBuilder.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/ICapabilityMissileStack.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/IMissile.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/IMissileAiming.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/parts/IMissileFlightLogic.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/parts/IMissileFlightLogicStep.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/parts/IMissileTarget.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/parts/IMissileTargetDelayed.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/projectile/IProjectileData.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/projectile/IProjectileDataRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/projectile/IProjectileStack.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/projectile/IProjectileThrowable.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/missiles/projectile/ProjectileTypes.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/events/BlastBuildEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/BlastEvent.java | 仅作数据载体（不再继承 Forge Event）；World→Level、Entity | S1.10 |
+| PORTED | icbm/classic/api/events/EmpEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/ExplosiveDefuseEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/LaserRemoteTriggerEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/LauncherEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/LauncherSetTargetEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/MissileChunkEvent.java | 切断 content 依赖：删 LoadedChunkPair/ForgeChunkManager.Ticket，改带 Identifier 维度 + ChunkPos + timeLeft（S4.03 自行管理区块票据） | S1.10 |
+| PORTED | icbm/classic/api/events/MissileEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载）；RayTraceResult→HitResult | S1.10 |
+| PORTED | icbm/classic/api/events/MissileRideEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/RadarGunTraceEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/events/RemoteTriggerEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/explosion/IBlast.java | World→Level、Vec3d→Vec3、Entity；实现 IWorldPosition+IAction | S1.10 |
+| PORTED | icbm/classic/api/explosion/IBlastFactory.java | World→Level、jspecify | S1.10 |
+| PORTED | icbm/classic/api/explosion/IBlastIgnore.java | 类型不变 | S1.10 |
+| PORTED | icbm/classic/api/explosion/IBlastInit.java | World→Level、NBTTagCompound→CompoundTag、Entity；javadoc 指向 IActionData#create(Level,...) | S1.10 |
+| PORTED | icbm/classic/api/explosion/IBlastMovable.java | 类型不变 | S1.10 |
+| PORTED | icbm/classic/api/explosion/IBlastRestore.java | save/load 改 ValueOutput/ValueInput（§4） | S1.10 |
+| PORTED | icbm/classic/api/explosion/IBlastTickable.java | 类型不变 | S1.10 |
+| PORTED | icbm/classic/api/explosion/redmatter/IBlastVelocity.java | Entity + jspecify | S1.10 |
+| PORTED | icbm/classic/api/launcher/ILauncherSolution.java | 类型不变（IMissileLauncher/IMissileTarget 已换签名） | S1.10 |
+| PORTED | icbm/classic/api/launcher/IMissileLauncher.java | Vec3d→Vec3、jspecify；配置引用 ConfigMissile 保持；capability 由 IcbmLookups.MISSILE_LAUNCHER 替代 | S1.10 |
+| PORTED | icbm/classic/api/missiles/ICapabilityMissileBuilder.java | World→Level（String getMissileId 保留） | S1.10 |
+| PORTED | icbm/classic/api/missiles/ICapabilityMissileStack.java | ItemStack 不变；由 IcbmLookups.MISSILE_STACK 查询 | S1.10 |
+| PORTED | icbm/classic/api/missiles/IMissile.java | Entity 不变；继承 IWorldPosition（Vec3/Level） | S1.10 |
+| PORTED | icbm/classic/api/missiles/IMissileAiming.java | posX/Y/Z→getX/getY/getZ、rotationYaw/Pitch→getYRot/getXRot | S1.10 |
+| PORTED | icbm/classic/api/missiles/parts/IMissileFlightLogic.java | World→Level、Entity；嵌套函数接口保留 | S1.10 |
+| PORTED | icbm/classic/api/missiles/parts/IMissileFlightLogicStep.java | 无类型改动 | S1.10 |
+| PORTED | icbm/classic/api/missiles/parts/IMissileTarget.java | Vec3d→Vec3 | S1.10 |
+| PORTED | icbm/classic/api/missiles/parts/IMissileTargetDelayed.java | 无类型改动 | S1.10 |
+| PORTED | icbm/classic/api/missiles/projectile/IProjectileData.java | World→Level、EnumHand→InteractionHand、jspecify | S1.10 |
+| PORTED | icbm/classic/api/missiles/projectile/IProjectileDataRegistry.java | World→Level、ResourceLocation→Identifier、Entity | S1.10 |
+| PORTED | icbm/classic/api/missiles/projectile/IProjectileStack.java | Entity/ItemStack 不变 | S1.10 |
+| PORTED | icbm/classic/api/missiles/projectile/IProjectileThrowable.java | jspecify 注解 | S1.10 |
+| PORTED | icbm/classic/api/missiles/projectile/ProjectileTypes.java | MetaTag 不变（icbm.classic.api.data.meta） | S1.10 |
 | PORTED | icbm/classic/api/radio/IRadio.java | World→Level，IBoundBox<BlockPos> | S1.05 |
 | PORTED | icbm/classic/api/radio/IRadioChannelAccess.java | @Nonnull→jspecify NonNull | S1.05 |
 | PORTED | icbm/classic/api/radio/IRadioMessage.java | 无类型改动 | S1.05 |
 | PORTED | icbm/classic/api/radio/IRadioReceiver.java | 无类型改动 | S1.05 |
 | PORTED | icbm/classic/api/radio/IRadioSender.java | 无类型改动 | S1.05 |
-| TODO | icbm/classic/api/radio/messages/IIncomingMissileMessage.java | 同上 | S1.05 |
+| PORTED | icbm/classic/api/radio/messages/IIncomingMissileMessage.java | IMissile 已可移植（Entity）；触发回调沿用 ITriggerActionMessage#onTriggerCallback(IRadioTargetAssignable) | S1.10（S4.04 复用） |
 | PORTED | icbm/classic/api/radio/messages/ITargetMessage.java | Vec3d→Vec3，@Nullable→jspecify | S1.05 |
 | PORTED | icbm/classic/api/radio/messages/ITextMessage.java | @Nullable→jspecify | S1.05 |
 | PORTED | icbm/classic/api/radio/messages/ITriggerActionMessage.java | onTriggerCallback 参数 IActionStatus→IRadioTargetAssignable | S1.05 |
-| TODO | icbm/classic/api/refs/ICBMEntities.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/refs/ICBMExplosives.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/IExplosiveCustomization.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/IExplosiveData.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/IExplosiveRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/content/IExBlockRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/content/IExFuseBlockRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/content/IExFuseEntityRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/content/IExGrenadeRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/content/IExMinecartRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/content/IExMissileRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/content/IExplosiveContentRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/refs/ICBMEntities.java | 常量换 registry-ids.md §4 新 ID（Identifier，ICBMConstants.id） | S1.10 |
+| PORTED | icbm/classic/api/refs/ICBMExplosives.java | 字段保留（值 null + TODO(S2.02) 由 ExplosiveRegistry 赋值） | S1.10 |
+| PORTED | icbm/classic/api/reg/IExplosiveCustomization.java | Identifier/ItemStack 不变 | S1.10 |
+| PORTED | icbm/classic/api/reg/IExplosiveData.java | EnumTier 保留；继承 IActionData | S1.10 |
+| PORTED | icbm/classic/api/reg/IExplosiveRegistry.java | ResourceLocation→Identifier | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExBlockRegistry.java | Identifier；引用 api/data/BlockActivateFunction | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExFuseBlockRegistry.java | World→Level、Identifier | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExFuseEntityRegistry.java | Entity、Identifier | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExGrenadeRegistry.java | 无改动 | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExMinecartRegistry.java | 无改动 | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExMissileRegistry.java | EntityPlayer→Player、EnumHand→InteractionHand、Identifier | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExplosiveContentRegistry.java | Identifier、ItemStack | S1.10 |
 | PORTED | icbm/classic/api/reg/events/ActionCauseRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
 | PORTED | icbm/classic/api/reg/events/ActionPotentialRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
 | PORTED | icbm/classic/api/reg/events/ActionRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
 | PORTED | icbm/classic/api/reg/events/ActionStatusRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
 | PORTED | icbm/classic/api/reg/events/ConditionalRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
-| TODO | icbm/classic/api/reg/events/ExplosiveContentRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ExplosiveCustomizationRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ExplosiveRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/MissileFlightLogicRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/MissileTargetRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ProjectileDataRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/reg/events/ExplosiveContentRegistryEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载）；删 register(id, registry) 糖方法（监听器直接调 registry.registerContentRegistry） | S1.10 |
+| PORTED | icbm/classic/api/reg/events/ExplosiveCustomizationRegistryEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/reg/events/ExplosiveRegistryEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载）；删 Forge 时代糖方法 register/enableContent/done（监听器直接调 registry） | S1.10 |
+| PORTED | icbm/classic/api/reg/events/MissileFlightLogicRegistryEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/reg/events/MissileTargetRegistryEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
+| PORTED | icbm/classic/api/reg/events/ProjectileDataRegistryEvent.java | Fabric Event + Callback（EventFactory.createArrayBacked；可取消事件回调返回 boolean，数据由事件对象承载） | S1.10 |
 | PORTED | icbm/classic/api/reg/obj/IBuildableObject.java | ResourceLocation→Identifier、INBTSerializable→ISavable、ITextComponent→Component；删 @SideOnly | S1.03（S1.10 复用） |
 | PORTED | icbm/classic/api/reg/obj/IBuilderRegistry.java | save/load 改走 ValueOutput/ValueInput（键 id + data 子节点）；删 1.12 的 save(NBTTagList) 默认方法 | S1.03（S1.10 复用） |
-| TODO | icbm/classic/api/tile/IRotatable.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/tile/IRotation.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/tile/IRotatable.java | EnumFacing→Direction | S1.10 |
+| PORTED | icbm/classic/api/tile/IRotation.java | EnumFacing→Direction | S1.10 |
 | TODO | icbm/classic/client/ClientProxy.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/ClientReg.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/ICBMCreativeTab.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
@@ -454,7 +454,7 @@
 | DROPPED（ADR 0002） | icbm/classic/datafix/TileExplosivesDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/TileRadarStationDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | PORTED | icbm/classic/lib/CalculationHelpers.java | 纯 Java，随机数参数保留 java.util.Random | S1.01（S1.03/S1.10 复用） |
-| TODO | icbm/classic/lib/CapabilityPrefab.java |  | — |
+| DROPPED | icbm/classic/lib/CapabilityPrefab.java | DROPPED（无 Capability 系统） | S1.10 |
 | TODO | icbm/classic/lib/ForgeRegistryHelpers.java |  | — |
 | TODO | icbm/classic/lib/InventoryUtility.java |  | — |
 | TODO | icbm/classic/lib/LanguageUtility.java |  | — |
@@ -480,23 +480,23 @@
 | PORTED | icbm/classic/lib/actions/status/MissingFieldStatus.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/buildable/BuildableObject.java | 实现新接口 ISavable；save/load(ValueOutput/ValueInput) 经 SaveHandler<T>；Lombok @Getter 改显式 getter | S1.03 |
 | PORTED | icbm/classic/lib/buildable/BuildableObjectRegistry.java | 键 ResourceLocation→Identifier；FMLCommonHandler mod name 改为模组 id；Lombok @Getter 改显式 isLocked() | S1.03 |
-| TODO | icbm/classic/lib/capability/chicken/CapSpaceChicken.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/emp/CapabilityEMP.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/emp/CapabilityEmpChecker.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/emp/CapabilityEmpCreeper.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/emp/CapabilityEmpEntityItem.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/emp/CapabilityEmpInventory.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/emp/CapabilityEmpKill.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/ex/CapabilityExplosive.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/ex/CapabilityExplosiveEntity.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/ex/CapabilityExplosiveStack.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/ex/CapabilityExplosiveStatic.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/gps/CapabilityGPSData.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/gps/CapabilityGPSDataItem.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/gps/GPSDataHelpers.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/launcher/CapabilityMissileHolder.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/launcher/CapabilityMissileLauncher.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
-| TODO | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
+| MERGED | icbm/classic/lib/capability/chicken/CapSpaceChicken.java | MERGED → 数据附件 ModAttachments.SPACE_CHICKEN（保留 isSpace/setSpace 静态工具，删除 DataManager/Capability 外壳） | S1.10 |
+| MERGED | icbm/classic/lib/capability/emp/CapabilityEMP.java | MERGED → IcbmLookups#init() 注册原版 EMP 接收器（EntityTypes.ITEM/CREEPER，替代 AttachCapabilitiesEvent） | S1.10 |
+| PORTED | icbm/classic/lib/capability/emp/CapabilityEmpChecker.java | 普通类，仅实现 IEMPReceiver（含新增 API Lookup 之外无 capability 代码） | S1.10 |
+| PORTED | icbm/classic/lib/capability/emp/CapabilityEmpCreeper.java | World→Level；EntityLightningBolt→EntityTypes.LIGHTNING_BOLT + Creeper#thunderHit；删 ICapabilityProvider | S1.10 |
+| PORTED | icbm/classic/lib/capability/emp/CapabilityEmpEntityItem.java | EntityItem→ItemEntity；stacksMatchExact→ItemStack.matches；删 ICapabilityProvider | S1.10 |
+| MERGED | icbm/classic/lib/capability/emp/CapabilityEmpInventory.java | MERGED → vanilla Container 版（IItemHandler → Container，getCapability() → getContainer()）；item-in-item 库存待 S3.07、能量抽空待 S6.05 | S1.10 |
+| PORTED | icbm/classic/lib/capability/emp/CapabilityEmpKill.java | setDead→discard | S1.10 |
+| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosive.java | 删 ICapabilitySerializable，改 ISavable（EXPLOSIVE_ID 走 ValueOutput/ValueInput） | S1.10 |
+| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveEntity.java | ISavable；ItemEntity 掉落、ItemStack.isSameItem、level.isClientSide() | S1.10 |
+| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStack.java | 构造签名 (ItemStack, Identifier)；自定义项存档走 IBuilderRegistry#save/load；TODO(S2.02) 数据组件 | S1.10 |
+| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStatic.java | INBTSerializable→ISavable（空实现，与 1.12 一致） | S1.10 |
+| DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSData.java | DROPPED（改用 icbmclassic:gps_data 数据组件，S2.04/S5.08） | S1.10 |
+| DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSDataItem.java | DROPPED（同上；物品数据组件） | S1.10 |
+| PORTED | icbm/classic/lib/capability/gps/GPSDataHelpers.java | Vec3 + Identifier 维度；TextComponent→Component.translatable、sendMessage→sendSystemMessage | S1.10 |
+| MERGED | icbm/classic/lib/capability/launcher/CapabilityMissileHolder.java | MERGED → vanilla Container 版（IItemHandlerModifiable → Container）；consumeMissile 走 IcbmLookups.MISSILE_STACK | S1.10 |
+| PORTED | icbm/classic/lib/capability/launcher/CapabilityMissileLauncher.java | 删 capability 注册；状态暂用 ActionResponses（TODO(S5.02) LauncherStatus） | S1.10 |
+| MERGED | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | MERGED → S4.02 实现（依赖 content/missile/entity/explosive/EntityExplosiveMissile） | S4.02 |
 | TODO | icbm/classic/lib/colors/ColorB.java |  | — |
 | TODO | icbm/classic/lib/colors/ColorHelper.java |  | — |
 | PORTED | icbm/classic/lib/data/BoundBlockPos.java | BlockPos/Vec3 边界盒实现 | S1.05（S1.10 复用） |
@@ -560,7 +560,7 @@
 | PORTED | icbm/classic/lib/radio/RadioRegistry.java | Map<ResourceKey<Level>, RadioMap>，提供 clear/clearAll/onLevelUnload，删除 Forge 事件 | S1.05 |
 | PORTED | icbm/classic/lib/radio/imp/Radio.java | INBTSerializable→ISavable，键 channel/disabled 不变 | S1.05 |
 | PORTED | icbm/classic/lib/radio/imp/RadioTile.java | T extends BlockEntity，新增 ensureRegistered/unregister | S1.05 |
-| TODO | icbm/classic/lib/radio/messages/IncomingMissileMessage.java | RadioRegistry 按 ResourceKey<Level> 分表 | S1.05 |
+| PORTED | icbm/classic/lib/radio/messages/IncomingMissileMessage.java | onTriggerCallback 改调 IRadioTargetAssignable#assignTarget(missile.getMissileEntity())，删 LaunchedWithMissile/EntitySurfaceToAirMissile；Vec3d→Vec3、motionX→getDeltaMovement | S1.10（S4.04 复用） |
 | PORTED | icbm/classic/lib/radio/messages/RadioTranslations.java | 保留旧键字符串 | S1.05 |
 | PORTED | icbm/classic/lib/radio/messages/TargetMessage.java | Vec3d→Vec3 | S1.05 |
 | PORTED | icbm/classic/lib/radio/messages/TextMessage.java | 无类型改动 | S1.05 |

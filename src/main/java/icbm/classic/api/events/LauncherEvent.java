@@ -1,0 +1,83 @@
+package icbm.classic.api.events;
+
+import icbm.classic.api.actions.cause.IActionSource;
+import icbm.classic.api.actions.status.IActionStatus;
+import icbm.classic.api.caps.IMissileHolder;
+import icbm.classic.api.launcher.IMissileLauncher;
+import icbm.classic.api.missiles.parts.IMissileTarget;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+
+/**
+ * Data carried by the launcher events.
+ * <p>
+ * 1.12 extended the Forge {@code Event} class; 26.3 uses Fabric events, so this class is only the data
+ * carrier and {@link PreLaunch} exposes the Fabric {@code Event}.
+ *
+ * Created by Dark(DarkGuardsman, Robin) on 1/9/19.
+ *
+ * @deprecated will be replaced with an event providing {@link icbm.classic.api.actions.IAction}
+ */
+@Deprecated
+public abstract class LauncherEvent
+{
+    /** Starting point of the missile */
+    public final IActionSource source;
+    /** Launcher capability, can be used to relaunch missile with edits */
+    public final IMissileLauncher launcher;
+    /** Missile inventory */
+    public final IMissileHolder holder;
+
+    public LauncherEvent(IActionSource source, IMissileLauncher launcher, IMissileHolder holder)
+    {
+        this.source = source;
+        this.launcher = launcher;
+        this.holder = holder;
+    }
+
+    /**
+     * Called before a missile is created and launched
+     * towards its target. Use this to cancel the launch
+     * or change data.
+     * <p>
+     * Called before {@link MissileEvent.PostLaunch}
+     */
+    public static class PreLaunch extends LauncherEvent
+    {
+        public static final Event<Callback> EVENT = EventFactory.createArrayBacked(Callback.class,
+                listeners -> event -> {
+                    for (Callback listener : listeners) {
+                        if (!listener.onPreLaunch(event)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+        /** Target of launcher, doesn't account for offsets or inaccuracy */
+        public final IMissileTarget target;
+
+        /** True if launch was simulated */
+        public final boolean simulate;
+
+        /** Optional reason for event being canceled, defaults to 'launcher.status.icbmclassic:message.canceled' */
+        public IActionStatus cancelReason;
+
+        public PreLaunch(IActionSource source, IMissileLauncher launcher, IMissileHolder holder, IMissileTarget target, boolean simulate)
+        {
+            super(source, launcher, holder);
+            this.target = target;
+            this.simulate = simulate;
+        }
+
+        @FunctionalInterface
+        public interface Callback
+        {
+            /**
+             * @param event carrying the source, launcher, holder, target and simulate flag
+             * @return false to cancel the launch
+             */
+            boolean onPreLaunch(PreLaunch event);
+        }
+    }
+}

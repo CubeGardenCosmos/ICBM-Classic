@@ -20,10 +20,10 @@
 - [x] (4) `PacketCodex` 传输层改为 Fabric 载荷，服务端校验。（S1.04，证据：../implementation/evidence/S1.04.md）
 - [x] (5) 无线电系统按世界维度键分表。（S1.05，证据：../implementation/evidence/S1.05.md）
 - [x] (6) 雷达注册表/地图。（S1.06，证据：../implementation/evidence/S1.06.md）
-- [ ] (7) Capability → API Lookup / 数据附件 / DataComponent；`IcbmEnergyBuffer`。
+- [ ] (7) Capability → API Lookup / 数据附件 / DataComponent；`IcbmEnergyBuffer`。（部分：S1.07、S1.10；GPS 的 DataComponent 与电池/机器对外存储随 S2.04/S5.08/S6）
 - [ ] (8) 动作系统（actions/conditions/causes/status）。（部分：S1.08：动作/条件/原因/状态/字段框架与 causeby、conditionals 已移植；content 动作注册、WorkTickingActionHandler、emp/** 与 entity/** 留 S3.02/S3.05/S3.07；证据：../implementation/evidence/S1.08.md）
 - [ ] (9) 线程化爆炸：工作线程计算、主线程按预算应用。（部分：S1.09；`lib/thread` 的 LevelSnapshot 快照、WorkerThread/WorkerThreadManager 线程池、BlockEditQueue 主线程预算队列与 `ConfigThread.BLOCKS_PER_TICK` 已完成；ThreadExplosion/ThreadLargeExplosion/ThreadSmallExplosion 与 content/blast/threaded/** 按裁决留 S3.02/S3.06 在快照/队列架构上重写；证据：../implementation/evidence/S1.09.md）
-- [ ] (10) 公共 API 包签名迁移。
+- [x] (10) 公共 API 包签名迁移。（S1.10，证据：../implementation/evidence/S1.10.md）
 
 ## 注册与资源
 

@@ -3,6 +3,7 @@ package icbm.classic;
 import icbm.classic.config.ConfigThread;
 import icbm.classic.config.core.ConfigManager;
 import icbm.classic.lib.actions.ActionSystem;
+import icbm.classic.lib.lookup.IcbmLookups;
 import icbm.classic.lib.radar.RadarRegistry;
 import icbm.classic.lib.radio.RadioRegistry;
 import icbm.classic.lib.thread.BlockEditQueue;
@@ -32,6 +33,8 @@ public final class ICBMClassic implements ModInitializer {
         ConfigManager.loadAll();
         // Action system registries (conditions, causes, statuses, actions, potentials), overview §5 item 2.
         ActionSystem.setup();
+        // API lookups replacing the 1.12 Forge capabilities + data attachments (S1.10, porting-guide §2.6).
+        IcbmLookups.init();
         IcbmNetwork.registerPayloads();
 
         // Drop per-level radio state when a level unloads, and everything when the server stops

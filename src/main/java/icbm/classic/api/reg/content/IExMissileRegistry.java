@@ -1,0 +1,62 @@
+package icbm.classic.api.reg.content;
+
+import icbm.classic.api.data.EntityInteractionFunction;
+import icbm.classic.api.missiles.IMissile;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.function.Consumer;
+
+/**
+ * @deprecated being removed in 1.13
+ */
+@Deprecated
+public interface IExMissileRegistry extends IExplosiveContentRegistry
+{
+
+    /**
+     * Adds a simple callback for when a missile launches
+     * <p>
+     * * Do not use this in place of normal events, this is designed to add logic for
+     * * specific missile types.
+     *
+     * @param exName        - id of the explosive/missile
+     * @param eventCallback - function to call
+     */
+    void setLaunchListener(Identifier exName, Consumer<IMissile> eventCallback);
+
+    /**
+     * Adds a simple callback for when a missile updates.
+     * <p>
+     * Do not use this in place of normal events, this is designed to add logic for
+     * specific missile types.
+     *
+     * @param exName        - id of the explosive/missile
+     * @param eventCallback - function to call
+     */
+    void setMissileUpdateListener(Identifier exName, Consumer<IMissile> eventCallback);
+
+    /**
+     * Adds a simple callback for player interaction with missile. This should be used
+     * to encoded data into the missile. Such as setting teleportation coordinates in the
+     * same way the ender blast does.
+     * <p>
+     * Do not use this in place of normal events, this is designed to add logic for
+     * specific missile types.
+     *
+     * @param exName        - id of the explosive/missile
+     * @param function - function to call
+     */
+    void setInteractionListener(Identifier exName, EntityInteractionFunction function);
+
+    //TODO add handling for insert into launcher (cruise launcher prevents cluster and homing)
+
+
+    void triggerLaunch(IMissile missile);
+
+    void triggerFlightUpdate(IMissile missile);
+
+    boolean onInteraction(Entity entity, Player player, InteractionHand hand);
+}

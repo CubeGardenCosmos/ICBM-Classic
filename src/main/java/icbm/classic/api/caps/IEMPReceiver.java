@@ -1,0 +1,115 @@
+package icbm.classic.api.caps;
+
+import icbm.classic.api.actions.IAction;
+import net.minecraft.world.level.Level;
+
+/**
+ * Applied to an object to receive EMP effects from a EMP blast or similar system.
+ * <p>
+ * 1.12 attached this through a Forge capability. 26.3 uses the API lookups in
+ * {@link icbm.classic.lib.lookup.IcbmLookups} instead: {@code EMP_RECEIVER_BLOCK},
+ * {@code EMP_RECEIVER_ENTITY} and {@code EMP_RECEIVER_ITEM}. Entities, block entities and items
+ * simply implement this interface and register themselves with the matching lookup (the vanilla
+ * defaults - dropped items and creepers - are registered by {@code IcbmLookups#init()}).
+ *
+ * Created by Dark on 3/12/2018.
+ */
+public interface IEMPReceiver
+{
+    /**
+     * Called when an EMP goes off and triggers an action on the object at the given location.
+     * <p>
+     * Use this function to apply effects to this object or weaken the EMP
+     *
+     * @param level     - this object's level
+     * @param x         - this object's x position
+     * @param y         - this object's y position
+     * @param z         - this object's z position
+     * @param emp_blast - source of the EMP
+     * @param power     - arbitrary value between 0 and 1 noting the power of the blast.
+     *                  Can be greater than 1 to note overpowered blast. Though will rarely
+     *                  have any effect on most actions other than to bypass shielding.
+     * @param doAction  - set to try to apply effects to the world, false to simulate actions.
+     * @return power to apply on the other side of the entity, any value under zero will be ignored
+     */
+    default float applyEmpAction(Level level, double x, double y, double z, IAction emp_blast, float power, boolean doAction)
+    {
+        //At the moment power is not used, check back later - 3/12/2018 Dark
+
+        //Do something to your object
+        //  Ex: Item -> Drain power
+        //  Ex: EntityCreeper -> Super charge
+        //  Ex: BlockEntity -> Turn off machine or explode
+
+        //Keep in mind ICBM-Classic's EMP is not realistic. It is very much game like in nature.
+        //  This means the blast doesn't loss power over distance. Instead only shielding can
+        //  reduce the effect of the EMP. Anything can act as shielding if desired. However, it
+        //  is suggested to balance shielding to gameplay. This means no 100% blocking instead
+        //  try to scale shielding to force players to think about designs.
+
+        //Return power remaining, by default return value unless making shielding
+        return power;
+    }
+
+    /**
+     * Sub version of {@link #applyEmpAction(Level, double, double, double, IAction, float, boolean)} used in
+     * connection with objects that are contained inside other objects. Allows gaining access to parent object
+     * in case addition effects are required.
+     * <p>
+     * Common example is containers that are inventories. In 1.12 this listed vanilla player, chest and
+     * minecart chest classes. 26.3 dropped the Forge inventory capability, so the container is passed
+     * as an opaque handle and it is up to the receiver to type check it.
+     *
+     * @param container - object containing this sub-object
+     */
+    default float applyEmpAction(Level level, double x, double y, double z, IAction emp_blast, Object container, float power, boolean doAction)
+    {
+        return applyEmpAction(level, x, y, z, emp_blast, power, doAction);
+    }
+
+    /**
+     * Called to get a theoretical resistance value for the object. Mainly will
+     * be used for simulation code and display of data to the user.
+     *
+     * @param level - this object's level
+     * @param x     - this object's x position
+     * @param y     - this object's y position
+     * @param z     - this object's z position
+     * @param power - power input into the object
+     * @return value between 0 to 1 to note resistance level
+     */
+    default float getEmpResistance(Level level, double x, double y, double z, float power)
+    {
+        return 0;
+    }
+
+    /**
+     * Called to check if the theoretical resistance value for the object is flat or ratio based.
+     * Mainly will be used for simulation code and display of data to the user.
+     *
+     * @param level - this object's level
+     * @param x     - this object's x position
+     * @param y     - this object's y position
+     * @param z     - this object's z position
+     * @param power - power input into the object
+     * @return true if the reduction is flat (power - constant) or ratio (power * reduction or power / ratio)
+     */
+    default boolean isEmpResistanceFlat(Level level, double x, double y, double z, float power)
+    {
+        return true;
+    }
+
+    /**
+     * Allow the EMP to automatically handle sub objects contained in inventories inside this object
+     *
+     * @param level - this object's level
+     * @param x     - this object's x position
+     * @param y     - this object's y position
+     * @param z     - this object's z position
+     * @return true to allow code to run on sub-objects
+     */
+    default boolean shouldEmpSubObjects(Level level, double x, double y, double z)
+    {
+        return true;
+    }
+}
