@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "environment": "*",
   "entrypoints": {
-    "fabric-gametest": ["icbm.classic.test.SmokeGameTest", "icbm.classic.test.lib.SaveHandlerGameTest", "icbm.classic.test.network.CodexGameTest", "icbm.classic.test.radio.RadioRegistryGameTest", "icbm.classic.test.radar.RadarRegistryGameTest"]
+    "fabric-gametest": ["icbm.classic.test.SmokeGameTest", "icbm.classic.test.lib.SaveHandlerGameTest", "icbm.classic.test.network.CodexGameTest", "icbm.classic.test.radio.RadioRegistryGameTest", "icbm.classic.test.radar.RadarRegistryGameTest", "icbm.classic.test.actions.ActionSystemGameTest"]
   },
   "depends": { "icbmclassic": "*" }
 }

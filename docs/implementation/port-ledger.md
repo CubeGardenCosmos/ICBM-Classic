@@ -21,32 +21,32 @@
 | TODO | icbm/classic/ICBMConstants.java |  | — |
 | TODO | icbm/classic/RecipeGeneration.java | 改为 datagen ICBMRecipeProvider | S2.08 |
 | TODO | icbm/classic/api/EnumTier.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/ICBMClassicAPI.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/ICBMClassicAPI.java | 动作字段（S1.08）+ 本步补齐 MISSILE_TARGET_DATA/FLIGHT_LOGIC/PROJECTILE_DATA/EXPLOSIVE/EX_*/EXPLOSIVE_CUSTOMIZATION 注册表与 EX_* Identifier 常量；删全部 @CapabilityInject，改指向 IcbmLookups | S1.08、S1.10 |
 | TODO | icbm/classic/api/ICBMClassicHelpers.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/actions/IAction.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/IActionData.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/IActionProvider.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/IPotentialAction.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/cause/IActionCause.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/cause/IActionSource.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/cause/ICausedByAction.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/cause/ICausedByBlock.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/cause/ICausedByEntity.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/conditions/ICondition.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/conditions/IConditionCause.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/conditions/IConditionLayer.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/ActionField.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/ActionFields.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/ActionTypes.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/BlockActionTypes.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/EntityActionTypes.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/IActionFieldProvider.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/IActionFieldReceiver.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/data/WorldActionTypes.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/listener/IActionListener.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/listener/IActionListenerHandler.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/status/ActionStatusTypes.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/api/actions/status/IActionStatus.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/IAction.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/IActionData.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/IActionProvider.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/IPotentialAction.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/cause/IActionCause.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/cause/IActionSource.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/cause/ICausedByAction.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/cause/ICausedByBlock.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/cause/ICausedByEntity.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/conditions/ICondition.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/conditions/IConditionCause.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/conditions/IConditionLayer.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/data/ActionField.java | 动作字段系统重设计：save/load 直接操作 ValueInput/ValueOutput | S1.08 |
+| PORTED | icbm/classic/api/actions/data/ActionFields.java | 动作字段系统重设计：save/load 直接操作 ValueInput/ValueOutput | S1.08 |
+| PORTED | icbm/classic/api/actions/data/ActionTypes.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/data/BlockActionTypes.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/data/EntityActionTypes.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/data/IActionFieldProvider.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/data/IActionFieldReceiver.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/data/WorldActionTypes.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/listener/IActionListener.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/listener/IActionListenerHandler.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/status/ActionStatusTypes.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/api/actions/status/IActionStatus.java | 动作系统 | S1.08 |
 | TODO | icbm/classic/api/caps/IEMPReceiver.java | 同上 | S1.07 |
 | TODO | icbm/classic/api/caps/IExplosive.java | 同上 | S1.07 |
 | TODO | icbm/classic/api/caps/IGPSData.java | 同上 | S1.07 |
@@ -62,8 +62,8 @@
 | TODO | icbm/classic/api/data/WorldEntityIntSupplier.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/WorldPosIntSupplier.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/WorldTickFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/meta/ITypeTaggable.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/meta/MetaTag.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/data/meta/ITypeTaggable.java | 纯 Java，动作/状态元标签基础 | S1.08（S1.10 复用） |
+| PORTED | icbm/classic/api/data/meta/MetaTag.java | 纯 Java（NonNullList 换 net.minecraft.core），动作/状态元标签基础 | S1.08（S1.10 复用） |
 | DROPPED（ADR 0003） | icbm/classic/api/energy/IEnergyBuffer.java | DROPPED（ADR 0003） | S1.07 |
 | DROPPED（ADR 0003） | icbm/classic/api/energy/IEnergyBufferProvider.java | DROPPED（ADR 0003） | S1.07 |
 | TODO | icbm/classic/api/events/BlastBuildEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
@@ -122,11 +122,11 @@
 | TODO | icbm/classic/api/reg/content/IExMinecartRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/reg/content/IExMissileRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/reg/content/IExplosiveContentRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ActionCauseRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ActionPotentialRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ActionRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ActionStatusRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/events/ConditionalRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/reg/events/ActionCauseRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
+| PORTED | icbm/classic/api/reg/events/ActionPotentialRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
+| PORTED | icbm/classic/api/reg/events/ActionRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
+| PORTED | icbm/classic/api/reg/events/ActionStatusRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
+| PORTED | icbm/classic/api/reg/events/ConditionalRegistryEvent.java | 改为 Fabric Event（EventFactory.createArrayBacked），回调参数为对应 IBuilderRegistry | S1.08 |
 | TODO | icbm/classic/api/reg/events/ExplosiveContentRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/reg/events/ExplosiveCustomizationRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/reg/events/ExplosiveRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
@@ -218,17 +218,17 @@
 | PORTED | icbm/classic/config/util/ItemStackConfigList.java | 键改为 namespace:path 字符串；元数据条目退回物品键 | S1.02 |
 | PORTED | icbm/classic/config/util/ResourceConfigEntry.java | ResourceLocation→namespace:path 字符串键 | S1.02 |
 | PORTED | icbm/classic/config/util/ResourceConfigList.java | ResourceLocation→namespace:path 字符串键；Loader→FabricLoader | S1.02 |
-| TODO | icbm/classic/content/actions/ActionProvider.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/ActionUpdateBlockState.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/causeby/CauseByTimer.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/conditionals/ConditionAnd.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/conditionals/ConditionOR.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/conditionals/ConditionTargetDistance.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/conditionals/ConditionalImpact.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/emp/ActionDataEmpArea.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/emp/ActionEmpArea.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/emp/EmpHandler.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/content/actions/entity/ActionSpawnEntity.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/content/actions/ActionProvider.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/content/actions/ActionUpdateBlockState.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/content/actions/causeby/CauseByTimer.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/content/actions/conditionals/ConditionAnd.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/content/actions/conditionals/ConditionOR.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/content/actions/conditionals/ConditionTargetDistance.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/content/actions/conditionals/ConditionalImpact.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| MERGED → S3.07 | icbm/classic/content/actions/emp/ActionDataEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
+| MERGED → S3.07 | icbm/classic/content/actions/emp/ActionEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
+| MERGED → S3.07 | icbm/classic/content/actions/emp/EmpHandler.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
+| MERGED → S3.05 | icbm/classic/content/actions/entity/ActionSpawnEntity.java | 生成实体动作，随内容实体在 S3.05 移植 | S3.05 |
 | TODO | icbm/classic/content/blast/Blast.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastAntiGravitational.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastBeam.java | 各爆炸实现 | S3.02–S3.07 |
@@ -424,9 +424,9 @@
 | TODO | icbm/classic/content/missile/logic/flight/prefab/AccelerateByFacingLogic.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/logic/flight/prefab/AccelerateByVec3Logic.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/logic/flight/prefab/FlightLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/source/ActionSource.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/source/cause/ActionCause.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/source/cause/CausedByBlock.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/logic/source/ActionSource.java | 动作框架数据层（IActionSource/IActionCause 实现），S4 直接复用 | S1.08（S4 复用） |
+| PORTED | icbm/classic/content/missile/logic/source/cause/ActionCause.java | 动作框架数据层（IActionSource/IActionCause 实现），S4 直接复用 | S1.08（S4 复用） |
+| PORTED | icbm/classic/content/missile/logic/source/cause/CausedByBlock.java | 动作框架数据层（IActionSource/IActionCause 实现），S4 直接复用 | S1.08（S4 复用） |
 | TODO | icbm/classic/content/missile/logic/source/cause/EntityCause.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/logic/source/cause/RedstoneCause.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/logic/targeting/BallisticTargetingData.java | 导弹实体与飞行逻辑 | S4 |
@@ -460,24 +460,24 @@
 | TODO | icbm/classic/lib/LanguageUtility.java |  | — |
 | TODO | icbm/classic/lib/MapWithDefault.java |  | — |
 | PORTED | icbm/classic/lib/NBTConstants.java | 纯字符串常量；log4j 用 26.3 自带的 org.apache.logging.log4j | S1.01（S1.03/S1.10 复用） |
-| TODO | icbm/classic/lib/actions/ActionBase.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/ActionDataBase.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/ActionDataGeneric.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/ActionSystem.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/PotentialAction.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/PotentialActionImp.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/PotentialActionKnown.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/WorkTickingActionHandler.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/conditionals/Condition.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/conditionals/timer/TimerCondition.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/conditionals/timer/TimerTickingStatus.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/fields/ActionFieldProvider.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/listners/ActionListenerHandler.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/listners/ActionListenerLayer.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/status/ActionResponses.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/status/ActionStatus.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/status/ImmutableStatus.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/actions/status/MissingFieldStatus.java | 动作系统 | S1.08 |
+| PORTED | icbm/classic/lib/actions/ActionBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/ActionDataBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/ActionDataGeneric.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/ActionSystem.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/PotentialAction.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/PotentialActionImp.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/PotentialActionKnown.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| MERGED → S3.02 | icbm/classic/lib/actions/WorkTickingActionHandler.java | 依赖 api.explosion.IBlast + content.blast.Blast（S3.02），并入爆炸线程处理 | S3.02 |
+| PORTED | icbm/classic/lib/actions/conditionals/Condition.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/conditionals/timer/TimerCondition.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/conditionals/timer/TimerTickingStatus.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/fields/ActionFieldProvider.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/listners/ActionListenerHandler.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/listners/ActionListenerLayer.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/status/ActionResponses.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/status/ActionStatus.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/status/ImmutableStatus.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/status/MissingFieldStatus.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/buildable/BuildableObject.java | 实现新接口 ISavable；save/load(ValueOutput/ValueInput) 经 SaveHandler<T>；Lombok @Getter 改显式 getter | S1.03 |
 | PORTED | icbm/classic/lib/buildable/BuildableObjectRegistry.java | 键 ResourceLocation→Identifier；FMLCommonHandler mod name 改为模组 id；Lombok @Getter 改显式 isLocked() | S1.03 |
 | TODO | icbm/classic/lib/capability/chicken/CapSpaceChicken.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
@@ -502,7 +502,7 @@
 | PORTED | icbm/classic/lib/data/BoundBlockPos.java | BlockPos/Vec3 边界盒实现 | S1.05（S1.10 复用） |
 | TODO | icbm/classic/lib/data/FaceRotations.java |  | — |
 | TODO | icbm/classic/lib/data/IMachineInfo.java |  | — |
-| TODO | icbm/classic/lib/data/LazyBuilder.java |  | — |
+| PORTED | icbm/classic/lib/data/LazyBuilder.java | 纯 Java 惰性构建器，动作与内容复用 | S1.08（S2.02/S4 复用） |
 | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | icbm/classic/lib/energy/storage/EnergyActionType.java | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | S1.07 |
 | MERGED → icbm/classic/lib/energy/IcbmEnergyBuffer.java | icbm/classic/lib/energy/storage/EnergyBuffer.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面；S6 不改接口 | S1.07 |
 | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | icbm/classic/lib/energy/storage/EnergyChangeCallback.java | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | S1.07 |
@@ -594,7 +594,7 @@
 | TODO | icbm/classic/lib/thread/IThreadWork.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
 | TODO | icbm/classic/lib/thread/WorkerThread.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
 | TODO | icbm/classic/lib/thread/WorkerThreadManager.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
-| TODO | icbm/classic/lib/tile/ITick.java |  | — |
+| PORTED | icbm/classic/lib/tile/ITick.java | 纯接口，动作与方块实体 tick 复用 | S1.08（S2.02/S4 复用） |
 | TODO | icbm/classic/lib/tile/TickAction.java |  | — |
 | TODO | icbm/classic/lib/tile/TickDoOnce.java |  | — |
 | TODO | icbm/classic/lib/tracker/EventTracker.java |  | — |

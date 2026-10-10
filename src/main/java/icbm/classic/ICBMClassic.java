@@ -1,6 +1,7 @@
 package icbm.classic;
 
 import icbm.classic.config.core.ConfigManager;
+import icbm.classic.lib.actions.ActionSystem;
 import icbm.classic.lib.radar.RadarRegistry;
 import icbm.classic.lib.radio.RadioRegistry;
 import icbm.classic.network.IcbmNetwork;
@@ -27,6 +28,7 @@ public final class ICBMClassic implements ModInitializer {
         // 初始化顺序见 docs/architecture/overview.md §5，后续步骤按顺序在此追加调用
         ConfigManager.loadAll();
         // Action system registries (conditions, causes, statuses, actions, potentials), overview §5 item 2.
+        ActionSystem.setup();
         IcbmNetwork.registerPayloads();
 
         // Drop per-level radio state when a level unloads, and everything when the server stops

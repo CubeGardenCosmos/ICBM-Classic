@@ -21,7 +21,7 @@
 - [x] (5) 无线电系统按世界维度键分表。（S1.05，证据：../implementation/evidence/S1.05.md）
 - [x] (6) 雷达注册表/地图。（S1.06，证据：../implementation/evidence/S1.06.md）
 - [ ] (7) Capability → API Lookup / 数据附件 / DataComponent；`IcbmEnergyBuffer`。
-- [ ] (8) 动作系统（actions/conditions/causes/status）。
+- [ ] (8) 动作系统（actions/conditions/causes/status）。（部分：S1.08：动作/条件/原因/状态/字段框架与 causeby、conditionals 已移植；content 动作注册、WorkTickingActionHandler、emp/** 与 entity/** 留 S3.02/S3.05/S3.07；证据：../implementation/evidence/S1.08.md）
 - [ ] (9) 线程化爆炸：工作线程计算、主线程按预算应用。
 - [ ] (10) 公共 API 包签名迁移。
 
