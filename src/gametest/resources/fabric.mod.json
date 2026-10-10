@@ -20,7 +20,8 @@
       "icbm.classic.test.reg.CreativeTabGameTest",
       "icbm.classic.test.reg.AssetsGameTest",
       "icbm.classic.test.reg.LootAndTagGameTest",
-      "icbm.classic.test.reg.RecipeGameTest"
+      "icbm.classic.test.reg.RecipeGameTest",
+      "icbm.classic.test.reg.SoundGameTest"
     ]
   },
   "depends": {

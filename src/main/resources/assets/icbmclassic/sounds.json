@@ -1,0 +1,106 @@
+{
+  "antimatter": {
+    "subtitle": "subtitles.icbmclassic.antimatter",
+    "sounds": [
+      "icbmclassic:antimatter"
+    ]
+  },
+  "beam_charging": {
+    "subtitle": "subtitles.icbmclassic.beam_charging",
+    "sounds": [
+      "icbmclassic:beamcharging"
+    ]
+  },
+  "collapse": {
+    "subtitle": "subtitles.icbmclassic.collapse",
+    "sounds": [
+      "icbmclassic:collapse1",
+      "icbmclassic:collapse2",
+      "icbmclassic:collapse3",
+      "icbmclassic:collapse4",
+      "icbmclassic:collapse5",
+      "icbmclassic:collapse6",
+      "icbmclassic:collapse7",
+      "icbmclassic:collapse8"
+    ]
+  },
+  "debilitation": {
+    "subtitle": "subtitles.icbmclassic.debilitation",
+    "sounds": [
+      "icbmclassic:debilitation"
+    ]
+  },
+  "emp": {
+    "subtitle": "subtitles.icbmclassic.emp",
+    "sounds": [
+      "icbmclassic:emp"
+    ]
+  },
+  "explosion": {
+    "subtitle": "subtitles.icbmclassic.explosion",
+    "sounds": [
+      "icbmclassic:explosion1"
+    ]
+  },
+  "explosion_fire": {
+    "subtitle": "subtitles.icbmclassic.explosion_fire",
+    "sounds": [
+      "icbmclassic:explosionfire"
+    ]
+  },
+  "gas_leak": {
+    "subtitle": "subtitles.icbmclassic.gas_leak",
+    "sounds": [
+      "icbmclassic:gasleak"
+    ]
+  },
+  "machine_hum": {
+    "subtitle": "subtitles.icbmclassic.machine_hum",
+    "sounds": [
+      "icbmclassic:machinehum"
+    ]
+  },
+  "missile_engine": {
+    "subtitle": "subtitles.icbmclassic.missile_engine",
+    "sounds": [
+      "icbmclassic:missileinair_short"
+    ]
+  },
+  "missile_launch": {
+    "subtitle": "subtitles.icbmclassic.missile_launch",
+    "sounds": [
+      "icbmclassic:missilelaunch1",
+      "icbmclassic:missilelaunch2"
+    ]
+  },
+  "power_down": {
+    "subtitle": "subtitles.icbmclassic.power_down",
+    "sounds": [
+      "icbmclassic:powerdown"
+    ]
+  },
+  "redmatter": {
+    "subtitle": "subtitles.icbmclassic.redmatter",
+    "sounds": [
+      "icbmclassic:redmatter"
+    ]
+  },
+  "sonic_wave": {
+    "subtitle": "subtitles.icbmclassic.sonic_wave",
+    "sounds": [
+      "icbmclassic:sonicwave"
+    ]
+  },
+  "meep": {
+    "subtitle": "subtitles.icbmclassic.meep",
+    "sounds": [
+      "icbmclassic:meep"
+    ]
+  },
+  "radioactive_tick": {
+    "subtitle": "subtitles.icbmclassic.radioactive_tick",
+    "sounds": [
+      "icbmclassic:radioactive_tick"
+    ]
+  }
+}

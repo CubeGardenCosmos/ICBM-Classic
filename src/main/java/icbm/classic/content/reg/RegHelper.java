@@ -60,6 +60,20 @@ public final class RegHelper
     }
 
     /**
+     * Registers a sound event.
+     * <p>
+     * 1.12 created {@code new SoundEvent(id).setRegistryName(id)} inside a {@code RegistryEvent}; 26.3
+     * builds the event from the id and registers it in one call. The 1.12 sound range was "variable"
+     * (the range came from the play call), so {@code createVariableRangeEvent} is used.
+     */
+    public static SoundEvent sound(String id)
+    {
+        final ResourceKey<SoundEvent> key = ResourceKey.create(Registries.SOUND_EVENT, ICBMConstants.id(id));
+        return net.minecraft.core.Registry.register(BuiltInRegistries.SOUND_EVENT, key,
+                SoundEvent.createVariableRangeEvent(key.identifier()));
+    }
+
+    /**
      * Looks up an item by its flat id, returns null when it is not registered.
      * <p>
      * The {@code containsKey} check is required: {@link BuiltInRegistries#ITEM} is a

@@ -144,7 +144,12 @@ DROPPED：1.12 中注释掉的圣诞节怪物（`skeleton.xmas.*`、`zombie.xmas
 
 ## 7. 其他
 
-- 声音事件：照搬 `legacy-1.12/src/main/resources/assets/icbmclassic/sounds.json` 的键名，转为小写 snake_case（`.` 保留）。清单在 S2.09 生成。
+- 声音事件：照搬 `legacy-1.12/src/main/resources/assets/icbmclassic/sounds.json` 的键名，转为小写 snake_case（`.` 保留）。S2.09 定稿的 16 项（括号内为 1.12 旧键，未写则同名）：
+  `antimatter`、`beam_charging`(beamcharging)、`collapse`、`debilitation`、`emp`、`explosion`、`explosion_fire`(explosionfire)、
+  `gas_leak`(gasleak)、`machine_hum`(machinehum)、`missile_engine`(missileinair)、`missile_launch`(missilelaunch)、
+  `power_down`(powerdown)、`redmatter`、`sonic_wave`(sonicwave)、`meep`、`radioactive_tick`。
+  字幕键固定为 `subtitles.icbmclassic.<id>`；`.ogg` 文件名沿用 1.12（如 `missileinair_short.ogg`），不随事件 ID 改名。
+  1.12 的 `SoundCategory`（除 `meep` 为 NEUTRAL 外均为 BLOCKS）在 26.3 由播放点传入 `SoundSource`，不写进 `sounds.json`。
 - 伤害类型（数据包 `damage_type`）：`missile_impact`、`radioactive_block`、`chemical_gas`、`contagious_gas`、`shrapnel`、`antimatter`、`redmatter`。来源：`grep -rn 'DamageSource("' legacy-1.12/src`；以 grep 结果为准，在 S3.02 证据中列出最终清单。
 - 方块实体类型：见 §2 第三列。
 - 粒子类型：S4.07 根据 `client/fx` 确定后补入本表。
