@@ -1,0 +1,11 @@
+net\.minecraftforge
+net\.minecraft\.util\.math\.Vec3d
+\bEnumFacing\b
+\bNBTTagCompound\b
+\bTileEntity\b
+\bEntityPlayer\b
+\bIBlockState\b
+\bResourceLocation\b
+@SideOnly
+import org\.lwjgl\.opengl
+GlStateManager
