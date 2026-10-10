@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "e": "minecraft:ender_eye",
+    "r": "icbmclassic:shrapnel_explosive"
+  },
+  "pattern": [
+    "eee",
+    "ere",
+    "eee"
+  ],
+  "result": {
+    "id": "icbmclassic:antigravitational_explosive"
+  }
+}

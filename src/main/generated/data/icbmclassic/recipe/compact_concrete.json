@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "c": "icbmclassic:concrete",
+    "o": "minecraft:obsidian"
+  },
+  "pattern": [
+    "coc",
+    "oco",
+    "coc"
+  ],
+  "result": {
+    "count": 8,
+    "id": "icbmclassic:compact_concrete"
+  }
+}

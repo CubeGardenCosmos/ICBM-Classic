@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "b": "icbmclassic:basic_circuit",
+    "c": "minecraft:quartz",
+    "i": "minecraft:gold_ingot",
+    "w": "icbmclassic:gold_wire"
+  },
+  "pattern": [
+    "wcw",
+    "ibi",
+    "wcw"
+  ],
+  "result": {
+    "id": "icbmclassic:elite_circuit"
+  }
+}

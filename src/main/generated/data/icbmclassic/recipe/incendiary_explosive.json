@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": "#c:dusts/sulfur",
+    "l": "minecraft:lava_bucket",
+    "r": "icbmclassic:shrapnel_explosive"
+  },
+  "pattern": [
+    "aaa",
+    "ara",
+    "ala"
+  ],
+  "result": {
+    "id": "icbmclassic:incendiary_explosive"
+  }
+}

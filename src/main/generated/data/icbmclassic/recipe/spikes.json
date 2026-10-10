@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "icbmclassic:spikes",
+  "key": {
+    "c": "minecraft:cactus",
+    "i": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "ccc",
+    "iii"
+  ],
+  "result": {
+    "count": 6,
+    "id": "icbmclassic:spikes"
+  }
+}

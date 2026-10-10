@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "a": "icbmclassic:antigravitational_explosive",
+    "c": "minecraft:minecart"
+  },
+  "pattern": [
+    "a",
+    "c"
+  ],
+  "result": {
+    "id": "icbmclassic:antigravitational_bomb_cart"
+  }
+}

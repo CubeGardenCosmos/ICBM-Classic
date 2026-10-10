@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "e": "minecraft:spider_eye",
+    "r": "minecraft:rotten_flesh"
+  },
+  "pattern": [
+    "er"
+  ],
+  "result": {
+    "count": 3,
+    "id": "icbmclassic:poison_powder"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "m": "icbmclassic:missile_module",
+    "x": "icbmclassic:smoke_explosive"
+  },
+  "pattern": [
+    "m",
+    "x"
+  ],
+  "result": {
+    "id": "icbmclassic:smoke_missile"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "a": "icbmclassic:sonic_explosive",
+    "c": "minecraft:minecart"
+  },
+  "pattern": [
+    "a",
+    "c"
+  ],
+  "result": {
+    "id": "icbmclassic:sonic_bomb_cart"
+  }
+}

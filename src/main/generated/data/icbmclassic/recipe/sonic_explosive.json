@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "i": "minecraft:iron_ingot",
+    "n": "minecraft:note_block",
+    "r": "icbmclassic:repulsive_explosive"
+  },
+  "pattern": [
+    "ini",
+    "nrn",
+    "ini"
+  ],
+  "result": {
+    "id": "icbmclassic:sonic_explosive"
+  }
+}

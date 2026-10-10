@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "c": "#c:ingots/copper",
+    "s": "minecraft:stick",
+    "w": "#minecraft:planks"
+  },
+  "pattern": [
+    "cwc",
+    "csc",
+    "cwc"
+  ],
+  "result": {
+    "count": 18,
+    "id": "icbmclassic:copper_wire"
+  }
+}

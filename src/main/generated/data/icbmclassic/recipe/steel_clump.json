@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "c": [
+      "minecraft:coal",
+      "minecraft:charcoal"
+    ],
+    "i": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "ic",
+    "cc"
+  ],
+  "result": {
+    "id": "icbmclassic:steel_clump"
+  }
+}

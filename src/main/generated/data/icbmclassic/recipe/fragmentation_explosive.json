@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": "icbmclassic:shrapnel_explosive",
+    "r": "icbmclassic:incendiary_explosive"
+  },
+  "pattern": [
+    " a ",
+    "ara",
+    " a "
+  ],
+  "result": {
+    "id": "icbmclassic:fragmentation_explosive"
+  }
+}

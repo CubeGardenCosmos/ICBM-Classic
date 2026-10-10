@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "g": "minecraft:glass"
+  },
+  "pattern": [
+    "ggg"
+  ],
+  "result": {
+    "id": "icbmclassic:glass_pressure_plate"
+  }
+}

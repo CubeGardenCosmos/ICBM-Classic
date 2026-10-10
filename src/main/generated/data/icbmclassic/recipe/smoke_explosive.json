@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": "minecraft:charcoal",
+    "r": "icbmclassic:repulsive_explosive"
+  },
+  "pattern": [
+    "CCC",
+    "CrC",
+    "CCC"
+  ],
+  "result": {
+    "count": 16,
+    "id": "icbmclassic:smoke_explosive"
+  }
+}

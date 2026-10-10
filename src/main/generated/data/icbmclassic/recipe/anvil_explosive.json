@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": "minecraft:anvil",
+    "r": "icbmclassic:repulsive_explosive"
+  },
+  "pattern": [
+    "aaa",
+    "ara",
+    "aaa"
+  ],
+  "result": {
+    "count": 10,
+    "id": "icbmclassic:anvil_explosive"
+  }
+}

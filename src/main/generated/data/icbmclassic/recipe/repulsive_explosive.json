@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "c": "icbmclassic:condensed_explosive"
+  },
+  "pattern": [
+    "c",
+    "c"
+  ],
+  "result": {
+    "id": "icbmclassic:repulsive_explosive"
+  }
+}

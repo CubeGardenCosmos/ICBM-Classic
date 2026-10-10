@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": "minecraft:tnt",
+    "r": "minecraft:redstone"
+  },
+  "pattern": [
+    "aaa",
+    "ara",
+    "aaa"
+  ],
+  "result": {
+    "count": 3,
+    "id": "icbmclassic:condensed_explosive"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": "icbmclassic:attractive_explosive",
+    "e": "minecraft:ender_eye",
+    "s": "minecraft:end_stone"
+  },
+  "pattern": [
+    "ses",
+    "eae",
+    "ses"
+  ],
+  "result": {
+    "id": "icbmclassic:ender_explosive"
+  }
+}

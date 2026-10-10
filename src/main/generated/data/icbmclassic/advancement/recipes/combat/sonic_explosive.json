@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_repulsive_explosive": {
+      "conditions": {
+        "items": [
+          {
+            "items": "icbmclassic:repulsive_explosive"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipes": "icbmclassic:sonic_explosive"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_repulsive_explosive"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "icbmclassic:sonic_explosive"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "g": "minecraft:glass",
+    "i": "icbmclassic:incendiary_explosive"
+  },
+  "pattern": [
+    "iii",
+    "igi",
+    "iii"
+  ],
+  "result": {
+    "id": "icbmclassic:exothermic_explosive"
+  }
+}

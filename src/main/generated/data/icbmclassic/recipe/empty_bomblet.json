@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "c": "icbmclassic:basic_circuit",
+    "i": "#c:ingots/steel",
+    "p": "minecraft:oak_button"
+  },
+  "pattern": [
+    " i ",
+    "ici",
+    "ipi"
+  ],
+  "result": {
+    "count": 16,
+    "id": "icbmclassic:empty_bomblet"
+  }
+}

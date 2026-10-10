@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "r": "icbmclassic:shrapnel_explosive",
+    "s": "#c:dusts/sulfur",
+    "w": "minecraft:water_bucket"
+  },
+  "pattern": [
+    "sss",
+    "wrw",
+    "sss"
+  ],
+  "result": {
+    "count": 3,
+    "id": "icbmclassic:debilitation_explosive"
+  }
+}

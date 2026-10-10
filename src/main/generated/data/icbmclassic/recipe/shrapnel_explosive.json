@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": "minecraft:arrow",
+    "r": "icbmclassic:condensed_explosive"
+  },
+  "pattern": [
+    "aaa",
+    "ara",
+    "aaa"
+  ],
+  "result": {
+    "id": "icbmclassic:shrapnel_explosive"
+  }
+}

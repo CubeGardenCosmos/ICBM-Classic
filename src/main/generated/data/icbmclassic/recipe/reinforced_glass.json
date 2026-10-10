@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "g": "minecraft:glass",
+    "i": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "igi",
+    "gig",
+    "igi"
+  ],
+  "result": {
+    "count": 8,
+    "id": "icbmclassic:reinforced_glass"
+  }
+}

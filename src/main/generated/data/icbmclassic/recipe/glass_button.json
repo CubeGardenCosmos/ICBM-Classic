@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "g": "minecraft:glass"
+  },
+  "pattern": [
+    "g",
+    "g",
+    "g"
+  ],
+  "result": {
+    "count": 2,
+    "id": "icbmclassic:glass_button"
+  }
+}

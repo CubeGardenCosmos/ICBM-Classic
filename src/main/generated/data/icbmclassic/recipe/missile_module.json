@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "c": "icbmclassic:basic_circuit",
+    "f": "minecraft:flint_and_steel",
+    "i": "#c:ingots/steel"
+  },
+  "pattern": [
+    " i ",
+    "ici",
+    "ifi"
+  ],
+  "result": {
+    "id": "icbmclassic:missile_module"
+  }
+}

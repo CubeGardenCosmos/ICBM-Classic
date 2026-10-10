@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "i": "minecraft:wither_skeleton_skull",
+    "t": "icbmclassic:thermobaric_explosive"
+  },
+  "pattern": [
+    "tit",
+    "iii",
+    "tit"
+  ],
+  "result": {
+    "id": "icbmclassic:nuclear_explosive"
+  }
+}

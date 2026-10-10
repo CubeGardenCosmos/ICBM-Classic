@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_poison_powder": {
+      "conditions": {
+        "items": [
+          {
+            "items": "icbmclassic:poison_powder"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipes": "icbmclassic:chemical_explosive"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_poison_powder"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "icbmclassic:chemical_explosive"
+    ]
+  }
+}

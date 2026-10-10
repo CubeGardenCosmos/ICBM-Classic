@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_attractive_explosive": {
+      "conditions": {
+        "items": [
+          {
+            "items": "icbmclassic:attractive_explosive"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipes": "icbmclassic:ender_explosive"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_attractive_explosive"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "icbmclassic:ender_explosive"
+    ]
+  }
+}

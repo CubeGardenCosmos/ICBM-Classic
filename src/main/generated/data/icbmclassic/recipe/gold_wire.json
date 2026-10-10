@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "g": "minecraft:gold_ingot",
+    "s": "minecraft:stick",
+    "w": "#minecraft:planks"
+  },
+  "pattern": [
+    "gwg",
+    "gsg",
+    "gwg"
+  ],
+  "result": {
+    "count": 18,
+    "id": "icbmclassic:gold_wire"
+  }
+}

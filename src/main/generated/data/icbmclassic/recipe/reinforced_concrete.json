@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "c": "icbmclassic:compact_concrete",
+    "o": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "coc",
+    "oco",
+    "coc"
+  ],
+  "result": {
+    "count": 8,
+    "id": "icbmclassic:reinforced_concrete"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "n": "minecraft:nether_star",
+    "r": "icbmclassic:nuclear_explosive"
+  },
+  "pattern": [
+    "nnn",
+    "nrn",
+    "nnn"
+  ],
+  "result": {
+    "id": "icbmclassic:antimatter_explosive"
+  }
+}

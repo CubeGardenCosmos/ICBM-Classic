@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "b": "#minecraft:planks",
+    "c": "minecraft:clay_ball",
+    "i": "#c:ingots/copper",
+    "r": "minecraft:redstone"
+  },
+  "pattern": [
+    "rcr",
+    "iii",
+    "bbb"
+  ],
+  "result": {
+    "count": 4,
+    "id": "icbmclassic:basic_circuit"
+  }
+}
