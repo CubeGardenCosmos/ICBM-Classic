@@ -15,7 +15,7 @@
 ## 基础库
 
 - [x] (1) 向量/旋转/区域与 jlib 纯 Java 部分移植，JUnit 覆盖。（S1.01，证据：../implementation/evidence/S1.01.md）
-- [ ] (2) JSON 配置系统替代 Forge `@Config`，全部配置类迁移。
+- [x] (2) JSON 配置系统替代 Forge `@Config`，全部配置类迁移。（S1.02，证据：../implementation/evidence/S1.02.md）
 - [ ] (3) `SaveHandler`（ValueInput/ValueOutput）替代 `NbtSaveHandler`。
 - [ ] (4) `PacketCodex` 传输层改为 Fabric 载荷，服务端校验。
 - [ ] (5) 无线电系统按世界维度键分表。

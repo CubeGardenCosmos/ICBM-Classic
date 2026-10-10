@@ -176,48 +176,48 @@
 | TODO | icbm/classic/command/system/ICommandGroup.java | Brigadier 命令 | S3.10 |
 | TODO | icbm/classic/command/system/ISubCommand.java | Brigadier 命令 | S3.10 |
 | TODO | icbm/classic/command/system/SubCommand.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/config/ConfigBattery.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/ConfigClient.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/ConfigDebug.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/ConfigFlyingBlocks.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/ConfigItems.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/ConfigJEI.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/ConfigMain.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/ConfigThread.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/ConfigBlast.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/ConfigFuseTimes.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/ConfigThermobaric.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigAntimatter.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigAnvil.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigBreaching.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigChemical.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigCondensed.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigContagious.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigDebilitation.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigEmp.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigExBasics.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigFragment.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigNuclear.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigRedmatter.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blast/types/ConfigShrapnel.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blocks/ConfigBlocks.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blocks/ConfigRadioactive.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/blocks/ConfigSpikes.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/machines/ConfigEmpTower.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/machines/ConfigLauncher.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/machines/ConfigRadar.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/missile/ConfigBomblet.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/missile/ConfigCargoItem.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/missile/ConfigClusterMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/missile/ConfigHeldItemMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/missile/ConfigMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/missile/ConfigSAMMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/util/BlockReplacementData.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/util/BlockStateConfigList.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/util/BlockStateConfigListOld.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/util/ItemStackConfigList.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/util/ResourceConfigEntry.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
-| TODO | icbm/classic/config/util/ResourceConfigList.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/ConfigBattery.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/ConfigClient.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/ConfigDebug.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/ConfigFlyingBlocks.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/ConfigItems.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| DROPPED（ADR 0006：JEI 联动不在本轮范围） | icbm/classic/config/ConfigJEI.java | 删除，无 JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/ConfigMain.java | 改写为 @IcbmConfig JSON 配置；删除 Forge onConfigChangedEvent | S1.02 |
+| PORTED | icbm/classic/config/ConfigThread.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/ConfigBlast.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/ConfigFuseTimes.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/ConfigThermobaric.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigAntimatter.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigAnvil.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigBreaching.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigChemical.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigCondensed.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigContagious.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigDebilitation.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigEmp.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigExBasics.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigFragment.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigNuclear.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigRedmatter.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blast/types/ConfigShrapnel.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blocks/ConfigBlocks.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blocks/ConfigRadioactive.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/blocks/ConfigSpikes.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/machines/ConfigEmpTower.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/machines/ConfigLauncher.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/machines/ConfigRadar.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/missile/ConfigBomblet.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/missile/ConfigCargoItem.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/missile/ConfigClusterMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/missile/ConfigHeldItemMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/missile/ConfigMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/missile/ConfigSAMMissile.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
+| PORTED | icbm/classic/config/util/BlockReplacementData.java | BlockState+CompoundTag，经 TagValueOutput/Input 应用方块实体数据 | S1.02 |
+| PORTED | icbm/classic/config/util/BlockStateConfigList.java | IBlockState→BlockState、IProperty→Property；元数据条目退回默认状态 | S1.02 |
+| PORTED | icbm/classic/config/util/BlockStateConfigListOld.java | ForgeRegistries→RegistryLookup；元数据条目退回默认状态 | S1.02 |
+| PORTED | icbm/classic/config/util/ItemStackConfigList.java | 键改为 namespace:path 字符串；元数据条目退回物品键 | S1.02 |
+| PORTED | icbm/classic/config/util/ResourceConfigEntry.java | ResourceLocation→namespace:path 字符串键 | S1.02 |
+| PORTED | icbm/classic/config/util/ResourceConfigList.java | ResourceLocation→namespace:path 字符串键；Loader→FabricLoader | S1.02 |
 | TODO | icbm/classic/content/actions/ActionProvider.java | 动作系统 | S1.08 |
 | TODO | icbm/classic/content/actions/ActionUpdateBlockState.java | 动作系统 | S1.08 |
 | TODO | icbm/classic/content/actions/causeby/CauseByTimer.java | 动作系统 | S1.08 |
