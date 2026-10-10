@@ -19,8 +19,8 @@
 | DROPPED（无 proxy） | icbm/classic/CommonProxy.java | Fabric 无 proxy，逻辑并入入口类 | — |
 | TODO | icbm/classic/ICBMClassic.java |  | — |
 | TODO | icbm/classic/ICBMConstants.java |  | — |
-| TODO | icbm/classic/RecipeGeneration.java | 改为 datagen ICBMRecipeProvider | S2.08 |
-| PORTED | icbm/classic/api/EnumTier.java | StringRepresentable + ChatFormatting；getLocalizedName 改 Component.translatable（LanguageUtility 未移植，getName→getSerializedName） | S1.10 |
+| DROPPED（1.12 的开发工具，把爆炸物注册表写成 JSON 配方） | icbm/classic/RecipeGeneration.java | 配方改由 datagen ICBMRecipeProvider 生成 | S2.08 |
+| PORTED | icbm/classic/api/EnumTier.java | StringRepresentable + ChatFormatting；getLocalizedName 改 Component.translatable（LanguageUtility 未移植，getName→getSerializedName）；S2.10 键改 icbmclassic.tier.* | S1.10、S2.10 |
 | PORTED | icbm/classic/api/ICBMClassicAPI.java | 动作字段（S1.08）+ 本步补齐 MISSILE_TARGET_DATA/FLIGHT_LOGIC/PROJECTILE_DATA/EXPLOSIVE/EX_*/EXPLOSIVE_CUSTOMIZATION 注册表与 EX_* Identifier 常量；删全部 @CapabilityInject，改指向 IcbmLookups | S1.08、S1.10 |
 | PORTED | icbm/classic/api/ICBMClassicHelpers.java | 删 hasCapability/getCapability：getMissile 走 instanceof+IcbmLookups.MISSILE；isExplosive/getExplosive(Entity) 走 instanceof；getLauncher 走 IcbmLookups；getExplosive(ItemStack)/getGPSData 待数据组件（TODO S2.02/S2.04） | S1.10 |
 | PORTED | icbm/classic/api/actions/IAction.java | 动作系统 | S1.08 |
@@ -139,8 +139,8 @@
 | PORTED | icbm/classic/api/tile/IRotation.java | EnumFacing→Direction | S1.10 |
 | TODO | icbm/classic/client/ClientProxy.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/ClientReg.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/ICBMCreativeTab.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/ICBMSounds.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
+| MERGED → icbm/classic/content/reg/ModCreativeTabs.java | icbm/classic/client/ICBMCreativeTab.java | 1.12 客户端排序表改为 main 源集的 displayItems；内容按 ID 查表，未注册的跳过 | S2.05 |
+| MERGED → icbm/classic/content/reg/ModSounds.java | icbm/classic/client/ICBMSounds.java | 16 个 SoundEvent 注册 + assets/icbmclassic/sounds.json（字幕键 subtitles.icbmclassic.*）；1.12 SoundCategory 改由播放点传 SoundSource | S2.09 |
 | TODO | icbm/classic/client/SpikeMeshDefinition.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/fx/FXAntimatterParticle.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/fx/ParticleAirICBM.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
@@ -272,11 +272,11 @@
 | MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastNuclear.java | 核爆（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
 | MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastThermobaric.java | 温压爆炸（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
 | MERGED → S3.02 | icbm/classic/content/blast/threaded/BlastThreaded.java | 线程化爆炸基类，依赖 content.blast.Blast 与 S3.02 的爆炸框架重写 | S3.02 |
-| TODO | icbm/classic/content/blocks/BlockConcrete.java | 平铺化方块 | S2.03、S3.08 |
-| TODO | icbm/classic/content/blocks/BlockGlassButton.java | 平铺化方块 | S2.03、S3.08 |
-| TODO | icbm/classic/content/blocks/BlockGlassPressurePlate.java | 平铺化方块 | S2.03、S3.08 |
-| TODO | icbm/classic/content/blocks/BlockReinforcedGlass.java | 平铺化方块 | S2.03、S3.08 |
-| TODO | icbm/classic/content/blocks/BlockSpikes.java | 平铺化方块 | S2.03、S3.08 |
+| MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/blocks/BlockConcrete.java | 1.12 三种 meta 改为 concrete/compact_concrete/reinforced_concrete 三个原版 Block 实例 | S2.03 |
+| PORTED | icbm/classic/content/blocks/BlockGlassButton.java | BlockSetType.STONE + 20 tick，Properties 里设 glass 声音 | S2.03 |
+| PORTED | icbm/classic/content/blocks/BlockGlassPressurePlate.java | BlockSetType.OAK（= 1.12 Sensitivity.EVERYTHING）+ 玻璃声音 | S2.03 |
+| PORTED | icbm/classic/content/blocks/BlockReinforcedGlass.java | TransparentBlock + noOcclusion | S2.03 |
+| PORTED | icbm/classic/content/blocks/BlockSpikes.java | 三种 meta 改为 SpikeType 字段 + 三个实例；伤害源改用原版 cactus（§7 无 spikes 伤害类型） | S2.03 |
 | TODO | icbm/classic/content/blocks/emptower/BlockEmpTower.java | EMP 塔 | S5 |
 | TODO | icbm/classic/content/blocks/emptower/ItemBlockEmpTower.java | EMP 塔 | S5 |
 | TODO | icbm/classic/content/blocks/emptower/PropertyTowerStates.java | EMP 塔 | S5 |
@@ -362,7 +362,7 @@
 | TODO | icbm/classic/content/cluster/bomblet/BombletProjectileData.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/cluster/bomblet/BombletProjectileStack.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/cluster/bomblet/EntityBombDroplet.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/bomblet/ItemBombDroplet.java | 集束导弹与子弹药 | S4 |
+| TODO | icbm/classic/content/cluster/bomblet/ItemBombDroplet.java | S2.05 注册 ExplosiveFormItem 占位（10 个平铺化子弹药）；S4.06 换成真实物品 | S2.05、S4.06 |
 | TODO | icbm/classic/content/cluster/bomblet/RenderBombDroplet.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/cluster/missile/CapabilityClusterMissileStack.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/cluster/missile/ClusterMissileHandler.java | 集束导弹与子弹药 | S4 |
@@ -381,14 +381,14 @@
 | TODO | icbm/classic/content/entity/flyingblock/FlyingBlock.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
 | TODO | icbm/classic/content/entity/flyingblock/RenderEntityBlock.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
 | TODO | icbm/classic/content/gas/ProtectiveArmorHandler.java | 气体爆炸 | S3.05 |
-| TODO | icbm/classic/content/items/ItemAntidote.java |  | — |
+| PORTED | icbm/classic/content/items/ItemAntidote.java | 食用改 food/consumable 组件；效果清除改 finishUsingItem（显式清单，S3.05 补 ICBM 效果） | S2.04 |
 | TODO | icbm/classic/content/items/ItemBattery.java |  | — |
-| TODO | icbm/classic/content/items/ItemBombCart.java |  | — |
-| TODO | icbm/classic/content/items/ItemCrafting.java | 平铺化材料物品 | S2.04 |
+| TODO | icbm/classic/content/items/ItemBombCart.java | S2.05 注册 ExplosiveFormItem 占位（23 个平铺化炸弹矿车）；S4.05 换成真实物品 | S2.05、S4.05 |
+| MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/items/ItemCrafting.java | 元数据子类型改为 10 个平铺化普通 Item；OreDictionary → c: 标签（S2.07） | S2.04 |
 | TODO | icbm/classic/content/items/ItemDefuser.java |  | — |
-| TODO | icbm/classic/content/items/ItemGrenade.java |  | — |
+| TODO | icbm/classic/content/items/ItemGrenade.java | S2.05 注册 ExplosiveFormItem 占位（10 个平铺化手雷）；S4.05 换成真实手雷物品 | S2.05、S4.05 |
 | TODO | icbm/classic/content/items/ItemLaserDetonator.java |  | — |
-| TODO | icbm/classic/content/items/ItemMissile.java |  | — |
+| TODO | icbm/classic/content/items/ItemMissile.java | S2.05 注册 ExplosiveFormItem 占位（23 个平铺化导弹）；S4.02 换成真实导弹物品 | S2.05、S4.02 |
 | TODO | icbm/classic/content/items/ItemRadarGun.java |  | — |
 | TODO | icbm/classic/content/items/ItemRemoteDetonator.java |  | — |
 | TODO | icbm/classic/content/items/ItemRocketLauncher.java |  | — |
@@ -441,10 +441,10 @@
 | TODO | icbm/classic/content/potion/Poison.java | 药水效果 | S3.05 |
 | TODO | icbm/classic/content/radioactive/BlockRadioactive.java | 平铺化方块 | S2.03、S3.08 |
 | TODO | icbm/classic/content/radioactive/RadioactiveHandler.java | 平铺化方块 | S2.03、S3.08 |
-| TODO | icbm/classic/content/reg/BlockReg.java | Mod* 注册类；BlockReg→ModBlocks 等改名 | S2 |
-| TODO | icbm/classic/content/reg/EntityReg.java | Mod* 注册类；BlockReg→ModBlocks 等改名 | S2 |
-| TODO | icbm/classic/content/reg/ExplosiveInit.java | Mod* 注册类；BlockReg→ModBlocks 等改名 | S2 |
-| TODO | icbm/classic/content/reg/ItemReg.java | Mod* 注册类；BlockReg→ModBlocks 等改名 | S2 |
+| MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品 | S2.01 |
+| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002） | S2.01 |
+| PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂为 S3 占位（throw） | S2.02 |
+| MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07） | S2.01 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityBombCartDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityExplosiveDataFixer.java | 不迁移旧存档（ADR 0002） | — |
@@ -493,7 +493,7 @@
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStatic.java | INBTSerializable→ISavable（空实现，与 1.12 一致） | S1.10 |
 | DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSData.java | DROPPED（改用 icbmclassic:gps_data 数据组件，S2.04/S5.08） | S1.10 |
 | DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSDataItem.java | DROPPED（同上；物品数据组件） | S1.10 |
-| PORTED | icbm/classic/lib/capability/gps/GPSDataHelpers.java | Vec3 + Identifier 维度；TextComponent→Component.translatable、sendMessage→sendSystemMessage | S1.10 |
+| PORTED | icbm/classic/lib/capability/gps/GPSDataHelpers.java | Vec3 + Identifier 维度；TextComponent→Component.translatable、sendMessage→sendSystemMessage；S2.10 键改 icbmclassic.message.gps.*（chat.launcher.noTargetInTool → icbmclassic.message.gps.set.empty） | S1.10、S2.10 |
 | MERGED | icbm/classic/lib/capability/launcher/CapabilityMissileHolder.java | MERGED → vanilla Container 版（IItemHandlerModifiable → Container）；consumeMissile 走 IcbmLookups.MISSILE_STACK | S1.10 |
 | PORTED | icbm/classic/lib/capability/launcher/CapabilityMissileLauncher.java | 删 capability 注册；状态暂用 ActionResponses（TODO(S5.02) LauncherStatus） | S1.10 |
 | MERGED | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | MERGED → S4.02 实现（依赖 content/missile/entity/explosive/EntityExplosiveMissile） | S4.02 |
@@ -511,13 +511,13 @@
 | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/EnergySystemNull.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
 | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/IEnergySystem.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
 | PORTED | icbm/classic/lib/explosive/ThreadWorkBlast.java | 通用收集型工作，`doRun(int, LevelSnapshot)`/`onStarted(LevelSnapshot)`；被线程化爆炸（S3.02/S3.06）与 ExplosiveRegistry（S2.02）使用 | S1.09、S2.02 |
-| TODO | icbm/classic/lib/explosive/reg/ExBlockContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
-| TODO | icbm/classic/lib/explosive/reg/ExGrenadeContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
-| TODO | icbm/classic/lib/explosive/reg/ExMinecartContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
-| TODO | icbm/classic/lib/explosive/reg/ExMissileContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
-| TODO | icbm/classic/lib/explosive/reg/ExplosiveContentRegistry.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
-| TODO | icbm/classic/lib/explosive/reg/ExplosiveData.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
-| TODO | icbm/classic/lib/explosive/reg/ExplosiveRegistry.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExBlockContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExGrenadeContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExMinecartContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExMissileContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExplosiveContentRegistry.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExplosiveData.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExplosiveRegistry.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
 | DROPPED（Fabric 网络替代） | icbm/classic/lib/network/IPacket.java | CustomPacketPayload + StreamCodec 取代 IPacket，见 src/main/java/icbm/classic/network/CodexPayload.java | S1.04 |
 | DROPPED（Fabric 网络替代） | icbm/classic/lib/network/IPacketIDReceiver.java | 自定义载荷的 ID 分发由 Fabric 处理，不需要接收器接口 | S1.04 |
 | DROPPED（Fabric 载荷替代） | icbm/classic/lib/network/PacketEvents.java | 旧实现基于 lib/tracker；错误分支改为 IcbmNetwork/IcbmClientNetwork 内 logDebug/logError | S1.04 |
@@ -656,10 +656,10 @@
 | TODO | icbm/classic/prefab/gui/tooltip/TooltipTranslations.java | 方块实体基类、库存、GUI 组件 | S5.01 |
 | TODO | icbm/classic/prefab/inventory/InventorySlot.java | 方块实体基类、库存、GUI 组件 | S5.01 |
 | TODO | icbm/classic/prefab/inventory/InventoryWithSlots.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/item/ItemBase.java | 方块实体基类、库存、GUI 组件 | S5.01 |
+| DROPPED（Forge 工具提示框架） | icbm/classic/prefab/item/ItemBase.java | 只做 setName 与 .info 提示；26.3 物品为普通 Item，提示文本未迁移（见 S2.04 证据） | S2.04 |
 | TODO | icbm/classic/prefab/item/ItemBlockAbstract.java | 方块实体基类、库存、GUI 组件 | S5.01 |
 | TODO | icbm/classic/prefab/item/ItemBlockSubTypes.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/item/ItemICBMBase.java | 方块实体基类、库存、GUI 组件 | S5.01 |
+| DROPPED（Forge 专用） | icbm/classic/prefab/item/ItemICBMBase.java | 只做 setCreativeTab/setName，由 Item.Properties 与 ModItems 承担 | S2.04 |
 | TODO | icbm/classic/prefab/item/ItemICBMElectrical.java | 方块实体基类、库存、GUI 组件 | S5.01 |
 | TODO | icbm/classic/prefab/item/ItemRadio.java | 方块实体基类、库存、GUI 组件 | S5.01 |
 | TODO | icbm/classic/prefab/item/ItemStackCapProvider.java | 方块实体基类、库存、GUI 组件 | S5.01 |
