@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 public final class ICBMClassic implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("ICBM-Classic");
 
+    /** 1.12 世界高度常量（地图高度），原为 ICBMClassic.MAP_HEIGHT；lib/transform 的旧工具用它做高度上限判断 */
+    public static final int MAP_HEIGHT = 255;
+
     /** 兼容 1.12 调用点 ICBMClassic.logger() */
     public static Logger logger() { return LOGGER; }
 

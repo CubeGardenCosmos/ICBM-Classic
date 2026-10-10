@@ -7,15 +7,15 @@
 
 | 状态 | 旧文件（相对 legacy-1.12/src/main/java） | 目标 / 说明 | 步骤 |
 | --- | --- | --- | --- |
-| TODO | com/builtbroken/jlib/data/network/IByteBufReader.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/data/network/IByteBufWriter.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/data/vector/IPos2D.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/data/vector/IPos3D.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/data/vector/ITransform.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/data/vector/Pos2D.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/data/vector/Pos2DBean.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/data/vector/Pos3D.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
-| TODO | com/builtbroken/jlib/lang/StringHelpers.java | jlib 纯 Java，ByteBuf 相关改 FriendlyByteBuf | S1.01 |
+| PORTED | com/builtbroken/jlib/data/network/IByteBufReader.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/data/network/IByteBufWriter.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/data/vector/IPos2D.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/data/vector/IPos3D.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/data/vector/ITransform.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/data/vector/Pos2D.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/data/vector/Pos2DBean.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/data/vector/Pos3D.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
+| PORTED | com/builtbroken/jlib/lang/StringHelpers.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
 | DROPPED（无 proxy） | icbm/classic/CommonProxy.java | Fabric 无 proxy，逻辑并入入口类 | — |
 | TODO | icbm/classic/ICBMClassic.java |  | — |
 | TODO | icbm/classic/ICBMConstants.java |  | — |
@@ -56,7 +56,7 @@
 | TODO | icbm/classic/api/data/EntityInteractionFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/EntityTickFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/IBoundBox.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/data/IWorldPosition.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/data/IWorldPosition.java | Vec3d→Vec3、World→Level、isRemote→isClientSide()、getVec3d→getVec3；S1.01 建立 | S1.01（S1.03/S1.10 复用） |
 | TODO | icbm/classic/api/data/Int3Consumer.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/Int3Looper.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/WorldEntityIntSupplier.java | 其余公共 API 换 26.3 类型 | S1.10 |
@@ -453,13 +453,13 @@
 | DROPPED（ADR 0002） | icbm/classic/datafix/ItemStackDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/TileExplosivesDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/TileRadarStationDataFixer.java | 不迁移旧存档（ADR 0002） | — |
-| TODO | icbm/classic/lib/CalculationHelpers.java |  | — |
+| PORTED | icbm/classic/lib/CalculationHelpers.java | 纯 Java，随机数参数保留 java.util.Random | S1.01（S1.03/S1.10 复用） |
 | TODO | icbm/classic/lib/CapabilityPrefab.java |  | — |
 | TODO | icbm/classic/lib/ForgeRegistryHelpers.java |  | — |
 | TODO | icbm/classic/lib/InventoryUtility.java |  | — |
 | TODO | icbm/classic/lib/LanguageUtility.java |  | — |
 | TODO | icbm/classic/lib/MapWithDefault.java |  | — |
-| TODO | icbm/classic/lib/NBTConstants.java |  | — |
+| PORTED | icbm/classic/lib/NBTConstants.java | 纯字符串常量；log4j 用 26.3 自带的 org.apache.logging.log4j | S1.01（S1.03/S1.10 复用） |
 | TODO | icbm/classic/lib/actions/ActionBase.java | 动作系统 | S1.08 |
 | TODO | icbm/classic/lib/actions/ActionDataBase.java | 动作系统 | S1.08 |
 | TODO | icbm/classic/lib/actions/ActionDataGeneric.java | 动作系统 | S1.08 |
@@ -586,7 +586,7 @@
 | TODO | icbm/classic/lib/saving/nodes/SaveNodeFloat.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
 | TODO | icbm/classic/lib/saving/nodes/SaveNodeInteger.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
 | TODO | icbm/classic/lib/saving/nodes/SaveNodeItemStack.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodePos.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodePos.java | Pos#save(ValueOutput)（S1.01 已就绪）写入子 child，读回 new Pos(in.child(key)) | S1.03 |
 | TODO | icbm/classic/lib/saving/nodes/SaveNodeResourceLocation.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
 | TODO | icbm/classic/lib/saving/nodes/SaveNodeString.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
 | TODO | icbm/classic/lib/saving/nodes/SaveNodeUUID.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
@@ -607,21 +607,21 @@
 | TODO | icbm/classic/lib/tracker/IEventTrackerListener.java |  | — |
 | TODO | icbm/classic/lib/tracker/ListenerEntry.java |  | — |
 | TODO | icbm/classic/lib/transform/BlockEditHandler.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/PosDistanceSorter.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/RotationHelper.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/region/Cube.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/region/Rectangle.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/region/Shape2D.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/region/Shape3D.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/region/Triangle.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/rotation/EulerAngle.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/rotation/IRotation.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/rotation/Quaternion.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/vector/AbstractLocation.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/vector/AbstractPos.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/vector/Location.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/vector/Point.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
-| TODO | icbm/classic/lib/transform/vector/Pos.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
+| PORTED | icbm/classic/lib/transform/PosDistanceSorter.java | Vec3d→Vec3、EnumFacing→Direction（javap 核对） | S1.01 |
+| PORTED | icbm/classic/lib/transform/RotationHelper.java | Vec3d→Vec3、MathHelper→Mth（wrapDegrees 返回 double） | S1.01 |
+| PORTED | icbm/classic/lib/transform/region/Cube.java | Vec3d→Vec3、AxisAlignedBB→AABB；存档改 save(ValueOutput)/构造收 ValueInput（toNBT() 删除）；getChunks/getEntities/getTilesInArea 改用 Level API | S1.01 |
+| PORTED | icbm/classic/lib/transform/region/Rectangle.java | 纯数学，原样移植（Point/Shape2D 已换 26.3 依赖） | S1.01 |
+| PORTED | icbm/classic/lib/transform/region/Shape2D.java | Vec3d→Vec3 | S1.01 |
+| PORTED | icbm/classic/lib/transform/region/Shape3D.java | NBTTagCompound 构造改为 ValueInput（键名 CENTER/YAW/PITCH/ROLL 保留） | S1.01 |
+| PORTED | icbm/classic/lib/transform/region/Triangle.java | 纯数学，原样移植 | S1.01 |
+| PORTED | icbm/classic/lib/transform/rotation/EulerAngle.java | EnumFacing→Direction；NBT 构造/写改为 ValueInput/ValueOutput（toNBT() 删除） | S1.01 |
+| PORTED | icbm/classic/lib/transform/rotation/IRotation.java | 纯数学，原样移植 | S1.01 |
+| PORTED | icbm/classic/lib/transform/rotation/Quaternion.java | 纯数学，原样移植（transform 返回 Pos） | S1.01 |
+| PORTED | icbm/classic/lib/transform/vector/AbstractLocation.java | World→Level；维度 int→Identifier；DimensionManager 与需要世界上下文的 (ValueInput/ByteBuf) 构造删除；ILocation(发射器) 接口删除 | S1.01 |
+| PORTED | icbm/classic/lib/transform/vector/AbstractPos.java | Vec3d→Vec3、EnumFacing→Direction；IPosition→net.minecraft.core.Position；存档改 save(ValueOutput)；rayTrace 改 ClipContext/HitResult | S1.01 |
+| PORTED | icbm/classic/lib/transform/vector/Location.java | World→Level；IB/ValueInput 世界解析构造删除；BlockFaceShape(枚举)→isFaceSturdy；playSound 用 playLocalSound 的 distanceDelay | S1.01 |
+| PORTED | icbm/classic/lib/transform/vector/Point.java | NBTTagCompound→ValueInput/ValueOutput（键名 X/Y 保留） | S1.01 |
+| PORTED | icbm/classic/lib/transform/vector/Pos.java | Vec3d→Vec3、EnumFacing→Direction；Entity 旋转字段改 getYRot/getXRot 与 yRotO/xRotO | S1.01 |
 | TODO | icbm/classic/lib/world/IProjectileBlockInteraction.java |  | — |
 | TODO | icbm/classic/lib/world/ProjectileBlockInteraction.java |  | — |
 | DROPPED（ADR 0006） | icbm/classic/mods/ModInteraction.java | 联动模组代码删除（ADR 0006） | — |
