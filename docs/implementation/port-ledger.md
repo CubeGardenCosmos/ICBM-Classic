@@ -64,8 +64,8 @@
 | TODO | icbm/classic/api/data/WorldTickFunction.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/meta/ITypeTaggable.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/data/meta/MetaTag.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/energy/IEnergyBuffer.java | 同上 | S1.07、S6 |
-| TODO | icbm/classic/api/energy/IEnergyBufferProvider.java | 同上 | S1.07、S6 |
+| DROPPED（ADR 0003） | icbm/classic/api/energy/IEnergyBuffer.java | DROPPED（ADR 0003） | S1.07 |
+| DROPPED（ADR 0003） | icbm/classic/api/energy/IEnergyBufferProvider.java | DROPPED（ADR 0003） | S1.07 |
 | TODO | icbm/classic/api/events/BlastBuildEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/events/BlastEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/events/EmpEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
@@ -503,13 +503,13 @@
 | TODO | icbm/classic/lib/data/FaceRotations.java |  | — |
 | TODO | icbm/classic/lib/data/IMachineInfo.java |  | — |
 | TODO | icbm/classic/lib/data/LazyBuilder.java |  | — |
-| TODO | icbm/classic/lib/energy/storage/EnergyActionType.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面 | S1.07、S6 |
-| TODO | icbm/classic/lib/energy/storage/EnergyBuffer.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面 | S1.07、S6 |
-| TODO | icbm/classic/lib/energy/storage/EnergyChangeCallback.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面 | S1.07、S6 |
-| TODO | icbm/classic/lib/energy/system/EnergySystem.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面 | S1.07、S6 |
-| TODO | icbm/classic/lib/energy/system/EnergySystemFE.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面 | S1.07、S6 |
-| TODO | icbm/classic/lib/energy/system/EnergySystemNull.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面 | S1.07、S6 |
-| TODO | icbm/classic/lib/energy/system/IEnergySystem.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面 | S1.07、S6 |
+| DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | icbm/classic/lib/energy/storage/EnergyActionType.java | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | S1.07 |
+| MERGED → icbm/classic/lib/energy/IcbmEnergyBuffer.java | icbm/classic/lib/energy/storage/EnergyBuffer.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面；S6 不改接口 | S1.07 |
+| DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | icbm/classic/lib/energy/storage/EnergyChangeCallback.java | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | S1.07 |
+| DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/EnergySystem.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
+| DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/EnergySystemFE.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
+| DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/EnergySystemNull.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
+| DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/IEnergySystem.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
 | TODO | icbm/classic/lib/explosive/ThreadWorkBlast.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
 | TODO | icbm/classic/lib/explosive/reg/ExBlockContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
 | TODO | icbm/classic/lib/explosive/reg/ExGrenadeContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
