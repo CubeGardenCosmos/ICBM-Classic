@@ -326,7 +326,7 @@ $ ./gradlew build
 | --- | --- | --- | --- | --- | --- |
 | [x] | S0.01 | 建立工作分支与基线记录 | P0 文档已提交 | P1 工具链 1 | [S0.01.md](evidence/S0.01.md) |
 | [x] | S0.02 | 旧代码移入 `legacy-1.12/` | S0.01 | P1 工具链 1 | [S0.02.md](evidence/S0.02.md) |
-| [ ] | S0.03 | Fabric 26.3 Gradle 工程骨架 | S0.02 | P1 工具链 2 | |
+| [x] | S0.03 | Fabric 26.3 Gradle 工程骨架 | S0.02 | P1 工具链 2 | [S0.03.md](evidence/S0.03.md) |
 | [ ] | S0.04 | JUnit 与 GameTest 管线 | S0.03 | P1 工具链 3 | |
 | [ ] | S0.05 | `scripts/check.sh` 与 `.gitignore` | S0.04 | P1 工具链 4 | |
 | [ ] | S0.06 | 移植账本 | S0.02 | P1 工具链 5 | |

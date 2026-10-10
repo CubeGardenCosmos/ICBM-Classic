@@ -96,3 +96,14 @@ GitHub API 未认证限速 60 次/小时；遇到限速就等待，不换来源�
 | 同版本 Fabric Gradle 配置 | `/home/klp/Minecraft-Server-Launcher/game-mods/build.gradle`、`settings.gradle`、`gradle.properties`、`gradle/wrapper/` |
 | GameTest 配置样例 | `/home/klp/Minecraft-Server-Launcher/game-mods/fabric-server-mod/build.gradle`（`fabricApi { configureTests { … } }`） |
 | GameTest 方法名核对结论 | `/home/klp/Minecraft-Server-Launcher/docs/implementation/evidence/S3.01.md`（`makeMockServerPlayerInLevel()`、`assertTrue(boolean, String)`、`succeed()`、`fail(String)` 在 26.3 存在） |
+
+## 6. 本机冒烟与联机测试环境（固定路径）
+
+| 项目 | Windows 路径 | WSL 路径 | 说明 |
+| --- | --- | --- | --- |
+| 专用测试服务端 | `G:\ICBM-Test-Server` | `/mnt/g/ICBM-Test-Server` | Fabric 26.3 专用服务端，默认离线模式（`online-mode=false`），端口 `127.0.0.1:25565` |
+| 服务端启动脚本 | `G:\ICBM-Test-Server\start_server.bat` | `/mnt/g/ICBM-Test-Server/start_server.sh` | Windows 使用 `G:\Minecraft\jdk-25`，WSL 使用 OpenJDK 25 |
+| 客户端路径 | `G:\Minecraft\.minecraft` | `/mnt/g/Minecraft/.minecraft` | 包含 `versions/26.3` 与 Fabric Loader 0.19.5 |
+| HMCL 启动器 | `G:\Minecraft\HMCL-3.16.4.exe` | `/mnt/g/Minecraft/HMCL-3.16.4.exe` | 离线模式启动客户端入服测试 |
+| 模组同步脚本 | `scripts/sync_test_server.sh` | — | 将编译产物 `ICBM-classic-26.3-*.jar` 同步至专用服务端与客户端 `mods/` |
+

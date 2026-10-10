@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+    id 'net.fabricmc.fabric-loom' version '1.18.3'
+}
+
+version = project.mod_version
+group = project.maven_group
+base { archivesName = project.archives_base_name }
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(project.java_version as int) }
+    withSourcesJar()
+}
+
+loom {
+    splitEnvironmentSourceSets()
+    mods {
+        icbmclassic {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://maven.fabricmc.net/" }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    compileOnly "org.projectlombok:lombok:${project.lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+    clientCompileOnly "org.projectlombok:lombok:${project.lombok_version}"
+    clientAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") { expand "version": project.version }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = project.java_version as int
+}
+
+jar {
+    from("LICENSE.md") { rename { "${it}_${project.base.archivesName.get()}" } }
+}
+
+tasks.register('installLocalGitHook', Copy) {
+    from new File(rootProject.rootDir, 'scripts/commit-msg')
+    into { new File(rootProject.rootDir, '.git/hooks') }
+    filePermissions { unix(0775) }
+}
+tasks.named('build') { dependsOn 'installLocalGitHook' }

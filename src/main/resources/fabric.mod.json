@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "icbmclassic",
+  "version": "${version}",
+  "name": "ICBM-Classic",
+  "description": "Intercontinental ballistic missiles, explosives, launchers, radar and missile defense.",
+  "authors": ["DarkCow (Robin Seifert)", "Calclavia"],
+  "contributors": ["bl4ckscor3", "dmod", "GHXX", "M1W3st", "tgame14", "kmecpp", "LetterN", "Graugger", "Vexatos"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/icbm",
+    "sources": "https://github.com/CubeGardenCosmos/ICBM-Classic",
+    "issues": "https://github.com/CubeGardenCosmos/ICBM-Classic/issues"
+  },
+  "license": "SEE LICENSE.md",
+  "icon": "assets/icbmclassic/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["icbm.classic.ICBMClassic"],
+    "client": ["icbm.classic.client.ICBMClassicClient"]
+  },
+  "mixins": [
+    "icbmclassic.mixins.json",
+    { "config": "icbmclassic.client.mixins.json", "environment": "client" }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
