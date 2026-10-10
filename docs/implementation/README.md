@@ -337,7 +337,7 @@ $ ./gradlew build
 | --- | --- | --- | --- | --- | --- |
 | [R] | S1.01 | jlib 与 `lib/transform` | S0.05、S0.06 | P1 基础库 1 | [S1.01.md](evidence/S1.01.md) |
 | [R] | S1.02 | JSON 配置系统与全部配置类 | S0.05、S0.06 | P1 基础库 2 | [S1.02.md](evidence/S1.02.md) |
-| [ ] | S1.03 | `SaveHandler` | S1.01 | P1 基础库 3 | |
+| [R] | S1.03 | `SaveHandler` | S1.01 | P1 基础库 3 | [S1.03.md](evidence/S1.03.md) |
 | [ ] | S1.04 | 网络 Codex 传输层 | S1.01 | P1 基础库 4 | |
 | [ ] | S1.05 | 无线电系统 | S1.03、S1.04 | P1 基础库 5 | |
 | [ ] | S1.06 | 雷达注册表与地图 | S1.01 | P1 基础库 6 | |

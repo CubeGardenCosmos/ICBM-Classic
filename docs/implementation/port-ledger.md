@@ -133,8 +133,8 @@
 | TODO | icbm/classic/api/reg/events/MissileFlightLogicRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/reg/events/MissileTargetRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/reg/events/ProjectileDataRegistryEvent.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/obj/IBuildableObject.java | 其余公共 API 换 26.3 类型 | S1.10 |
-| TODO | icbm/classic/api/reg/obj/IBuilderRegistry.java | 其余公共 API 换 26.3 类型 | S1.10 |
+| PORTED | icbm/classic/api/reg/obj/IBuildableObject.java | ResourceLocation→Identifier、INBTSerializable→ISavable、ITextComponent→Component；删 @SideOnly | S1.03（S1.10 复用） |
+| PORTED | icbm/classic/api/reg/obj/IBuilderRegistry.java | save/load 改走 ValueOutput/ValueInput（键 id + data 子节点）；删 1.12 的 save(NBTTagList) 默认方法 | S1.03（S1.10 复用） |
 | TODO | icbm/classic/api/tile/IRotatable.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/api/tile/IRotation.java | 其余公共 API 换 26.3 类型 | S1.10 |
 | TODO | icbm/classic/client/ClientProxy.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
@@ -478,8 +478,8 @@
 | TODO | icbm/classic/lib/actions/status/ActionStatus.java | 动作系统 | S1.08 |
 | TODO | icbm/classic/lib/actions/status/ImmutableStatus.java | 动作系统 | S1.08 |
 | TODO | icbm/classic/lib/actions/status/MissingFieldStatus.java | 动作系统 | S1.08 |
-| TODO | icbm/classic/lib/buildable/BuildableObject.java |  | — |
-| TODO | icbm/classic/lib/buildable/BuildableObjectRegistry.java |  | — |
+| PORTED | icbm/classic/lib/buildable/BuildableObject.java | 实现新接口 ISavable；save/load(ValueOutput/ValueInput) 经 SaveHandler<T>；Lombok @Getter 改显式 getter | S1.03 |
+| PORTED | icbm/classic/lib/buildable/BuildableObjectRegistry.java | 键 ResourceLocation→Identifier；FMLCommonHandler mod name 改为模组 id；Lombok @Getter 改显式 isLocked() | S1.03 |
 | TODO | icbm/classic/lib/capability/chicken/CapSpaceChicken.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
 | TODO | icbm/classic/lib/capability/emp/CapabilityEMP.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
 | TODO | icbm/classic/lib/capability/emp/CapabilityEmpChecker.java | 按 §2.6 改为 API Lookup / 附件 / 组件 | S1.07 |
@@ -569,28 +569,28 @@
 | TODO | icbm/classic/lib/recipe/ConditionOreValue.java |  | — |
 | TODO | icbm/classic/lib/recipe/ExIngredientFactory.java |  | — |
 | TODO | icbm/classic/lib/recipe/ExRecipeFactory.java |  | — |
-| TODO | icbm/classic/lib/saving/INbtSaveNode.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/NbtSaveHandler.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/NbtSaveNode.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/NbtSaveRoot.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveBuildableObject.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveBuildableObjectList.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeBlockPos.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeBlockState.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeBoolean.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeByte.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeCompoundTag.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeDouble.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeEnum.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeFacing.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeFloat.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeInteger.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeItemStack.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
+| MERGED → icbm/classic/lib/saving/ISaveNode.java | icbm/classic/lib/saving/INbtSaveNode.java | 改名 ISaveNode<E>；save(E, ValueOutput)/load(E, ValueInput)，不再有 NBT 数据类型参数 | S1.03 |
+| MERGED → icbm/classic/lib/saving/SaveHandler.java | icbm/classic/lib/saving/NbtSaveHandler.java | 改名 SaveHandler；save/load 收 ValueOutput/ValueInput，新增 saveToTag/loadFromTag（TagValueOutput/TagValueInput） | S1.03 |
+| MERGED → icbm/classic/lib/saving/SaveNode.java | icbm/classic/lib/saving/NbtSaveNode.java | 改名 SaveNode<E>；泛型 NBT 数据参数改为 ValueOutput/ValueInput 两个抽象方法 | S1.03 |
+| MERGED → icbm/classic/lib/saving/SaveRoot.java | icbm/classic/lib/saving/NbtSaveRoot.java | 改名 SaveRoot；out.child/in.child 嵌套，mainRoot 直写当前层；nodeVec3/nodeIdentifier/nodeDirection/nodeSavable；nodeWorldDim 改存 Identifier | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveBuildableObject.java | IBuilderRegistry#save/load 改走 ValueOutput/ValueInput，键沿用 1.12 的 id + data 子节点 | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveBuildableObjectList.java | out.childrenList(name) 写多个元素，读回用 in.childrenList(name) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeBlockPos.java | out.store(name, BlockPos.CODEC, pos) / in.read(name, BlockPos.CODEC) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeBlockState.java | out.store(name, BlockState.CODEC, state) / in.read(name, BlockState.CODEC) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeBoolean.java | out.putBoolean(name, v) / in.getBooleanOr(name, 默认取 getter 当前值) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeByte.java | out.putByte(name, v) / in.getByteOr(name, 默认取 getter 当前值) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeCompoundTag.java | out.store(name, CompoundTag.CODEC, tag) / in.read(name, CompoundTag.CODEC) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeDouble.java | out.putDouble(name, v) / in.getDoubleOr(name, 默认取 getter 当前值) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeEnum.java | 写 name() 字符串；按 accessor 读回，失败保留默认并 ICBMClassic.logger().warn | S1.03 |
+| MERGED → icbm/classic/lib/saving/nodes/SaveNodeDirection.java | icbm/classic/lib/saving/nodes/SaveNodeFacing.java | 改名 SaveNodeDirection；out.store(name, Direction.CODEC, dir) / in.read(name, Direction.CODEC) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeFloat.java | out.putFloat(name, v) / in.getFloatOr(name, 默认取 getter 当前值) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeInteger.java | out.putInt(name, v) / in.getIntOr(name, 默认取 getter 当前值) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeItemStack.java | out.store(name, ItemStack.OPTIONAL_CODEC, stack) / in.read(name, ItemStack.OPTIONAL_CODEC)；仍跳过空栈 | S1.03 |
 | PORTED | icbm/classic/lib/saving/nodes/SaveNodePos.java | Pos#save(ValueOutput)（S1.01 已就绪）写入子 child，读回 new Pos(in.child(key)) | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeResourceLocation.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeString.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeUUID.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
-| TODO | icbm/classic/lib/saving/nodes/SaveNodeVec3d.java | NbtSaveHandler → SaveHandler（ValueInput/ValueOutput） | S1.03 |
+| MERGED → icbm/classic/lib/saving/nodes/SaveNodeIdentifier.java | icbm/classic/lib/saving/nodes/SaveNodeResourceLocation.java | 改名 SaveNodeIdentifier；out.store(name, Identifier.CODEC, key) / in.read(name, Identifier.CODEC) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeString.java | out.putString(name, v) / in.getStringOr(name, 默认取 getter 当前值) | S1.03 |
+| PORTED | icbm/classic/lib/saving/nodes/SaveNodeUUID.java | out.store(name, UUIDUtil.CODEC, uuid) / in.read(name, UUIDUtil.CODEC) | S1.03 |
+| MERGED → icbm/classic/lib/saving/nodes/SaveNodeVec3.java | icbm/classic/lib/saving/nodes/SaveNodeVec3d.java | 改名 SaveNodeVec3；out.store(name, Vec3.CODEC, vec) / in.read(name, Vec3.CODEC) | S1.03 |
 | TODO | icbm/classic/lib/thread/IThreadWork.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
 | TODO | icbm/classic/lib/thread/WorkerThread.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
 | TODO | icbm/classic/lib/thread/WorkerThreadManager.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
