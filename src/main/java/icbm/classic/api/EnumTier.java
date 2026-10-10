@@ -36,7 +36,7 @@ public enum EnumTier implements StringRepresentable
 
     public String getLocalizedName()
     {
-        return Component.translatable("tier.icbmclassic." + getSerializedName()).getString();
+        return Component.translatable("icbmclassic.tier." + getSerializedName()).getString();
     }
 
     @Override

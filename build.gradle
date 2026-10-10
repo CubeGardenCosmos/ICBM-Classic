@@ -35,6 +35,9 @@ fabricApi {
         enableClientGameTests = false
         eula = true
     }
+    // S2.06: models and block states need client classes, so the data generator runs against the client
+    // source set. addToResources puts src/main/generated on the main resources, which also makes the
+    // generated files readable from the GameTests.
     configureDataGeneration {
         client = true
         addToResources = true
@@ -60,7 +63,59 @@ dependencies {
 
 test { useJUnitPlatform() }
 
+/**
+ * S2.10: the English language file has two sources (i18n.md §4), both would land on the same path in the
+ * jar. The generated one holds the names of the registered content (datagen), the hand written one the
+ * migrated GUI/message/tooltip text (scripts/migrate_lang.py). They are merged into one file here; a key
+ * that both define with a different value fails the build.
+ */
+def mergedLangDir = layout.buildDirectory.dir("generated/lang")
+def mergedLangFile = mergedLangDir.map { it.file("assets/icbmclassic/lang/en_us.json") }
+tasks.register('mergeLang') {
+    def generatedLang = file("src/main/generated/assets/icbmclassic/lang/en_us.json")
+    def handwrittenLang = file("src/main/resources/assets/icbmclassic/lang/en_us.json")
+    inputs.files(generatedLang, handwrittenLang)
+    outputs.file(mergedLangFile)
+    doLast {
+        def slurper = new groovy.json.JsonSlurper()
+        def merged = new TreeMap()
+        [generatedLang, handwrittenLang].each { source ->
+            if (!source.exists()) {
+                if (source == handwrittenLang) {
+                    throw new GradleException("lang source is missing: " + source)
+                }
+                // the generated names come from runDatagen; on a tree that never ran it, merge what exists
+                // (LangGameTest fails when the generated keys are not in the jar)
+                logger.lifecycle("mergeLang: " + source + " is missing, run runDatagen to generate it")
+                return
+            }
+            def parsed = slurper.parse(source, "UTF-8")
+            if (!(parsed instanceof Map)) {
+                throw new GradleException("lang file is not a JSON object: " + source)
+            }
+            parsed.each { key, value ->
+                if (!(value instanceof String)) {
+                    throw new GradleException("lang value is not a string: " + key + " in " + source)
+                }
+                if (merged.containsKey(key) && merged[key] != value) {
+                    throw new GradleException("lang key conflict: " + key)
+                }
+                merged[key] = value
+            }
+        }
+        def target = mergedLangFile.get().asFile
+        target.parentFile.mkdirs()
+        target.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(merged)) + "\n", "UTF-8")
+    }
+}
+
+// the two en_us.json sources are dropped from the resources (both would end up on the same jar path),
+// mergeLang puts the single merged file back in below
+sourceSets.main.resources.exclude "assets/icbmclassic/lang/en_us.json"
+
 processResources {
+    dependsOn 'mergeLang'
+    from(mergedLangDir)
     inputs.property "version", project.version
     filesMatching("fabric.mod.json") { expand "version": project.version }
 }
@@ -68,6 +123,13 @@ processResources {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     options.release = project.java_version as int
+}
+
+tasks.named('sourcesJar') {
+    // same rule as processResources: the two en_us.json sources are replaced by the merged file
+    dependsOn 'mergeLang'
+    mustRunAfter 'runDatagen'
+    from(mergedLangDir)
 }
 
 jar {

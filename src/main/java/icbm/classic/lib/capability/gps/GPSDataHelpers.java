@@ -38,7 +38,7 @@ public class GPSDataHelpers {
         final Vec3 position = gpsData.getPosition();
         final Identifier dimension = gpsData.getWorldId();
         if(position == null) {
-            player.sendSystemMessage(Component.translatable("chat.launcher.noTargetInTool"));
+            player.sendSystemMessage(Component.translatable("icbmclassic.message.gps.set.empty"));
         }
         else if(setWorld && dimension != null) {
             setter.accept(dimension, position);
@@ -47,7 +47,7 @@ public class GPSDataHelpers {
             final String y = String.format("%.1f", position.y);
             final String z = String.format("%.1f", position.z);
 
-            player.sendSystemMessage(Component.translatable("info.icbmclassic:gps.set.all", x, y, z, dimension.toString()));
+            player.sendSystemMessage(Component.translatable("icbmclassic.message.gps.set.all", x, y, z, dimension.toString()));
         }
         else {
             setter.accept(null, position);
@@ -55,7 +55,7 @@ public class GPSDataHelpers {
             final String x = String.format("%.1f", position.x);
             final String y = String.format("%.1f", position.y);
             final String z = String.format("%.1f", position.z);
-            player.sendSystemMessage(Component.translatable("info.icbmclassic:gps.set.pos", x, y, z));
+            player.sendSystemMessage(Component.translatable("icbmclassic.message.gps.set.pos", x, y, z));
         }
         return true;
     }
