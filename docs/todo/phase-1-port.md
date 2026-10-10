@@ -19,7 +19,7 @@
 - [x] (3) `SaveHandler`（ValueInput/ValueOutput）替代 `NbtSaveHandler`。（S1.03，证据：../implementation/evidence/S1.03.md）
 - [x] (4) `PacketCodex` 传输层改为 Fabric 载荷，服务端校验。（S1.04，证据：../implementation/evidence/S1.04.md）
 - [x] (5) 无线电系统按世界维度键分表。（S1.05，证据：../implementation/evidence/S1.05.md）
-- [ ] (6) 雷达注册表/地图。
+- [x] (6) 雷达注册表/地图。（S1.06，证据：../implementation/evidence/S1.06.md）
 - [ ] (7) Capability → API Lookup / 数据附件 / DataComponent；`IcbmEnergyBuffer`。
 - [ ] (8) 动作系统（actions/conditions/causes/status）。
 - [ ] (9) 线程化爆炸：工作线程计算、主线程按预算应用。

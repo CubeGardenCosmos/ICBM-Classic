@@ -340,7 +340,7 @@ $ ./gradlew build
 | [R] | S1.03 | `SaveHandler` | S1.01 | P1 基础库 3 | [S1.03.md](evidence/S1.03.md) |
 | [R] | S1.04 | 网络 Codex 传输层 | S1.01 | P1 基础库 4 | [S1.04.md](evidence/S1.04.md) |
 | [R] | S1.05 | 无线电系统 | S1.03、S1.04 | P1 基础库 5 | [S1.05.md](evidence/S1.05.md) |
-| [ ] | S1.06 | 雷达注册表与地图 | S1.01 | P1 基础库 6 | |
+| [R] | S1.06 | 雷达注册表与地图 | S1.01 | P1 基础库 6 | [S1.06.md](evidence/S1.06.md) |
 | [ ] | S1.07 | 能力映射（API Lookup / 附件 / 组件）与 `IcbmEnergyBuffer` | S1.02、S1.03 | P1 基础库 7 | |
 | [ ] | S1.08 | 动作系统 | S1.07 | P1 基础库 8 | |
 | [ ] | S1.09 | 线程化爆炸框架 | S1.02 | P1 基础库 9 | |

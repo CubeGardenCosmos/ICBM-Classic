@@ -552,9 +552,9 @@
 | TODO | icbm/classic/lib/projectile/vanilla/ItemProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
 | TODO | icbm/classic/lib/projectile/vanilla/SpectralArrowProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
 | TODO | icbm/classic/lib/projectile/vanilla/TippedArrowProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/radar/RadarEntity.java | RadarRegistry 按 ResourceKey<Level> 分表 | S1.06 |
-| TODO | icbm/classic/lib/radar/RadarMap.java | RadarRegistry 按 ResourceKey<Level> 分表 | S1.06 |
-| TODO | icbm/classic/lib/radar/RadarRegistry.java | RadarRegistry 按 ResourceKey<Level> 分表 | S1.06 |
+| PORTED | icbm/classic/lib/radar/RadarEntity.java | world→Level，字段直读 getX/getY/getZ，`getEntityId`→`getId`，`ChunkPos` 用 `net.minecraft.world.level` record | S1.06 |
+| PORTED | icbm/classic/lib/radar/RadarMap.java | `dimID`→`ResourceKey<Level> dimension`，`remove(Chunk)`→`remove(ChunkPos)`，其余行为照 1.12 | S1.06 |
+| PORTED | icbm/classic/lib/radar/RadarRegistry.java | 按 `ResourceKey<Level>` 分表；Forge 订阅者改为 `onChunkUnload`/`onLevelTick`/`clear`/`clearAll` | S1.06 |
 | DROPPED（26.3 无 Capability 系统，见 porting-guide §2.6；无线电由类直接实现） | icbm/classic/lib/radio/CapabilityRadio.java | 无线电由类直接实现 IRadio | S1.05 |
 | PORTED | icbm/classic/lib/radio/RadioMap.java | 维度键 ResourceKey<Level>，行为照 1.12 | S1.05 |
 | PORTED | icbm/classic/lib/radio/RadioRegistry.java | Map<ResourceKey<Level>, RadioMap>，提供 clear/clearAll/onLevelUnload，删除 Forge 事件 | S1.05 |
