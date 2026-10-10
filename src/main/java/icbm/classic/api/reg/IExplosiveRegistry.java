@@ -47,14 +47,6 @@ public interface IExplosiveRegistry
     IExplosiveData getExplosiveData(Identifier name, boolean allowNull);
 
     /**
-     * Gets the explosive data for the registry name
-     *
-     * @param id - id of the explosive
-     * @return explosive data if registered
-     */
-    IExplosiveData getExplosiveData(int id);
-
-    /**
      * All content registries that use the explosive registry.
      *
      * @return

@@ -1,6 +1,5 @@
 package icbm.classic.api;
 
-import icbm.classic.ICBMClassic;
 import icbm.classic.api.caps.IExplosive;
 import icbm.classic.api.caps.IGPSData;
 import icbm.classic.api.launcher.IMissileLauncher;
@@ -8,7 +7,6 @@ import icbm.classic.api.missiles.IMissile;
 import icbm.classic.api.refs.ICBMExplosives;
 import icbm.classic.api.reg.IExplosiveData;
 import icbm.classic.lib.lookup.IcbmLookups;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -25,27 +23,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  */
 public final class ICBMClassicHelpers
 {
-
-    /**
-     * Called to get explosive
-     *
-     * @param explosive
-     * @return explosive desired, or default TNT
-     */
-    public static IExplosiveData getExplosive(int explosive, boolean returnNull)
-    {
-        IExplosiveData data = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(explosive);
-        if (data != null)
-        {
-            return data;
-        }
-        if(FabricLoader.getInstance().isDevelopmentEnvironment())
-        {
-            ICBMClassic.logger().error("ICBMClassicAPI: Error - Failed to locate explosive for " +
-                    "ID[" + explosive + "] this may cause unexpected logic", new RuntimeException());
-        }
-        return returnNull ? null : ICBMExplosives.CONDENSED;
-    }
 
     /**
      * Called to get explosive
@@ -146,9 +123,10 @@ public final class ICBMClassicHelpers
      */
     public static IExplosive getExplosive(ItemStack stack)
     {
-        // TODO(S2.02) build a CapabilityExplosiveStack(stack, explosiveId) from the flat item id plus the
-        //  icbmclassic:explosive_settings data component. The component is registered by ModDataComponents
-        //  (S2.01/S2.02), so this returns null until then. 1.12 used the Forge EXPLOSIVE_CAPABILITY.
+        // TODO(S2.05) build a CapabilityExplosiveStack(stack, explosiveId) from the flat item id plus the
+        //  icbmclassic:explosive_settings data component. The item classes that carry the flat id are
+        //  registered by ModItems in S2.05, so this returns null until then. 1.12 used the Forge
+        //  EXPLOSIVE_CAPABILITY.
         return null;
     }
 

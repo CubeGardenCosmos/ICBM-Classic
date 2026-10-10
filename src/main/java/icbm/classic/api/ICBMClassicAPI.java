@@ -56,7 +56,7 @@ public final class ICBMClassicAPI {
     public static IActionListenerHandler ACTION_LISTENER;
 
     /** Registry for projectile information */
-    public static IProjectileDataRegistry PROJECTILE_DATA_REGISTRY; // TODO(S2.02) assigned by the explosive/projectile content registration
+    public static IProjectileDataRegistry PROJECTILE_DATA_REGISTRY; // TODO(S3.01) assigned by the projectile content registration
 
     //=========================
     //=== References ==========
@@ -102,7 +102,7 @@ public final class ICBMClassicAPI {
      * @deprecated replaced with {@link icbm.classic.api.actions.data.IActionFieldProvider}
      * */
     @Deprecated
-    public static IBuilderRegistry<IExplosiveCustomization> EXPLOSIVE_CUSTOMIZATION_REGISTRY; // TODO(S2.02)
+    public static IBuilderRegistry<IExplosiveCustomization> EXPLOSIVE_CUSTOMIZATION_REGISTRY; // TODO(S3.07) assigned with the ender blast customization
 
     @Deprecated
     public static final Identifier EX_MISSILE = ICBMConstants.id("missile");

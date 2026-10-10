@@ -39,8 +39,8 @@ public class CapabilityExplosiveStack implements IExplosive, ISavable
      * @param stack       item the explosive belongs to, may be null for a detached instance
      * @param explosiveId id of the explosive, see {@code docs/architecture/registry-ids.md} §3
      */
-    // TODO(S2.02) replace the explicit id with the icbmclassic:explosive_settings data component once
-    //  ModDataComponents exists (S2.01/S2.02); 1.12 used the item metadata for this
+    // TODO(S2.05) replace the explicit id with the icbmclassic:explosive_settings data component once the
+    //  flat explosive items exist (ModItems, S2.05); 1.12 used the item metadata for this
     public CapabilityExplosiveStack(ItemStack stack, Identifier explosiveId)
     {
         this.stack = stack;

@@ -13,7 +13,8 @@
       "icbm.classic.test.actions.ActionSystemGameTest",
       "icbm.classic.test.blast.ThreadedBlastFrameworkGameTest",
       "icbm.classic.test.api.ApiLookupsGameTest",
-      "icbm.classic.test.reg.RegistrySmokeGameTest"
+      "icbm.classic.test.reg.RegistrySmokeGameTest",
+      "icbm.classic.test.reg.ExplosiveFormsGameTest"
     ]
   },
   "depends": {

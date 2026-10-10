@@ -20,13 +20,13 @@ public interface IExplosiveContentRegistry
     Identifier getRegistryName();
 
     /**
-     * Set of all ids enabled for the content
+     * Set of all enabled explosives by name.
      * <p>
      * Set should be immutable after {@link #lockRegistry()} is called
      *
      * @return set of enabled explosives
      */
-    Set<Integer> getExplosivesIDs();
+    Set<Identifier> getExplosiveNames();
 
     /**
      * Enables content type for the explosion
@@ -34,15 +34,6 @@ public interface IExplosiveContentRegistry
      * @param explosiveID - registry name of the explosion
      */
     void enableContent(Identifier explosiveID);
-
-    /**
-     * Gets a list of all explosives by name.
-     * <p>
-     * List should be immutable after {@link #lockRegistry()} is called
-     *
-     * @return
-     */
-    Set<Identifier> getExplosiveNames();
 
     /**
      * Gets a list of all explosives
@@ -102,7 +93,7 @@ public interface IExplosiveContentRegistry
      */
     default boolean isEnabled(IExplosiveData explosiveData)
     {
-        return getExplosivesIDs() != null && getExplosivesIDs().contains(explosiveData.getRegistryID());
+        return isEnabled(explosiveData.getRegistryKey());
     }
 
     /**
@@ -114,17 +105,6 @@ public interface IExplosiveContentRegistry
     default boolean isEnabled(Identifier exName)
     {
         return getExplosiveNames() != null && getExplosiveNames().contains(exName);
-    }
-
-    /**
-     * Is the content enabled for the explosive
-     *
-     * @param exID - explosive data ID
-     * @return true if enabled, can also be false if the registry is not setup yet
-     */
-    default boolean isEnabled(int exID)
-    {
-        return getExplosivesIDs() != null && getExplosivesIDs().contains(exID);
     }
 
 }

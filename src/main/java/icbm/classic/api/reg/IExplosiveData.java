@@ -16,16 +16,6 @@ import org.jspecify.annotations.NonNull;
 public interface IExplosiveData extends Comparable<IExplosiveData>, IActionData
 {
     /**
-     * Assigned ID of the explosive. Is
-     * saved to config file and automatically
-     * assigned for new explosives.
-     *
-     * @return ID
-     * @deprecated will be removed in MC 1.13 and replaced with {@link #getRegistryKey()}
-     */
-    int getRegistryID();
-
-    /**
      * Tier of the explosive.
      *
      * @return tier of the explosive

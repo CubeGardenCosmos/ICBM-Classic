@@ -7,6 +7,7 @@ import icbm.classic.api.reg.IExplosiveCustomization;
 import icbm.classic.api.reg.IExplosiveData;
 import icbm.classic.lib.NBTConstants;
 import icbm.classic.lib.saving.ISavable;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -22,22 +23,23 @@ import org.jspecify.annotations.Nullable;
  */
 public class CapabilityExplosive implements IExplosive, ISavable
 {
-    public int explosiveID; //TODO change over to resource location or include in save to check for issues using ID only for in memory
+    // 1.12 stored the numeric explosive id (item metadata / registry id); 26.3 keys explosives by Identifier
+    public Identifier explosiveId;
 
     public CapabilityExplosive()
     {
     }
 
-    public CapabilityExplosive(int id)
+    public CapabilityExplosive(Identifier explosiveId)
     {
-        this.explosiveID = id;
+        this.explosiveId = explosiveId;
     }
 
     @Nullable
     @Override
     public IExplosiveData getExplosiveData()
     {
-        return ICBMClassicHelpers.getExplosive(explosiveID, false);
+        return explosiveId == null ? null : ICBMClassicHelpers.getExplosive(explosiveId, true);
     }
 
     @Override
@@ -60,12 +62,15 @@ public class CapabilityExplosive implements IExplosive, ISavable
     @Override
     public void save(ValueOutput out)
     {
-        out.putInt(NBTConstants.EXPLOSIVE_ID, explosiveID);
+        if (explosiveId != null)
+        {
+            out.store(NBTConstants.EXPLOSIVE_ID, Identifier.CODEC, explosiveId);
+        }
     }
 
     @Override
     public void load(ValueInput in)
     {
-        explosiveID = in.getIntOr(NBTConstants.EXPLOSIVE_ID, explosiveID);
+        explosiveId = in.read(NBTConstants.EXPLOSIVE_ID, Identifier.CODEC).orElse(explosiveId);
     }
 }

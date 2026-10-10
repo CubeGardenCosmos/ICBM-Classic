@@ -43,8 +43,9 @@ public interface IExFuseBlockRegistry
      * @param posY
      * @param posZ
      * @param ticksExisted
+     * @param explosiveName - registry name of the explosive
      */
-    void tickFuse(Level world, double posX, double posY, double posZ, int ticksExisted, int explosiveID);
+    void tickFuse(Level world, double posX, double posY, double posZ, int ticksExisted, Identifier explosiveName);
 
-    int getFuseTime(Level world, double posX, double posY, double posZ, int explosiveID);
+    int getFuseTime(Level world, double posX, double posY, double posZ, Identifier explosiveName);
 }
