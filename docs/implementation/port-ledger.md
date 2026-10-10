@@ -263,15 +263,15 @@
 | TODO | icbm/classic/content/blast/redmatter/logic/RedmatterLogic.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/redmatter/render/RedmatterClientLogic.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/redmatter/render/RenderRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/thread/BasicResistanceCallBack.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/thread/IThreadCallBack.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/thread/ThreadExplosion.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/thread/ThreadLargeExplosion.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/thread/ThreadSmallExplosion.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/threaded/BlastAntimatter.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/threaded/BlastNuclear.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/threaded/BlastThermobaric.java | 同上（content/blast/thread*/） | S1.09 |
-| TODO | icbm/classic/content/blast/threaded/BlastThreaded.java | 同上（content/blast/thread*/） | S1.09 |
+| PORTED | icbm/classic/content/blast/thread/BasicResistanceCallBack.java | 默认抗性回调；1.12 的 Blast 字段与 IFluidBlock 检查删除（26.3 `Block#getExplosionResistance()` 无参），可安全用于工作线程 | S1.09 |
+| PORTED | icbm/classic/content/blast/thread/IThreadCallBack.java | World→Level、Block、BlockPos、IPos3D；工作线程调用时 level 为 null（不向工作线程暴露世界） | S1.09 |
+| MERGED → S3.02 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadExplosion.java | 1.12 的 thread-per-blast 设计（Thread 子类 + doRun(World, Location)）与 26.3 快照/预算队列架构不兼容，随爆炸框架在 S3.02 重写 | S3.02 |
+| MERGED → S3.02 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadLargeExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随爆炸框架在 S3.02 重写 | S3.02 |
+| MERGED → S3.02 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadSmallExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随爆炸框架在 S3.02 重写 | S3.02 |
+| MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastAntimatter.java | 反物质爆炸（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
+| MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastNuclear.java | 核爆（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
+| MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastThermobaric.java | 温压爆炸（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
+| MERGED → S3.02 | icbm/classic/content/blast/threaded/BlastThreaded.java | 线程化爆炸基类，依赖 content.blast.Blast 与 S3.02 的爆炸框架重写 | S3.02 |
 | TODO | icbm/classic/content/blocks/BlockConcrete.java | 平铺化方块 | S2.03、S3.08 |
 | TODO | icbm/classic/content/blocks/BlockGlassButton.java | 平铺化方块 | S2.03、S3.08 |
 | TODO | icbm/classic/content/blocks/BlockGlassPressurePlate.java | 平铺化方块 | S2.03、S3.08 |
@@ -510,7 +510,7 @@
 | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/EnergySystemFE.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
 | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/EnergySystemNull.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
 | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/IEnergySystem.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
-| TODO | icbm/classic/lib/explosive/ThreadWorkBlast.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/ThreadWorkBlast.java | 通用收集型工作，`doRun(int, LevelSnapshot)`/`onStarted(LevelSnapshot)`；被线程化爆炸（S3.02/S3.06）与 ExplosiveRegistry（S2.02）使用 | S1.09、S2.02 |
 | TODO | icbm/classic/lib/explosive/reg/ExBlockContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
 | TODO | icbm/classic/lib/explosive/reg/ExGrenadeContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
 | TODO | icbm/classic/lib/explosive/reg/ExMinecartContentReg.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
@@ -591,9 +591,9 @@
 | PORTED | icbm/classic/lib/saving/nodes/SaveNodeString.java | out.putString(name, v) / in.getStringOr(name, 默认取 getter 当前值) | S1.03 |
 | PORTED | icbm/classic/lib/saving/nodes/SaveNodeUUID.java | out.store(name, UUIDUtil.CODEC, uuid) / in.read(name, UUIDUtil.CODEC) | S1.03 |
 | MERGED → icbm/classic/lib/saving/nodes/SaveNodeVec3.java | icbm/classic/lib/saving/nodes/SaveNodeVec3d.java | 改名 SaveNodeVec3；out.store(name, Vec3.CODEC, vec) / in.read(name, Vec3.CODEC) | S1.03 |
-| TODO | icbm/classic/lib/thread/IThreadWork.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
-| TODO | icbm/classic/lib/thread/WorkerThread.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
-| TODO | icbm/classic/lib/thread/WorkerThreadManager.java | 工作线程只读快照 + 主线程按预算应用 | S1.09 |
+| PORTED | icbm/classic/lib/thread/IThreadWork.java | 增加 LevelSnapshot 参数（doRun/onStarted）；onCompleted 在工作线程执行，方块修改交给 BlockEditQueue | S1.09 |
+| PORTED | icbm/classic/lib/thread/WorkerThread.java | 守护线程 + ConcurrentLinkedQueue（任务+快照）；禁用 Thread.stop → volatile doRun + interrupt + join(5000) | S1.09 |
+| PORTED | icbm/classic/lib/thread/WorkerThreadManager.java | INSTANCE/线程池/killThreads（5 秒总等待 + 丢弃告警）；runningAsDev → FabricLoader#isDevelopmentEnvironment | S1.09 |
 | PORTED | icbm/classic/lib/tile/ITick.java | 纯接口，动作与方块实体 tick 复用 | S1.08（S2.02/S4 复用） |
 | TODO | icbm/classic/lib/tile/TickAction.java |  | — |
 | TODO | icbm/classic/lib/tile/TickDoOnce.java |  | — |
@@ -606,7 +606,7 @@
 | TODO | icbm/classic/lib/tracker/EventTrackerType.java |  | — |
 | TODO | icbm/classic/lib/tracker/IEventTrackerListener.java |  | — |
 | TODO | icbm/classic/lib/tracker/ListenerEntry.java |  | — |
-| TODO | icbm/classic/lib/transform/BlockEditHandler.java | Vec3d→Vec3、EnumFacing→Direction | S1.01 |
+| MERGED → 由 S1.09 的 lib/thread/BlockEditQueue.java 取代 | icbm/classic/lib/transform/BlockEditHandler.java | 1.12 用 addScheduledTask 排队方块修改；本步不移植，S1.09 以 BlockEditQueue 在主线程按预算应用 | S1.01 |
 | PORTED | icbm/classic/lib/transform/PosDistanceSorter.java | Vec3d→Vec3、EnumFacing→Direction（javap 核对） | S1.01 |
 | PORTED | icbm/classic/lib/transform/RotationHelper.java | Vec3d→Vec3、MathHelper→Mth（wrapDegrees 返回 double） | S1.01 |
 | PORTED | icbm/classic/lib/transform/region/Cube.java | Vec3d→Vec3、AxisAlignedBB→AABB；存档改 save(ValueOutput)/构造收 ValueInput（toNBT() 删除）；getChunks/getEntities/getTilesInArea 改用 Level API | S1.01 |

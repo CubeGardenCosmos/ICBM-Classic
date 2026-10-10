@@ -1,9 +1,12 @@
 package icbm.classic;
 
+import icbm.classic.config.ConfigThread;
 import icbm.classic.config.core.ConfigManager;
 import icbm.classic.lib.actions.ActionSystem;
 import icbm.classic.lib.radar.RadarRegistry;
 import icbm.classic.lib.radio.RadioRegistry;
+import icbm.classic.lib.thread.BlockEditQueue;
+import icbm.classic.lib.thread.WorkerThreadManager;
 import icbm.classic.network.IcbmNetwork;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
@@ -43,6 +46,19 @@ public final class ICBMClassic implements ModInitializer {
         ServerChunkEvents.CHUNK_UNLOAD.register(RadarRegistry::onChunkUnload);
         ServerLevelEvents.UNLOAD.register((server, level) -> RadarRegistry.clear(level.dimension()));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> RadarRegistry.clearAll());
+
+        // Threaded blast framework (S1.09, docs/architecture/overview.md §6): worker threads read a
+        // LevelSnapshot, BlockEditQueue applies their edits on the server thread with a per tick budget.
+        WorkerThreadManager.INSTANCE = new WorkerThreadManager(ConfigThread.THREAD_COUNT);
+        WorkerThreadManager.INSTANCE.startThreads();
+        ServerTickEvents.END_LEVEL_TICK.register(BlockEditQueue::tick);
+        ServerLevelEvents.UNLOAD.register((server, level) -> BlockEditQueue.clear(level.dimension()));
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> BlockEditQueue.clearAll());
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+            if (WorkerThreadManager.INSTANCE != null) {
+                WorkerThreadManager.INSTANCE.killThreads();
+            }
+        });
 
         LOGGER.info("ICBM-Classic initializing (26.3 port)");
     }

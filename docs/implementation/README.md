@@ -343,7 +343,7 @@ $ ./gradlew build
 | [R] | S1.06 | 雷达注册表与地图 | S1.01 | P1 基础库 6 | [S1.06.md](evidence/S1.06.md) |
 | [R] | S1.07 | 能力映射（API Lookup / 附件 / 组件）与 `IcbmEnergyBuffer` | S1.02、S1.03 | P1 基础库 7 | [S1.07.md](evidence/S1.07.md)（能量核心已完成；能力映射部分按依赖顺序下沉 S1.10） |
 | [R] | S1.08 | 动作系统 | S1.07 | P1 基础库 8 | [S1.08.md](evidence/S1.08.md) |
-| [ ] | S1.09 | 线程化爆炸框架 | S1.02 | P1 基础库 9 | |
+| [R] | S1.09 | 线程化爆炸框架 | S1.02 | P1 基础库 9 | [S1.09.md](evidence/S1.09.md) |
 | [ ] | S1.10 | 公共 API 包收尾 | S1.05、S1.06、S1.08、S1.09 | P1 基础库 10 | |
 
 ### S2 注册与资源 → [phase-s2-registry-assets.md](phase-s2-registry-assets.md)

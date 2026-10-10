@@ -16,4 +16,8 @@ public class ConfigThread
             "Which is counter to the reason threads exist.")
     @ConfigRange(min = 1, max = 8)
     public static int THREAD_COUNT = 1;
+
+    @ConfigEntry(name = "blocks_per_tick", comment = "Max block edits applied by the main thread per tick for threaded explosions")
+    @ConfigRange(min = 1, max = 1_000_000)
+    public static int BLOCKS_PER_TICK = 2000;
 }
