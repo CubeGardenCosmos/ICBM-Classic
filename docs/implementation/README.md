@@ -329,7 +329,7 @@ $ ./gradlew build
 | [x] | S0.03 | Fabric 26.3 Gradle 工程骨架 | S0.02 | P1 工具链 2 | [S0.03.md](evidence/S0.03.md) |
 | [x] | S0.04 | JUnit 与 GameTest 管线 | S0.03 | P1 工具链 3 | [S0.04.md](evidence/S0.04.md) |
 | [x] | S0.05 | `scripts/check.sh` 与 `.gitignore` | S0.04 | P1 工具链 4 | [S0.05.md](evidence/S0.05.md) |
-| [ ] | S0.06 | 移植账本 | S0.02 | P1 工具链 5 | |
+| [x] | S0.06 | 移植账本 | S0.02 | P1 工具链 5 | [S0.06.md](evidence/S0.06.md) |
 
 ### S1 基础库 → [phase-s1-core-lib.md](phase-s1-core-lib.md)
 
