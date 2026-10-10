@@ -518,28 +518,28 @@
 | TODO | icbm/classic/lib/explosive/reg/ExplosiveContentRegistry.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
 | TODO | icbm/classic/lib/explosive/reg/ExplosiveData.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
 | TODO | icbm/classic/lib/explosive/reg/ExplosiveRegistry.java | ExplosiveRegistry + 平铺化内容生成 | S2.02 |
-| TODO | icbm/classic/lib/network/IPacket.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/IPacketIDReceiver.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/PacketEvents.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/ex/PacketTileReadException.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
+| DROPPED（Fabric 网络替代） | icbm/classic/lib/network/IPacket.java | CustomPacketPayload + StreamCodec 取代 IPacket，见 src/main/java/icbm/classic/network/CodexPayload.java | S1.04 |
+| DROPPED（Fabric 网络替代） | icbm/classic/lib/network/IPacketIDReceiver.java | 自定义载荷的 ID 分发由 Fabric 处理，不需要接收器接口 | S1.04 |
+| DROPPED（Fabric 载荷替代） | icbm/classic/lib/network/PacketEvents.java | 旧实现基于 lib/tracker；错误分支改为 IcbmNetwork/IcbmClientNetwork 内 logDebug/logError | S1.04 |
+| PORTED | icbm/classic/lib/network/ex/PacketTileReadException.java | 保留类与构造签名（Location/BlockEntity/BlockState） | S1.04 |
 | TODO | icbm/classic/lib/network/lambda/GeneralCodexs.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/PacketCodex.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/PacketCodexEntry.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/PacketCodexReg.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/PacketEventUtils.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/entity/PacketCodexEntity.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/entity/PacketLambdaEntity.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/tile/PacketCodexTile.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/tile/PacketLambdaTile.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/lambda/tile/PacketTileEvents.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/netty/PacketEncoderDecoderHandler.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/netty/PacketInboundHandler.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/netty/PacketManager.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/packet/PacketBase.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/packet/PacketEntityPos.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/packet/PacketPlayerItem.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/packet/PacketSpawnAirParticle.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
-| TODO | icbm/classic/lib/network/packet/PacketSpawnBlockExplosion.java | PacketCodex 保留 API，netty/ 与 PacketManager 删除 | S1.04 |
+| PORTED | icbm/classic/lib/network/lambda/PacketCodex.java | 构建器 API 与语义不变；编解码改 RegistryFriendlyByteBuf，发送走 CodexPayload + IcbmNetwork，新增 codexId/encodeBody/decodeAsSetters/locate | S1.04 |
+| PORTED | icbm/classic/lib/network/lambda/PacketCodexEntry.java | encoder/decoder 由 ByteBuf 改 RegistryFriendlyByteBuf | S1.04 |
+| PORTED | icbm/classic/lib/network/lambda/PacketCodexReg.java | key 改为 Identifier codexId；重复注册抛 RuntimeException | S1.04 |
+| DROPPED（Fabric 载荷替代） | icbm/classic/lib/network/lambda/PacketEventUtils.java | 仅被 PacketEvents/PacketLambda* 使用，随二者一起删除 | S1.04 |
+| PORTED | icbm/classic/lib/network/lambda/entity/PacketCodexEntity.java | 定位前缀 varInt(entity id)；sendToAllAround 改 sendToTracking（PlayerLookup.tracking(Entity)） | S1.04 |
+| MERGED → src/main/java/icbm/classic/network/CodexPayload.java | icbm/classic/lib/network/lambda/entity/PacketLambdaEntity.java | 包体编码并入 PacketCodex.encodeBody + createPayload；接收校验/应用并入 IcbmNetwork.handleServer 与 PacketCodex.handleFrom* | S1.04 |
+| PORTED | icbm/classic/lib/network/lambda/tile/PacketCodexTile.java | 定位前缀 BlockPos；构造收 Class<TARGET>；isValid=非 null 且未移除；sendToAllAround 改 sendToTracking（PlayerLookup.tracking(BlockEntity)） | S1.04 |
+| MERGED → src/main/java/icbm/classic/network/CodexPayload.java | icbm/classic/lib/network/lambda/tile/PacketLambdaTile.java | 包体编码并入 PacketCodex.encodeBody + createPayload；接收校验/应用并入 IcbmNetwork.handleServer 与 PacketCodex.handleFrom* | S1.04 |
+| DROPPED（Fabric 载荷替代） | icbm/classic/lib/network/lambda/tile/PacketTileEvents.java | 旧实现基于 lib/tracker；接收端错误分支改为 PacketCodex.logDebug/logError | S1.04 |
+| DROPPED（Fabric 网络替代） | icbm/classic/lib/network/netty/PacketEncoderDecoderHandler.java | 载荷编解码由 Fabric PayloadTypeRegistry 与自定义 StreamCodec 负责 | S1.04 |
+| DROPPED（Fabric 网络替代） | icbm/classic/lib/network/netty/PacketInboundHandler.java | 载荷分发由 ServerPlayNetworking/ClientPlayNetworking 负责 | S1.04 |
+| DROPPED（Fabric 网络替代） | icbm/classic/lib/network/netty/PacketManager.java | 改为 IcbmNetwork.registerPayloads + CodexPayload 两个 Type | S1.04 |
+| DROPPED（Fabric 网络替代） | icbm/classic/lib/network/packet/PacketBase.java | IPacket 基类随之删除 | S1.04 |
+| DROPPED（26.3 原版同步实体位置；原调用方 MekProxy 已 DROPPED） | icbm/classic/lib/network/packet/PacketEntityPos.java | 26.3 用原版实体位置同步 | S1.04 |
+| DROPPED（26.3 原版同步手持物；调用方 ItemRadarGun/ItemLaserDetonator 在 S5.08 处理） | icbm/classic/lib/network/packet/PacketPlayerItem.java | 26.3 用原版手持物品同步 | S1.04 |
+| MERGED → src/main/java/icbm/classic/network/AirParticlePayload.java | icbm/classic/lib/network/packet/PacketSpawnAirParticle.java | 字段不变（维度改 Identifier）；粒子类型未移植，接收端先 debug 日志，S4.07 补完 | S1.04 |
+| MERGED → src/main/java/icbm/classic/network/BlockExplosionFxPayload.java | icbm/classic/lib/network/packet/PacketSpawnBlockExplosion.java | 字段不变（维度改 Identifier）；粒子类型未移植，接收端先 debug 日志，S4.07 补完 | S1.04 |
 | TODO | icbm/classic/lib/projectile/CachedProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
 | TODO | icbm/classic/lib/projectile/CapabilityProjectileStack.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
 | TODO | icbm/classic/lib/projectile/EntityProjectile.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |

@@ -17,7 +17,7 @@
 - [x] (1) 向量/旋转/区域与 jlib 纯 Java 部分移植，JUnit 覆盖。（S1.01，证据：../implementation/evidence/S1.01.md）
 - [x] (2) JSON 配置系统替代 Forge `@Config`，全部配置类迁移。（S1.02，证据：../implementation/evidence/S1.02.md）
 - [x] (3) `SaveHandler`（ValueInput/ValueOutput）替代 `NbtSaveHandler`。（S1.03，证据：../implementation/evidence/S1.03.md）
-- [ ] (4) `PacketCodex` 传输层改为 Fabric 载荷，服务端校验。
+- [x] (4) `PacketCodex` 传输层改为 Fabric 载荷，服务端校验。（S1.04，证据：../implementation/evidence/S1.04.md）
 - [ ] (5) 无线电系统按世界维度键分表。
 - [ ] (6) 雷达注册表/地图。
 - [ ] (7) Capability → API Lookup / 数据附件 / DataComponent；`IcbmEnergyBuffer`。
