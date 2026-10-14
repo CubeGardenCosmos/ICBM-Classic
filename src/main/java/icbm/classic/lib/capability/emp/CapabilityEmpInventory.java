@@ -7,6 +7,7 @@ import icbm.classic.config.blast.ConfigBlast;
 import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -87,17 +88,13 @@ public abstract class CapabilityEmpInventory<H extends Object> implements IEMPRe
 
         if (doInventory)
         {
-            if (container instanceof Entity entity)
-            {
-                power = new EntityInv(entity).applyEmpAction(level, x, y, z, emp_blast, power, doAction);
-            }
-            else if (container instanceof BlockEntity blockEntity)
-            {
-                power = new TileInv(blockEntity).applyEmpAction(level, x, y, z, emp_blast, power, doAction);
-            }
-            // TODO(S3.07) item contained inventories (1.12 ItemInvInEntity/ItemInvInTile): 1.12 asked the
-            //  ItemStack for the Forge item handler capability; 26.3 stores item inventories in the
-            //  icbmclassic content data components, which arrive with S2.04/S3.07.
+            // 1.12 continued here only when the item itself carried the Forge item handler capability, and
+            // then ran the ItemInvInEntity/ItemInvInTile wrappers to EMP the inventory stored *inside* the
+            // item. 26.3 has no item inventory capability: the content data components that hold item
+            // inventories are not ported yet, so no item contains an inventory and this branch can not run.
+            // Re-entering the host container here (EntityInv/TileInv -> empItemStack) would recurse until the
+            // stack overflows, because the slot write back only happens after the nested call returns.
+            // TODO(S3.07): reconnect with the item inventory data component once it exists.
         }
         return power;
     }
@@ -119,9 +116,19 @@ public abstract class CapabilityEmpInventory<H extends Object> implements IEMPRe
         @Override
         protected Container getContainer()
         {
-            if (ConfigBlast.emp.ALLOW_ENTITY_INVENTORY && entity instanceof Container container)
+            if (ConfigBlast.emp.ALLOW_ENTITY_INVENTORY)
             {
-                return container;
+                //1.12: the player entity carried the Forge item handler capability, so the player inventory
+                //was EMP'd like any other container; 26.3 Player implements ContainerUser instead of
+                //Container, the inventory is reached through Player#getInventory()
+                if (entity instanceof Player player)
+                {
+                    return player.getInventory();
+                }
+                if (entity instanceof Container container)
+                {
+                    return container;
+                }
             }
             return null;
         }

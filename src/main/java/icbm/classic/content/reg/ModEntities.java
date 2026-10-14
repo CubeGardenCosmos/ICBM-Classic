@@ -8,6 +8,7 @@ import icbm.classic.content.entity.EntityLightBeam;
 import icbm.classic.content.entity.EntitySmoke;
 import icbm.classic.content.blast.redmatter.EntityRedmatter;
 import icbm.classic.content.entity.flyingblock.EntityFlyingBlock;
+import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -63,6 +64,10 @@ public final class ModEntities
         FLYING_BLOCK = registerEntity(ICBMEntities.BLOCK_GRAVITY, 0.98F, 0.98F, 8, 1, EntityFlyingBlock::new);
         // 1.12 EntityReg: buildEntityEntry(EntityExplosive.class, ICBMEntities.BLOCK_EXPLOSIVE, 50, 5)
         PRIMED_EXPLOSIVE = registerEntity(ICBMEntities.BLOCK_EXPLOSIVE, 0.98F, 0.98F, 4, 5, EntityExplosive::new);
+        // 1.12: EntityExplosive exposed capabilityEMP through getCapability(CapabilityEMP.EMP, null); the
+        // entity implements IEMPReceiver itself, the lookup registration needs the EntityType to exist
+        // (IcbmLookups.init runs earlier, see CapabilityEMP#register)
+        IcbmLookups.EMP_RECEIVER_ENTITY.registerSelf(PRIMED_EXPLOSIVE);
         // 1.12 EntityReg: buildEntityEntry(EntityLightBeam.class, ICBMEntities.BEAM, 80, 5)
         LIGHT_BEAM = registerEntity(ICBMEntities.BEAM, 1.0F, 1.0F, 5, 5, EntityLightBeam::new);
         // 1.12 EntityReg: buildEntityEntry(EntitySmoke.class, ICBMEntities.SMOKE, 100, 15)

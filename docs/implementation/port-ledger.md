@@ -225,9 +225,9 @@
 | PORTED | icbm/classic/content/actions/conditionals/ConditionOR.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/content/actions/conditionals/ConditionTargetDistance.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/content/actions/conditionals/ConditionalImpact.java | 动作系统（ISavable + SaveHandler） | S1.08 |
-| MERGED → S3.07 | icbm/classic/content/actions/emp/ActionDataEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
-| MERGED → S3.07 | icbm/classic/content/actions/emp/ActionEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
-| MERGED → S3.07 | icbm/classic/content/actions/emp/EmpHandler.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
+| PORTED | icbm/classic/content/actions/emp/ActionDataEmpArea.java | 爆炸 id 的 IExplosiveData 由工厂持有，create 时用注册表查 ICBMClassicAPI.EXPLOSIVE_REGISTRY（1.12 走 ExplosiveRegistry.get）；SaveHandler→ValueInput/Output | S3.07 |
+| PORTED | icbm/classic/content/actions/emp/ActionEmpArea.java | 立方体三趟扫描（方块/方块实体/实体）照抄；Forge 事件 → EmpEvent.BlockPre/BlockPost（Fabric Event）；CapabilityEMP → IcbmLookups.EMP_RECEIVER_BLOCK/ENTITY/ITEM；能量抽空留 S6.05 TODO | S3.07 |
+| PORTED | icbm/classic/content/actions/emp/EmpHandler.java | BlockChanceOut 表照 1.12；配置源改 icbmclassic/blast.json#emp.replacements.list（Forge 配置路径不复存在）；loadFromConfig/setup 照抄 | S3.07 |
 | PORTED | icbm/classic/content/actions/entity/ActionSpawnEntity.java | 生成实体动作；实体存档走 TagValueOutput/TagValueInput（1.12 writeToNBT+merge+readFromNBT）；注册到 ACTION_REGISTRY 的 icbmclassic:entity.spawn（ActionSystem.setup） | S3.05 |
 | PORTED | icbm/classic/content/blast/Blast.java | 26.3 的 Explosion 是接口 → 改为 implements（不再 extends 构造器）；删 Forge onExplosionStart 钩子与 doExplosionA/B；线程字段（thread/threadResults/ThreadExplosion）随 S3.06 重建一并删除；保留 1.12 缺陷 getBlastSource 自递归；S3.04 补回 1.12 从 Explosion 继承的 affectedBlockPositions/getAffectedBlockPositions | S3.02、S3.04 |
 | PORTED | icbm/classic/content/blast/BlastAntiGravitational.java | 去掉旧 ThreadSmallExplosion 字段，只用 doRun + getThreadResults()；飞行方块生成/实体抬升/RUNNING_TICKS 照抄 | S3.04 |
@@ -246,8 +246,8 @@
 | PORTED | icbm/classic/content/blast/BlastTNT.java | 射线/能量/推拉数学照抄（PushType 保留）；onBlockExploded+掉落 → BlockState#onExplosionHit + Block.popResource；爆炸物方块连锁留 TODO(S3.09)；粒子改 ServerLevel#sendParticles | S3.04 |
 | DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlast.java | IBlast 查询方法全部返回固定值，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
 | DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlastVelocity.java | onBlastApplyMotion 恒返回 false，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
-| TODO | icbm/classic/content/blast/ender/BlastEnder.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/ender/EnderBlastCustomization.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/ender/BlastEnder.java | 传送逻辑照抄（搜寻落点、传送实体与自身方块）；Forge 事件无对应物故直接执行；目标点来自 ExplosiveSettings#enderTarget（S3.07 新增 GlobalPos 字段） | S3.07 |
+| PORTED | icbm/classic/content/blast/ender/EnderBlastCustomization.java | 爆炸自定义（末影目标坐标）照抄，标签读写走 ValueInput/Output，配置版本号与 1.12 一致 | S3.07 |
 | PORTED | icbm/classic/content/blast/gas/BlastChemical.java | 伤害源改 ModDamageTypes.CHEMICAL；毒性累积/最小伤害照抄；毒作用改施加注册的 TOXIN 效果 | S3.05 |
 | PORTED | icbm/classic/content/blast/gas/BlastColor.java | 颜色爆炸照抄（依赖 lib/colors 两个纯数学类） | S3.05 |
 | PORTED | icbm/classic/content/blast/gas/BlastContagious.java | 伤害源改 ModDamageTypes.CONTAGIOUS；传染分支照抄；作用改注册的 VIRUS 效果 | S3.05 |
@@ -443,8 +443,8 @@
 | TODO | icbm/classic/content/radioactive/BlockRadioactive.java | 平铺化方块 | S2.03、S3.08 |
 | TODO | icbm/classic/content/radioactive/RadioactiveHandler.java | 平铺化方块 | S2.03、S3.08 |
 | MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品 | S2.01 |
-| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块 | S2.01、S3.02、S3.03、S3.06 |
-| PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂为 S3 占位（throw） | S2.02 |
+| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块；S3.07 在实体类型建好后注册 EMP 接收器（IcbmLookups.init 早于本类） | S2.01、S3.02、S3.03、S3.06、S3.07 |
+| PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂逐个换成真实实现（S3.04–S3.08 全部完成，无 todoBlast 占位） | S2.02、S3.04、S3.05、S3.06、S3.07、S3.08 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07） | S2.01 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityBombCartDataFixer.java | 不迁移旧存档（ADR 0002） | — |
@@ -464,7 +464,7 @@
 | PORTED | icbm/classic/lib/actions/ActionBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/ActionDataBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/ActionDataGeneric.java | 动作系统（ISavable + SaveHandler） | S1.08 |
-| PORTED | icbm/classic/lib/actions/ActionSystem.java | 动作系统（ISavable + SaveHandler） | S1.08 |
+| PORTED | icbm/classic/lib/actions/ActionSystem.java | 动作系统（ISavable + SaveHandler）；S3.05 注册 icbmclassic:entity.spawn、S3.07 注册 icbmclassic:emp.area | S1.08、S3.05、S3.07 |
 | PORTED | icbm/classic/lib/actions/PotentialAction.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/PotentialActionImp.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/PotentialActionKnown.java | 动作系统（ISavable + SaveHandler） | S1.08 |
@@ -482,11 +482,11 @@
 | PORTED | icbm/classic/lib/buildable/BuildableObject.java | 实现新接口 ISavable；save/load(ValueOutput/ValueInput) 经 SaveHandler<T>；Lombok @Getter 改显式 getter | S1.03 |
 | PORTED | icbm/classic/lib/buildable/BuildableObjectRegistry.java | 键 ResourceLocation→Identifier；FMLCommonHandler mod name 改为模组 id；Lombok @Getter 改显式 isLocked() | S1.03 |
 | MERGED | icbm/classic/lib/capability/chicken/CapSpaceChicken.java | MERGED → 数据附件 ModAttachments.SPACE_CHICKEN（保留 isSpace/setSpace 静态工具，删除 DataManager/Capability 外壳） | S1.10 |
-| MERGED | icbm/classic/lib/capability/emp/CapabilityEMP.java | MERGED → IcbmLookups#init() 注册原版 EMP 接收器（EntityTypes.ITEM/CREEPER，替代 AttachCapabilitiesEvent） | S1.10 |
+| MERGED | icbm/classic/lib/capability/emp/CapabilityEMP.java | MERGED → IcbmLookups#init() 注册原版 EMP 接收器（EntityTypes.ITEM/CREEPER，替代 AttachCapabilitiesEvent）；模组自身实体类型（primed_explosive）由 ModEntities 在类型建好后注册（IcbmLookups.init 更早） | S1.10、S3.07 |
 | PORTED | icbm/classic/lib/capability/emp/CapabilityEmpChecker.java | 普通类，仅实现 IEMPReceiver（含新增 API Lookup 之外无 capability 代码） | S1.10 |
 | PORTED | icbm/classic/lib/capability/emp/CapabilityEmpCreeper.java | World→Level；EntityLightningBolt→EntityTypes.LIGHTNING_BOLT + Creeper#thunderHit；删 ICapabilityProvider | S1.10 |
 | PORTED | icbm/classic/lib/capability/emp/CapabilityEmpEntityItem.java | EntityItem→ItemEntity；stacksMatchExact→ItemStack.matches；删 ICapabilityProvider | S1.10 |
-| MERGED | icbm/classic/lib/capability/emp/CapabilityEmpInventory.java | MERGED → vanilla Container 版（IItemHandler → Container，getCapability() → getContainer()）；item-in-item 库存待 S3.07、能量抽空待 S6.05 | S1.10 |
+| MERGED | icbm/classic/lib/capability/emp/CapabilityEmpInventory.java | MERGED → vanilla Container 版（IItemHandler → Container，getCapability() → getContainer()；EntityInv 的 Player→getInventory()）；item 内层库存分支保持 1.12 行为（1.12 会在 EntityInv/TileInv 之间无终止递归，故留 TODO(S3.07) 与注释，不复活该缺陷）、能量抽空待 S6.05 | S1.10、S3.07 |
 | PORTED | icbm/classic/lib/capability/emp/CapabilityEmpKill.java | setDead→discard | S1.10 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosive.java | 删 ICapabilitySerializable，改 ISavable（EXPLOSIVE_ID 走 ValueOutput/ValueInput） | S1.10 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveEntity.java | ISavable；ItemEntity 掉落、ItemStack.isSameItem、level.isClientSide() | S1.10 |

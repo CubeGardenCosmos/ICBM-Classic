@@ -9,6 +9,7 @@ import icbm.classic.api.reg.IExplosiveData;
 import icbm.classic.api.reg.events.ExplosiveContentRegistryEvent;
 import icbm.classic.api.reg.events.ExplosiveRegistryEvent;
 import icbm.classic.config.blast.ConfigBlast;
+import icbm.classic.content.actions.emp.ActionDataEmpArea;
 import icbm.classic.content.actions.entity.ActionSpawnEntity;
 import icbm.classic.content.blast.BlastAntiGravitational;
 import icbm.classic.content.blast.BlastBreach;
@@ -16,6 +17,7 @@ import icbm.classic.content.blast.gas.BlastChemical;
 import icbm.classic.content.blast.gas.BlastColor;
 import icbm.classic.content.blast.gas.BlastContagious;
 import icbm.classic.content.blast.gas.BlastDebilitation;
+import icbm.classic.content.blast.ender.BlastEnder;
 import icbm.classic.content.blast.BlastEndothermic;
 import icbm.classic.content.blast.BlastExothermic;
 import icbm.classic.content.blast.BlastFire;
@@ -254,7 +256,8 @@ public final class ExplosiveInit
 
 
         // 1.12: ActionDataEmpArea.INSTANCE.create(w, x, y, z, s, null)
-        ICBMExplosives.EMP = newEx(EnumTier.THREE, "emp", todoBlast("emp", "S3.07"));
+        ICBMExplosives.EMP = newEx(EnumTier.THREE, "emp",
+                (w, x, y, z, s) -> ActionDataEmpArea.INSTANCE.create(w, x, y, z, s, null));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.EMP.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.EMP);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.EMP.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.EMP);
 
@@ -284,7 +287,8 @@ public final class ExplosiveInit
 
 
         // 1.12: new BlastEnder().setBlastSize(ConfigBlast.ender.scale)
-        ICBMExplosives.ENDER = newEx(EnumTier.THREE, "ender", todoBlast("ender", "S3.07"));
+        ICBMExplosives.ENDER = newEx(EnumTier.THREE, "ender",
+                (w, x, y, z, s) -> new BlastEnder().setBlastSize(ConfigBlast.ender.scale).setBlastWorld(w).setBlastPosition(x, y, z));
         ICBMClassicAPI.EX_MISSILE_REGISTRY.setInteractionListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::todoEnderMissileCoordSet);
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setActivationListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::todoEnderBlockCoordSet);
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.ENDER.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.ENDER);

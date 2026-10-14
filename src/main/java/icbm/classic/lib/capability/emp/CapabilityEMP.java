@@ -36,5 +36,11 @@ public final class CapabilityEMP
         IcbmLookups.EMP_RECEIVER_ENTITY.registerForTypes(
                 (entity, context) -> entity instanceof Creeper creeper ? new CapabilityEmpCreeper(creeper) : null,
                 EntityTypes.CREEPER);
+
+        // 1.12: EntityExplosive exposed capabilityEMP (CapabilityEmpKill) through
+        // getCapability(CapabilityEMP.EMP, null); the entity itself implements IEMPReceiver, so it is its own
+        // receiver on the lookup. This runs before ModEntities registers the type (IcbmLookups.init is called
+        // first in ICBMClassic#onInitialize), so the mod's own entity types are registered from
+        // ModEntities#register once their EntityType exists.
     }
 }
