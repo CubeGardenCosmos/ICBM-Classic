@@ -370,16 +370,16 @@
 | TODO | icbm/classic/content/cluster/missile/RecipeCluster.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/entity/EntityBombCart.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
 | PORTED | icbm/classic/content/entity/EntityExplosion.java | IEntityAdditionalSpawnData 删除 → 爆炸 ID/偏移走 SynchedEntityData，blast 只在服务端构造；setDead→discard、readEntityFromNBT→readAdditionalSaveData(ValueInput)；注册为 explosion_holder（7 区块/5 tick） | S3.02 |
-| TODO | icbm/classic/content/entity/EntityExplosive.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/EntityFragments.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
+| PORTED | icbm/classic/content/entity/EntityExplosive.java | IEntityAdditionalSpawnData → SynchedEntityData（爆炸 id/引信/朝向）；IRotatable 保留、IExplosive 改由实体自身实现（IEMPReceiver 转发 CapabilityEmpKill）；引信到时仍走 EXPLOSIVE_REGISTRY→IExplosiveData#create→doAction（工厂在 S3.04 前仍为占位） | S3.03 |
+| PORTED | icbm/classic/content/entity/EntityFragments.java | 三种模式（箭/铁砧/爆炸）保留；伤害源沿用 1.12 的原版 arrow 类型（1.12 TODO 不修）；mode/damage/critical 等改 SynchedEntityData，其余走 SaveHandler；已加 en_us 键 entity.icbmclassic.fragment | S3.03 |
 | TODO | icbm/classic/content/entity/EntityGrenade.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/EntityLightBeam.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
+| PORTED | icbm/classic/content/entity/EntityLightBeam.java | 光束颜色/尺寸/进度改 SynchedEntityData（updateDataBeforeSync + onSyncedDataUpdated 回填 1.12 公开字段）；1.12 存档方法本身为空，端口按字段表补 SaveHandler 并记录 | S3.03 |
 | TODO | icbm/classic/content/entity/EntityPlayerSeat.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/EntitySmoke.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/flyingblock/BlockCaptureData.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/flyingblock/EntityFlyingBlock.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/flyingblock/FlyingBlock.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/flyingblock/RenderEntityBlock.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
+| PORTED | icbm/classic/content/entity/EntitySmoke.java | 颜色/寿命改 SynchedEntityData；粒子 world.spawnParticle → ServerLevel#sendParticles（ParticleTypes.SMOKE，数量/速度换算与 1.12 等效） | S3.03 |
+| PORTED | icbm/classic/content/entity/flyingblock/BlockCaptureData.java | INBTSerializable<NBTTagCompound> → ISavable(ValueInput/ValueOutput)；键名原样（block_state/source_stack/block_entity） | S3.03 |
+| PORTED | icbm/classic/content/entity/flyingblock/EntityFlyingBlock.java | 继承移植后的 EntityProjectile；方块状态走 EntityDataSerializers.BLOCK_STATE（S4.07 渲染用）；落地放回方块/掉落逻辑照抄；gravity 钩子改名 getProjectileGravity（26.3 getGravity 为 final） | S3.03 |
+| PORTED | icbm/classic/content/entity/flyingblock/FlyingBlock.java | 静态生成/白名单/配置加载照抄；spawn 回调在 addFreshEntity 前推同步数据（等价 1.12 spawn data 时机） | S3.03 |
+| TODO | icbm/classic/content/entity/flyingblock/RenderEntityBlock.java | 渲染器，改写成 26.3 EntityRenderer 的工作在 S4.07（步骤卡 S3.03 明确排除） | S4.07 |
 | TODO | icbm/classic/content/gas/ProtectiveArmorHandler.java | 气体爆炸 | S3.05 |
 | PORTED | icbm/classic/content/items/ItemAntidote.java | 食用改 food/consumable 组件；效果清除改 finishUsingItem（显式清单，S3.05 补 ICBM 效果） | S2.04 |
 | TODO | icbm/classic/content/items/ItemBattery.java |  | — |

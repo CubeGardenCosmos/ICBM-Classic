@@ -10,6 +10,7 @@
   "effect.icbmclassic.radiation": "Radiation",
   "effect.icbmclassic.toxin": "Toxin",
   "effect.icbmclassic.virus": "Virus",
+  "entity.icbmclassic.fragment": "Fragments",
   "icbmclassic.block.battery_box.0.name": "Battery Box",
   "icbmclassic.block.concrete.0.name": "Concrete",
   "icbmclassic.block.concrete.1.name": "Compact Concrete",
