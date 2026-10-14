@@ -13,6 +13,7 @@ import icbm.classic.lib.NBTConstants;
 import icbm.classic.lib.actions.WorkTickingActionHandler;
 import icbm.classic.lib.actions.status.ActionResponses;
 import icbm.classic.lib.transform.vector.Location;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -33,6 +34,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,6 +78,12 @@ public abstract class Blast implements IBlastInit, IBlastRestore, Explosion
     private boolean hasSetupBlast = false;
 
     private boolean hasBuilt = false;
+
+    /**
+     * Blocks this explosion has destroyed. 1.12 inherited the list (and its getter) from the vanilla
+     * {@code Explosion} class, 26.3 only has the {@link Explosion} interface so the port keeps it here.
+     */
+    private final List<BlockPos> affectedBlockPositions = new ArrayList<>();
 
     private IExplosiveData explosiveData;
     private IActionSource actionSource;
@@ -658,5 +666,15 @@ public abstract class Blast implements IBlastInit, IBlastRestore, Explosion
         {
             controller.discard(); //1.12: controller.setDead()
         }
+    }
+
+    /**
+     * Blocks this explosion has destroyed. 1.12 callers used this to look up what the explosion touched.
+     *
+     * @return live list of destroyed block positions
+     */
+    public List<BlockPos> getAffectedBlockPositions()
+    {
+        return affectedBlockPositions;
     }
 }

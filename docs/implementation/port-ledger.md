@@ -229,20 +229,21 @@
 | MERGED → S3.07 | icbm/classic/content/actions/emp/ActionEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
 | MERGED → S3.07 | icbm/classic/content/actions/emp/EmpHandler.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
 | MERGED → S3.05 | icbm/classic/content/actions/entity/ActionSpawnEntity.java | 生成实体动作，随内容实体在 S3.05 移植 | S3.05 |
-| PORTED | icbm/classic/content/blast/Blast.java | 26.3 的 Explosion 是接口 → 改为 implements（不再 extends 构造器）；删 Forge onExplosionStart 钩子与 doExplosionA/B；线程字段（thread/threadResults/ThreadExplosion）随 S3.06 重建一并删除；保留 1.12 缺陷 getBlastSource 自递归 | S3.02 |
-| TODO | icbm/classic/content/blast/BlastAntiGravitational.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastBeam.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastBreach.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastEndothermic.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastExothermic.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastFire.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/Blast.java | 26.3 的 Explosion 是接口 → 改为 implements（不再 extends 构造器）；删 Forge onExplosionStart 钩子与 doExplosionA/B；线程字段（thread/threadResults/ThreadExplosion）随 S3.06 重建一并删除；保留 1.12 缺陷 getBlastSource 自递归；S3.04 补回 1.12 从 Explosion 继承的 affectedBlockPositions/getAffectedBlockPositions | S3.02、S3.04 |
+| PORTED | icbm/classic/content/blast/BlastAntiGravitational.java | 去掉旧 ThreadSmallExplosion 字段，只用 doRun + getThreadResults()；飞行方块生成/实体抬升/RUNNING_TICKS 照抄 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastBeam.java | 两次 worker 遍历跑在 S1.09 框架（每次 capture 独立快照、结果回主线程）；光束/飞行方块/换块/计时顺序与 1.12 的 8 个 has* 标志一致；createExplosion → level.explode | S3.04 |
+| MERGED → icbm/classic/content/blast/threaded/BlastThreaded.java（新增：1.12 的 Blast 线程字段 + ThreadExplosion 外壳在 26.3 的归处） | icbm/classic/content/blast/threaded/BlastThreaded.java | 无 1.12 对应文件：把 Blast 里的 thread/threadResults/createAndStartThread/markThreadCompleted/isThreadCompleted 收敛到线程基类，跑在 S1.09 的 LevelSnapshot/BlockEditQueue 上 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastBreach.java | 继承 BlastTNT；朝向枚举改 Direction、getFrontOffset* → getStep*、getAdjustedHorizontalFacing → getDirection；HOST_DIRECTION 字段保留 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastEndothermic.java | 制冷表照抄（水→冰、熔岩→黑曜石、流动熔岩→雪层、岩浆块→石头等）与药水效果；setWorldTime 改 clockManager | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastExothermic.java | 换热表照抄（水/冰/植物/岩/沙/土 → 熔岩/岩浆块/下界岩/火）；改为经 mutateBlocks(worker 结果) 生效；setWorldTime 改 clockManager | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastFire.java | 放火用 BaseFireBlock.getState + canSurvive；其余照抄 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastHelpers.java | Int3Consumer/Int3Looper 改自 api.data，循环与停止语义不变 | S3.02 |
-| TODO | icbm/classic/content/blast/BlastMutation.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastRadioactiveBlockSwaps.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastShrapnel.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastSonic.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/BlastMutation.java | 手工生成转换实体 → Mob#convertTo(EntityType, ConversionParams, AfterConversion)（新实体生成、旧实体 discard）；不改声音禁用的行为 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastRadioactiveBlockSwaps.java | 继承 BlastThreaded + IBlastTickable；替换表先用 BuiltInRegistries.BLOCK 按 id 解析 radioactive_dirt/stone（缺则跳过并 warn），TODO(S3.08) 换成 RadioactiveHandler 的表 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastShrapnel.java | setLocationAndAngles → setPos+setYRot/setXRot（含 yRotO/xRotO）；motion 写改 setDeltaMovement；六面环生成逻辑与 1.12 一致 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastSonic.java | 由 Blast 改继承 BlastThreaded，ThreadLargeExplosion 的射线收集并入 doRun(worker+快照)；每 4 tick 消费结果、区块半径增长、实体击退照 1.12 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastStatus.java | new ResourceLocation(DOMAIN,…) → ICBMConstants.id(…)，ImmutableStatus 工厂不变 | S3.02 |
-| TODO | icbm/classic/content/blast/BlastTNT.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/BlastTNT.java | 射线/能量/推拉数学照抄（PushType 保留）；onBlockExploded+掉落 → BlockState#onExplosionHit + Block.popResource；爆炸物方块连锁留 TODO(S3.09)；粒子改 ServerLevel#sendParticles | S3.04 |
 | DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlast.java | IBlast 查询方法全部返回固定值，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
 | DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlastVelocity.java | onBlastApplyMotion 恒返回 false，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
 | TODO | icbm/classic/content/blast/ender/BlastEnder.java | 各爆炸实现 | S3.02–S3.07 |
