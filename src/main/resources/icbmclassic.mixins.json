@@ -3,6 +3,6 @@
   "minVersion": "0.8",
   "package": "icbm.classic.mixin",
   "compatibilityLevel": "JAVA_25",
-  "mixins": [],
+  "mixins": ["MinecartTNTAccessor"],
   "injectors": { "defaultRequire": 1 }
 }

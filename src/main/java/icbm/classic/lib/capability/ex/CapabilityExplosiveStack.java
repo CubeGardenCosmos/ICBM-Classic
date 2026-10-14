@@ -7,6 +7,7 @@ import icbm.classic.api.explosion.IBlast;
 import icbm.classic.api.reg.IExplosiveCustomization;
 import icbm.classic.api.reg.IExplosiveData;
 import icbm.classic.content.blocks.explosive.ExplosiveBlock;
+import icbm.classic.content.items.ExplosiveFormItem;
 import icbm.classic.lib.saving.ISavable;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
@@ -54,8 +55,9 @@ public class CapabilityExplosiveStack implements IExplosive, ISavable
      * {@code ItemStack#getCapability(ICBMClassicAPI.EXPLOSIVE_CAPABILITY, null)}.
      * <p>
      * A block explosive carries its id on the block (1.12 used the item metadata, and the flat block item is
-     * the only explosive item of this step); the flat missile, grenade and bomb cart items have their own id
-     * and are added by S4/S5.
+     * the only explosive item of this step); the flat missile, grenade and bomb cart items carry their own id
+     * and are handled by S4/S5 (S4.05 added the grenade and bomb cart, see {@code ItemGrenade}/
+     * {@code ItemBombCart} extending {@code ExplosiveFormItem}).
      *
      * @param stack to read
      * @return explosive of the stack, null when the item is not an explosive (1.12 {@code hasCapability})
@@ -63,11 +65,18 @@ public class CapabilityExplosiveStack implements IExplosive, ISavable
     @Nullable
     public static CapabilityExplosiveStack fromStack(ItemStack stack)
     {
-        if (stack != null && !stack.isEmpty()
-                && stack.getItem() instanceof BlockItem blockItem
-                && blockItem.getBlock() instanceof ExplosiveBlock explosiveBlock)
+        if (stack != null && !stack.isEmpty())
         {
-            return new CapabilityExplosiveStack(stack, explosiveBlock.getExplosiveId());
+            if (stack.getItem() instanceof BlockItem blockItem
+                    && blockItem.getBlock() instanceof ExplosiveBlock explosiveBlock)
+            {
+                return new CapabilityExplosiveStack(stack, explosiveBlock.getExplosiveId());
+            }
+            // S4.05/S4.02/S4.06: the flat missile, grenade, bomb cart and bomblet items carry their own id
+            if (stack.getItem() instanceof ExplosiveFormItem formItem)
+            {
+                return new CapabilityExplosiveStack(stack, formItem.getExplosiveId());
+            }
         }
         return null;
     }

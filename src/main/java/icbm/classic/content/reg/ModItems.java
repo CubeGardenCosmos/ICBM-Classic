@@ -3,6 +3,8 @@ package icbm.classic.content.reg;
 import icbm.classic.config.ConfigItems;
 import icbm.classic.content.items.ExplosiveFormItem;
 import icbm.classic.content.items.ItemAntidote;
+import icbm.classic.content.items.ItemBombCart;
+import icbm.classic.content.items.ItemGrenade;
 import icbm.classic.content.items.ItemMissile;
 import icbm.classic.content.missile.entity.anti.item.CapabilitySAMStack;
 import icbm.classic.content.missile.entity.anti.item.ItemSurfaceToAirMissile;
@@ -147,6 +149,8 @@ public final class ModItems
         return switch (form)
         {
             case MISSILE -> new ItemMissile(ex, form, p.stacksTo(ItemMissile.MAX_STACK_SIZE));
+            case GRENADE -> new ItemGrenade(ex, form, p.stacksTo(ItemGrenade.MAX_STACK_SIZE));
+            case BOMB_CART -> new ItemBombCart(ex, form, p.stacksTo(ItemBombCart.MAX_STACK_SIZE));
             default -> new ExplosiveFormItem(ex, form, p);
         };
     }

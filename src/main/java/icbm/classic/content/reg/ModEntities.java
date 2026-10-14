@@ -1,9 +1,11 @@
 package icbm.classic.content.reg;
 
 import icbm.classic.api.refs.ICBMEntities;
+import icbm.classic.content.entity.EntityBombCart;
 import icbm.classic.content.entity.EntityExplosion;
 import icbm.classic.content.entity.EntityExplosive;
 import icbm.classic.content.entity.EntityFragments;
+import icbm.classic.content.entity.EntityGrenade;
 import icbm.classic.content.entity.EntityLightBeam;
 import icbm.classic.content.entity.EntitySmoke;
 import icbm.classic.content.blast.redmatter.EntityRedmatter;
@@ -54,6 +56,12 @@ public final class ModEntities
     /** Redmatter, 1.12 {@code redmatter} (500 blocks / 1 → 32 chunks / 1) */
     public static EntityType<EntityRedmatter> REDMATTER;
 
+    /** Thrown grenade, 1.12 {@code item.grenade} (50 blocks / 5 → 4 chunks / 5, S4.05) */
+    public static EntityType<EntityGrenade> GRENADE;
+
+    /** Explosive minecart, 1.12 {@code cart.bomb} (50 blocks / 2 → 4 chunks / 2, S4.05) */
+    public static EntityType<EntityBombCart> BOMB_CART;
+
     /** Explosive missile, 1.12 {@code explosive_missile} (500 blocks / 1 → 32 chunks / 1, S4.02) */
     public static EntityType<EntityExplosiveMissile> EXPLOSIVE_MISSILE;
 
@@ -87,8 +95,12 @@ public final class ModEntities
         // 1.12 EntityReg: buildEntityEntry(EntityRedmatter.class, ICBMEntities.REDMATTER, 500, 1)
         REDMATTER = registerEntity(ICBMEntities.REDMATTER, 0.98F, 0.98F, 32, 1, EntityRedmatter::new);
 
+        // 1.12 EntityReg: buildEntityEntry(EntityGrenade.class, ICBMEntities.GRENADE, 50, 5)
         // 1.12 size comes from the EntityGrenade constructor (setSize(0.25F, 0.25F))
+        GRENADE = registerEntity(ICBMEntities.GRENADE, 0.25F, 0.25F, 4, 5, EntityGrenade::new);
+        // 1.12 EntityReg: buildEntityEntry(EntityBombCart.class, ICBMEntities.BOMB_CART, 50, 2)
         // 1.12 size is the vanilla minecart one inherited from EntityMinecartTNT (0.98F x 0.7F)
+        BOMB_CART = registerEntity(ICBMEntities.BOMB_CART, 0.98F, 0.7F, 4, 2, EntityBombCart::new);
 
         // 1.12 EntityReg: buildEntityEntry(EntityExplosiveMissile.class, ICBMEntities.MISSILE_EXPLOSIVE, 500, 1)
         EXPLOSIVE_MISSILE = registerEntity(ICBMEntities.MISSILE_EXPLOSIVE, 0.5F, 0.5F, 32, 1, EntityExplosiveMissile::new);

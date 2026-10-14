@@ -40,6 +40,7 @@
       "icbm.classic.test.entity.BeamSmokeGameTest",
       "icbm.classic.test.block.ExplosiveBlockGameTest",
       "icbm.classic.test.command.CommandGameTest",
+      "icbm.classic.test.entity.GrenadeBombCartGameTest",
       "icbm.classic.test.missile.MissileSystemGameTest",
       "icbm.classic.test.missile.MissileFlightGameTest",
       "icbm.classic.test.missile.MissileTrackerGameTest",

@@ -369,11 +369,11 @@
 | TODO | icbm/classic/content/cluster/missile/ClusterMissileHandler.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/cluster/missile/ItemClusterMissile.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/cluster/missile/RecipeCluster.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/entity/EntityBombCart.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
+| PORTED | icbm/classic/content/entity/EntityBombCart.java | 继承原版 MinecartTNT（26.3 包 vehicle.minecart）；IEntityAdditionalSpawnData → SynchedEntityData（爆炸物物品栈）；explodeCart → explode(DamageSource,double)、killMinecart → destroy(ServerLevel,DamageSource)、ignite → primeFuse（引信经 Mixin Accessor 覆盖）、getDefaultDisplayTile → getDefaultDisplayBlockState（按爆炸 id 取平铺方块 + FACING=UP）；爆炸走 CapabilityExplosiveEntity → 爆炸物工厂；注册 bomb_cart（4 区块/2 tick，0.98x0.7） | S4.05 |
 | PORTED | icbm/classic/content/entity/EntityExplosion.java | IEntityAdditionalSpawnData 删除 → 爆炸 ID/偏移走 SynchedEntityData，blast 只在服务端构造；setDead→discard、readEntityFromNBT→readAdditionalSaveData(ValueInput)；注册为 explosion_holder（7 区块/5 tick） | S3.02 |
 | PORTED | icbm/classic/content/entity/EntityExplosive.java | IEntityAdditionalSpawnData → SynchedEntityData（爆炸 id/引信/朝向）；IRotatable 保留、IExplosive 改由实体自身实现（IEMPReceiver 转发 CapabilityEmpKill）；引信到时仍走 EXPLOSIVE_REGISTRY→IExplosiveData#create→doAction（工厂在 S3.04 前仍为占位） | S3.03 |
 | PORTED | icbm/classic/content/entity/EntityFragments.java | 三种模式（箭/铁砧/爆炸）保留；伤害源沿用 1.12 的原版 arrow 类型（1.12 TODO 不修）；mode/damage/critical 等改 SynchedEntityData，其余走 SaveHandler；已加 en_us 键 entity.icbmclassic.fragment | S3.03 |
-| TODO | icbm/classic/content/entity/EntityGrenade.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
+| PORTED | icbm/classic/content/entity/EntityGrenade.java | 继承 Entity；IEntityAdditionalSpawnData → SynchedEntityData（爆炸物物品栈，客户端渲染/解析爆炸 id）；motionX/Y/Z → getDeltaMovement/setDeltaMovement、rotationYaw/Pitch → setYRot/setXRot + yRotO/xRotO、setLocationAndAngles → snapTo、ticksExisted → tickCount、canBeCollidedWith/canBePushed → isPickable/isPushable；IExplosive 由实体自身实现（转发 CapabilityExplosiveEntity）；handleWaterMovement/canTriggerWalking 无 26.3 对应删除；引信走 EX_GRENADE_REGISTRY；注册 grenade（4 区块/5 tick，0.25x0.25） | S4.05 |
 | PORTED | icbm/classic/content/entity/EntityLightBeam.java | 光束颜色/尺寸/进度改 SynchedEntityData（updateDataBeforeSync + onSyncedDataUpdated 回填 1.12 公开字段）；1.12 存档方法本身为空，端口按字段表补 SaveHandler 并记录 | S3.03 |
 | TODO | icbm/classic/content/entity/EntityPlayerSeat.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
 | PORTED | icbm/classic/content/entity/EntitySmoke.java | 颜色/寿命改 SynchedEntityData；粒子 world.spawnParticle → ServerLevel#sendParticles（ParticleTypes.SMOKE，数量/速度换算与 1.12 等效） | S3.03 |
@@ -384,10 +384,10 @@
 | PORTED | icbm/classic/content/gas/ProtectiveArmorHandler.java | 配置项改 ConfigMain.protectiveArmor（item_ratings 字符串列表，ItemStackConfigList.FloatOut 已在 S1.02 移植）；护甲槽用 EquipmentSlotGroup.ARMOR 的人类槽位 | S3.05 |
 | PORTED | icbm/classic/content/items/ItemAntidote.java | 食用改 food/consumable 组件；效果清除改 finishUsingItem，清单在 S3.05 补齐（4 个 ICBM 效果 + gas 用到的原版效果） | S2.04、S3.05 |
 | TODO | icbm/classic/content/items/ItemBattery.java |  | — |
-| TODO | icbm/classic/content/items/ItemBombCart.java | S2.05 注册 ExplosiveFormItem 占位（23 个平铺化炸弹矿车）；S4.05 换成真实物品 | S2.05、S4.05 |
+| PORTED | icbm/classic/content/items/ItemBombCart.java | 继承 ExplosiveFormItem；onItemUse → useOn(UseOnContext)，在铁轨上放 EntityBombCart（BlockRailBase.isRailBlock → BlockTags.RAILS，isAscending → RailShape#isSlope）；stack size 3、initCapabilities（Forge）删除（爆炸 id 由扁平物品自带），元数据/getSubItems 删除；显示名沿用物品的 CUSTOM_NAME 组件 | S2.05、S4.05 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/items/ItemCrafting.java | 元数据子类型改为 10 个平铺化普通 Item；OreDictionary → c: 标签（S2.07） | S2.04 |
 | TODO | icbm/classic/content/items/ItemDefuser.java |  | — |
-| TODO | icbm/classic/content/items/ItemGrenade.java | S2.05 注册 ExplosiveFormItem 占位（10 个平铺化手雷）；S4.05 换成真实手雷物品 | S2.05、S4.05 |
+| PORTED | icbm/classic/content/items/ItemGrenade.java | 继承 ExplosiveFormItem；蓄力投掷照抄：getItemUseAction → getUseAnimation(BOW)、getMaxItemUseDuration → getUseDuration(ItemStack,LivingEntity)、onItemRightClick → use（startUsingItem + CONSUME）、onPlayerStoppedUsing → releaseUsing（生成 EntityGrenade，按蓄力算投掷能量，音效 ENTITY_TNT_PRIMED → TNT_PRIMED）；stack size 16；initCapabilities（Forge）删除（爆炸 id 由扁平物品自带），元数据/getSubItems 删除；tier 提示沿用翻译键 | S2.05、S4.05 |
 | TODO | icbm/classic/content/items/ItemLaserDetonator.java |  | — |
 | PORTED | icbm/classic/content/items/ItemMissile.java | 继承 ExplosiveFormItem；appendHoverText 显示等级（appendExplosiveTier）与 collectInformation；ModItems 注册 23 个平铺物品并注册 IcbmLookups.MISSILE_STACK | S2.05、S4.02 |
 | TODO | icbm/classic/content/items/ItemRadarGun.java |  | — |
@@ -446,7 +446,7 @@
 | MERGED → icbm/classic/content/reg/ModBlockEntities.java | icbm/classic/content/reg/BlockReg.java（registerTileEntity 部分） | GameRegistry.registerTileEntity(TileEntityExplosive) → Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, icbmclassic:explosive, FabricBlockEntityTypeBuilder.create(ExplosiveBlockEntity::new, <23 个平铺爆炸物方块>).build())，23 个方块共享一个类型（registry-ids.md §2）；S5.02–S5.06 的机器类型仍 TODO | S3.09 |
 | MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块；S3.07 在实体类型建好后注册 EMP 接收器（IcbmLookups.init 早于本类）；S4.05 注册 grenade/bomb_cart | S2.01、S3.02、S3.03、S3.06、S3.07、S4.05 |
 | PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂逐个换成真实实现（S3.04–S3.08 全部完成，无 todoBlast 占位）；S3.09 末影激活监听器落地（todoEnderBlockCoordSet → 读 icbmclassic:gps_data 写 ExplosiveSettings#enderTarget 并提示 icbmclassic.message.launcher.toolTargetSet/noTargetInTool）；导弹侧 todoEnderMissileCoordSet 仍为 TODO(S3.07) | S2.02、S3.04、S3.05、S3.06、S3.07、S3.08、S3.09 |
-| MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07） | S2.01 |
+| MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07）；S4.05 registerFormItems 按形态选真实类（GRENADE→ItemGrenade、BOMB_CART→ItemBombCart，其余仍 ExplosiveFormItem） | S2.01、S4.05 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityBombCartDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityExplosiveDataFixer.java | 不迁移旧存档（ADR 0002） | — |

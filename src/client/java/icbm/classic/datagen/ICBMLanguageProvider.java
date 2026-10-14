@@ -123,6 +123,8 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         ENTITY_NAMES.put("light_beam", "Light Beam");
         ENTITY_NAMES.put("smoke", "Smoke");
         ENTITY_NAMES.put("redmatter", "Red Matter");
+        ENTITY_NAMES.put("grenade", "Grenade");
+        ENTITY_NAMES.put("bomb_cart", "Bomb Cart");
         ENTITY_NAMES.put("explosive_missile", "Explosive Missile");
         ENTITY_NAMES.put("generic_missile", "Generic Missile");
         ENTITY_NAMES.put("anti_ballistic_missile", "Anti-Ballistic Missile");
