@@ -16,8 +16,8 @@ import net.minecraft.world.phys.Vec3;
  * Spawns a colored air particle on the client.
  *
  * 1.12: {@code PacketSpawnAirParticle} (dimension id + position + velocity + color + size + life time).
- * The dimension is an id in 26.3, so the packet carries the dimension identifier. Particle types are not
- * ported yet, the receiving side only logs until S4.07 completes the effect.
+ * The dimension is an id in 26.3, so the packet carries the dimension identifier. The client receiver spawns
+ * the ICBM smoke particle (S4.07, {@code ModParticlesClient#spawnSmoke}).
  */
 public record AirParticlePayload(Identifier dimension, double posX, double posY, double posZ,
                                  double v, double v1, double v2,

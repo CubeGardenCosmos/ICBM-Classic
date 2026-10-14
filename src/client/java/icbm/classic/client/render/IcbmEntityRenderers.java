@@ -2,21 +2,32 @@ package icbm.classic.client.render;
 
 import icbm.classic.ICBMConstants;
 import icbm.classic.client.ICBMClassicClient;
+import icbm.classic.client.model.ModelChickenHelmet;
+import icbm.classic.client.render.entity.IcbmChickenRenderer;
+import icbm.classic.client.render.entity.RenderBombDroplet;
 import icbm.classic.client.render.entity.RenderEntityBlock;
 import icbm.classic.client.render.entity.RenderExBlock;
 import icbm.classic.client.render.entity.RenderFragments;
 import icbm.classic.client.render.entity.RenderLightBeam;
+import icbm.classic.client.render.entity.RenderMissile;
+import icbm.classic.client.render.entity.RenderParachute;
 import icbm.classic.client.render.entity.RenderRedmatter;
+import icbm.classic.client.render.entity.item.RenderAsItem;
+import icbm.classic.content.cargo.balloon.EntityBalloon;
+import icbm.classic.content.entity.EntityGrenade;
 import icbm.classic.content.reg.ModEntities;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.minecraft.client.renderer.entity.TntMinecartRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Registers the client renderer of every entity this mod can spawn.
@@ -48,7 +59,59 @@ public final class IcbmEntityRenderers
         EntityRendererRegistry.register(ModEntities.LIGHT_BEAM, RenderLightBeam::new);
         EntityRendererRegistry.register(ModEntities.REDMATTER, RenderRedmatter::new);
 
-        ClientLifecycleEvents.CLIENT_STARTED.register(client -> validateRenderers());
+        //1.12 registered RenderMissile for the EntityMissile base class, 26.3 needs one registration per type
+        EntityRendererRegistry.register(ModEntities.EXPLOSIVE_MISSILE, RenderMissile::new);
+        EntityRendererRegistry.register(ModEntities.GENERIC_MISSILE, RenderMissile::new);
+        EntityRendererRegistry.register(ModEntities.MISSILE_SAM, RenderMissile::new); //1.12 EntitySurfaceToAirMissile
+        EntityRendererRegistry.register(ModEntities.HELD_ITEM_MISSILE, RenderMissile::new);
+        //1.12: new RenderAsItem<>(rm, EntityGrenade::renderItemStack).setBillboard(true)
+        EntityRendererRegistry.register(ModEntities.GRENADE,
+                context -> new RenderAsItem<>(context, EntityGrenade::renderItemStack).setBillboard(true));
+        //1.12: new RenderAsItem<>(rm, EntityBalloon::getRenderItemStack)
+        EntityRendererRegistry.register(ModEntities.BALLOON,
+                context -> new RenderAsItem<>(context, EntityBalloon::getRenderItemStack));
+        EntityRendererRegistry.register(ModEntities.PARACHUTE, RenderParachute::new);
+        EntityRendererRegistry.register(ModEntities.BOMB_DROPLET, RenderBombDroplet::new);
+        //1.12 drew nothing for the seat (empty doRender with shadowSize 0), NoopRenderer is the 26.3 form
+        EntityRendererRegistry.register(ModEntities.MISSILE_SEAT, NoopRenderer::new);
+        //1.12 the bomb cart extended the vanilla TNT minecart and used its renderer, 26.3 needs the type
+        //registered against our own entity type
+        EntityRendererRegistry.register(ModEntities.BOMB_CART, TntMinecartRenderer::new);
+
+        //Space chicken helmet layer (1.12 ClientProxy#init added it to the vanilla chicken renderer)
+        ModelLayerRegistry.registerModelLayer(ModelChickenHelmet.LAYER, ModelChickenHelmet::createLayerDefinition);
+        EntityRendererRegistry.register(EntityTypes.CHICKEN, IcbmChickenRenderer::new);
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> validateRenderersWhenReady(client));
+    }
+
+    /** True once {@link #validateRenderersWhenReady(Minecraft)} reported its result. */
+    private static boolean renderersValidated;
+
+    /**
+     * The entity renderers are built by {@code EntityRenderDispatcher} during the first client resource reload,
+     * which happens after {@code CLIENT_STARTED}, so the check can not run from that event (it reported every
+     * type as missing, see the S4.07 evidence). This waits for the dispatcher to answer for a vanilla type and
+     * then checks the mod types once.
+     */
+    private static void validateRenderersWhenReady(Minecraft client)
+    {
+        if (renderersValidated)
+        {
+            return;
+        }
+
+        final EntityRenderDispatcher dispatcher = client.getEntityRenderDispatcher();
+        final EntityRenderState probe = new EntityRenderState();
+        //A vanilla type answers only after the dispatcher reloaded the renderers
+        probe.entityType = EntityTypes.CHICKEN;
+        if (dispatcher.getRenderer(probe) == null)
+        {
+            return;
+        }
+
+        renderersValidated = true;
+        validateRenderers(dispatcher, probe);
     }
 
     /**
@@ -57,10 +120,8 @@ public final class IcbmEntityRenderers
      * with a missing renderer the client does not just render nothing, it dies on the next frame of that
      * entity.
      */
-    private static void validateRenderers()
+    private static void validateRenderers(final EntityRenderDispatcher dispatcher, final EntityRenderState probe)
     {
-        final EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        final EntityRenderState probe = new EntityRenderState();
         int checked = 0;
 
         for (final Identifier key : BuiltInRegistries.ENTITY_TYPE.keySet())

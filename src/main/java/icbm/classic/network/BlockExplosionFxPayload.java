@@ -17,8 +17,8 @@ import net.minecraft.world.phys.Vec3;
  * Spawns the explosion effect of a block on the client.
  *
  * 1.12: {@code PacketSpawnBlockExplosion} (dimension id + explosion source + blast scale + block position).
- * The dimension is an id in 26.3, so the packet carries the dimension identifier. Particle types are not
- * ported yet, the receiving side only logs until S4.07 completes the effect.
+ * The dimension is an id in 26.3, so the packet carries the dimension identifier. The client receiver spawns
+ * the vanilla poof/smoke particles (S4.07, {@code ModParticlesClient#spawnExplosionParticles}).
  */
 public record BlockExplosionFxPayload(Identifier dimension, double sourceX, double sourceY, double sourceZ,
                                       double blastScale, BlockPos blockPos) implements CustomPacketPayload

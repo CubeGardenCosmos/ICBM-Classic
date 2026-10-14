@@ -155,6 +155,6 @@ DROPPED：1.12 中注释掉的圣诞节怪物（`skeleton.xmas.*`、`zombie.xmas
   1.12 的 `icbmclassic:projectile` 带 `.setProjectile()` → 26.3 加入标签 `minecraft:is_projectile`；`DamageSourceRedmatter` 的 `setDamageBypassesArmor`/`setDamageIsAbsolute` → 标签 `minecraft:bypasses_armor`、`minecraft:bypasses_enchantments`、`minecraft:bypasses_effects` 与 `"scaling": "never"`。
   1.12 计划中的 `chemical_gas`、`contagious_gas`、`shrapnel`、`antimatter` 并未在 1.12 代码中出现（化学/传染伤害源 id 为 `icbm.chemical`/`icbm.contagious`，破片实体沿用原版 `arrow` 类型，反物质沿用原版爆炸伤害），已按实际 grep 结果替换。
 - 方块实体类型：见 §2 第三列。
-- 粒子类型：S4.07 根据 `client/fx` 确定后补入本表。
+- 粒子类型（S4.07 定稿，来源 `client/fx`）：`smoke_icbm`（1.12 `ParticleSmokeICBM`/`ParticleAirICBM`/`ParticleLauncherSmoke`，26.3 合并为一个 `ParticleIcbmSmoke`；`client/fx/FXAntimatterParticle` 与 `ParticleCollisionLogic` 在 1.12 无调用者，不移植）。粒子贴图复用 `minecraft:generic_0..7`（`assets/icbmclassic/particles/smoke_icbm.json`）。
 - API Lookup ID：`missile`、`missile_launcher`、`missile_holder`、`emp_receiver`。
 - 数据附件：`space_chicken`。

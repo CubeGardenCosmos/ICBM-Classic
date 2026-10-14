@@ -5,13 +5,12 @@ import icbm.classic.content.blast.Blast;
 import icbm.classic.content.gas.ProtectiveArmorHandler;
 import icbm.classic.content.reg.ModSounds;
 import icbm.classic.lib.NBTConstants;
+import icbm.classic.network.AirParticlePayload;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.particles.ColorParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -53,13 +52,9 @@ import java.util.Queue;
  *     distance delay flag only affected client side playback and has no 26.3 argument.</li>
  *     <li>Particles: the 1.12 cloud used {@code ICBMClassic.proxy.spawnAirParticle} (a client side
  *     {@code ParticleAirICBM}, a coloured, non-rising normal smoke puff with scale 7 and a life time of the
- *     cloud duration) sent through {@code PacketSpawnAirParticle}. 26.3 has no coloured smoke particle and the
- *     custom particle belongs to the (pending) renderer step S4.07, so the port emits the closest vanilla
- *     particle: {@link ParticleTypes#ENTITY_EFFECT} (the colour carrying soft sprite, built with
- *     {@link ColorParticleOption#create}) with the same per block position colour, the same per axis velocity
- *     and a count of 0 so the exact block position is kept (26.3 clamps the particle to the position and the
- *     velocity to {@code speed * spread}). The 1.12 scale/life time have no vanilla equivalent and are
- *     dropped, so the cloud is denser and shorter lived than in 1.12 (see the report).</li>
+ *     cloud duration) sent through {@code PacketSpawnAirParticle}. 26.3 sends the same values through
+ *     {@link AirParticlePayload} and the client spawns {@code ParticleIcbmSmoke}
+ *     ({@code ModParticlesClient#spawnSmoke}, S4.07).</li>
  * </ul>
  */
 public abstract class BlastGasBase extends Blast implements IBlastTickable
@@ -345,12 +340,13 @@ public abstract class BlastGasBase extends Blast implements IBlastTickable
         //1.12: ICBMClassic.proxy.spawnAirParticle(world, pos.getX(), pos.getY(), pos.getZ(), vx, vy, vz, red, green, blue, 7.0F, duration)
         if (world() instanceof ServerLevel serverLevel)
         {
-            final ColorParticleOption particle = ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT,
-                    getParticleColorRed(pos), getParticleColorGreen(pos), getParticleColorBlue(pos));
-            //count 0 keeps the exact position and turns xDist/yDist/zDist into the velocity multiplier
-            serverLevel.sendParticles(particle, pos.getX(), pos.getY(), pos.getZ(), 0,
-                    1.0D, 1.0D, 1.0D,
-                    (Math.random() - 0.5) / 2, (Math.random() - 0.5) / 2 - 0.1, (Math.random() - 0.5) / 2);
+            AirParticlePayload.sendToAllClients(serverLevel,
+                    pos.getX(), pos.getY(), pos.getZ(),
+                    (Math.random() - 0.5) / 2,
+                    (Math.random() - 0.5) / 2 - 0.1,
+                    (Math.random() - 0.5) / 2,
+                    getParticleColorRed(pos), getParticleColorGreen(pos), getParticleColorBlue(pos),
+                    7.0F, duration);
         }
     }
 

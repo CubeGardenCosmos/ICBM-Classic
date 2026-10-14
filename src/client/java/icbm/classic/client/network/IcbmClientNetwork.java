@@ -1,6 +1,7 @@
 package icbm.classic.client.network;
 
 import icbm.classic.ICBMClassic;
+import icbm.classic.client.particle.ModParticlesClient;
 import icbm.classic.lib.network.lambda.PacketCodex;
 import icbm.classic.lib.network.lambda.PacketCodexReg;
 import icbm.classic.network.AirParticlePayload;
@@ -79,15 +80,31 @@ public final class IcbmClientNetwork
 
     private static void handleAirParticle(AirParticlePayload payload, ClientPlayNetworking.Context context)
     {
-        // Particle types are not ported yet, S4.07 completes the effect (see docs/implementation/port-ledger.md)
-        ICBMClassic.logger().debug("Received air particle payload in dimension({}) at {}x {}y {}z, particle rendering is done in S4.07",
-            payload.dimension(), payload.posX(), payload.posY(), payload.posZ());
+        //1.12 PacketSpawnAirParticle: spawnAirParticle(player.world, pos, motion, colour, scale, ticksToLive)
+        final ClientLevel level = context.client().level;
+        if (level == null || !level.dimension().identifier().equals(payload.dimension()))
+        {
+            return;
+        }
+
+        ModParticlesClient.spawnSmoke(level,
+                payload.posX(), payload.posY(), payload.posZ(),
+                payload.v(), payload.v1(), payload.v2(),
+                payload.red(), payload.green(), payload.blue(),
+                payload.scale(), payload.ticksToLive());
     }
 
     private static void handleBlockExplosion(BlockExplosionFxPayload payload, ClientPlayNetworking.Context context)
     {
-        // Particle types are not ported yet, S4.07 completes the effect (see docs/implementation/port-ledger.md)
-        ICBMClassic.logger().debug("Received block explosion payload in dimension({}) at {}x {}y {}z for block {}, particle rendering is done in S4.07",
-            payload.dimension(), payload.sourceX(), payload.sourceY(), payload.sourceZ(), payload.blockPos());
+        //1.12 PacketSpawnBlockExplosion: spawnExplosionParticles(player.world, source, blastScale, blockPos)
+        final ClientLevel level = context.client().level;
+        if (level == null || !level.dimension().identifier().equals(payload.dimension()))
+        {
+            return;
+        }
+
+        ModParticlesClient.spawnExplosionParticles(level,
+                payload.sourceX(), payload.sourceY(), payload.sourceZ(),
+                payload.blastScale(), payload.blockPos());
     }
 }

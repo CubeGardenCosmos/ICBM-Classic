@@ -32,6 +32,7 @@ import icbm.classic.content.cargo.parachute.ParachuteProjectileData;
 import icbm.classic.content.cluster.bomblet.BombletProjectileData;
 import icbm.classic.content.reg.ModItems;
 import icbm.classic.content.reg.ModMenus;
+import icbm.classic.content.reg.ModParticles;
 import icbm.classic.content.reg.ModRecipes;
 import icbm.classic.content.reg.ModSounds;
 import net.minecraft.world.item.Item;
@@ -85,6 +86,8 @@ public final class ICBMClassic implements ModInitializer {
         // first (items and blocks reference both while being constructed), then content, then the tab.
         ModSounds.register();
         ModDataComponents.register();
+        // Particle types (S4.07): server side content and data packs address the ICBM smoke by id
+        ModParticles.register();
         // Custom mob effects (S3.05): the gas blasts and the antidote reference them by holder
         ModEffects.register();
         ModBlocks.register();
