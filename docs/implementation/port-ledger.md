@@ -395,7 +395,7 @@
 | TODO | icbm/classic/content/items/ItemRocketLauncher.java |  | — |
 | TODO | icbm/classic/content/items/behavior/BombCartDispenseBehavior.java |  | — |
 | TODO | icbm/classic/content/items/behavior/GrenadeDispenseBehavior.java |  | — |
-| TODO | icbm/classic/content/missile/MissileEventHandler.java | 导弹实体与飞行逻辑 | S4 |
+| DROPPED（Forge 事件在 26.3 无对应） | icbm/classic/content/missile/MissileEventHandler.java | 两条订阅事件均已并入内容类：EntityMountEvent 的下马判定改为 `EntityMissile#removePassenger` 触发 `MissileRideEvent.Stop`；ChunkEvent.Unload 里的 BallisticFlightLogicOld 模拟随该类删除（S4.03 用 SavedData 追踪取代） | S4.01 |
 | PORTED | icbm/classic/content/missile/entity/CapabilityEmpMissile.java | 实现 IEMPReceiver（Level 版签名）；setDead→discard、createExplosion→level.explode(…, ExplosionInteraction.NONE)、rand→level.getRandom；S4.02 回填 EntityExplosiveMissile/EntityMissileActionable 分支，SAM 分支改判 IRadioTargetAssignable | S4.01、S4.02 |
 | PORTED | icbm/classic/content/missile/entity/CapabilityMissile.java | 去 Forge Capability 外壳（删 register/CapabilityManager），保留类名；implements IMissile, ISavable；triggerFlightLogic/launch 改用 missile.level()/getX/getY/getZ、ModSounds.MISSILE_LAUNCH + Level#playSound、RadarRegistry.add；SAVE_LOGIC 用 SaveHandler（nodeBuildableObject target/flight、nodeSavable source） | S4.01 |
 | PORTED | icbm/classic/content/missile/entity/EntityMissile.java | abstract EntityMissile<E> extends EntityProjectile<E> implements IMissile，委托 missileCapability；删 IEntityAdditionalSpawnData/IPacketIDReceiver/PACKET_DESC，改 SynchedEntityData（DATA_RENDER_STACK/DATA_SMOKE_COLOR）；processInitialInteract→interact(Player,InteractionHand,Vec3)；getMountedYOffset→getPassengerAttachmentPoint；setDead→remove(RemovalReason)；hurtServer 实现 hasHealth+TIER 生命值；鸡骑乘彩蛋接 ModSounds.MEEP 与 CapSpaceChicken 附件；存档用 nodeSavable(missile) | S4.01 |
@@ -413,7 +413,7 @@
 | TODO | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissileDecraft.java | 导弹实体与飞行逻辑 | S4 |
 | PORTED | icbm/classic/content/missile/logic/TargetRangeDet.java | 近炸触发器：world.isRemote→level().isClientSide()；读 BallisticTargetingData.impactHeightOffset 或 cluster 偏移；inRange 接近目标距离时触发 explosive.doExplosion 并 discard() | S4.02 |
-| TODO | icbm/classic/content/missile/logic/flight/ArcFlightLogic.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/logic/flight/ArcFlightLogic.java | motionX/Y/Z→setDeltaMovement、rotation→setYRot/setXRot（同步 yRotO/xRotO）；弧线参数抽成静态纯函数 calculateArcParameters（JUnit 覆盖）；shouldSimulate 用 ServerLevel#hasChunk；S4.03 接通 MissileTrackerHandler.simulateMissile 模拟移交 | S4.01、S4.03 |
 | DROPPED（ADR 0002：不迁移 1.12 存档） | icbm/classic/content/missile/logic/flight/BallisticFlightLogicOld.java | 未在 26.3 注册（注册表也不注册其 ballistic 名）；1.12 只在注册、chunk unload 模拟、getMountedYOffset 与 EntityMissileDataFixer 里出现，后两处均为旧存档兼容路径 | S4.01 |
 | PORTED | icbm/classic/content/missile/logic/flight/DeadFlightLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
 | PORTED | icbm/classic/content/missile/logic/flight/DirectFlightLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
@@ -432,10 +432,10 @@
 | PORTED | icbm/classic/content/missile/logic/source/cause/RedstoneCause.java | EnumFacing→Direction、nodeFacing→nodeDirection；构造改为 (Level, BlockPos, BlockState, Direction) | S4.01 |
 | PORTED | icbm/classic/content/missile/logic/targeting/BallisticTargetingData.java | Vec3d→Vec3；INBTSerializable→ISavable（ValueInput/ValueOutput，键 x/y/z/firingDelay/impact_height 不变） | S4.01 |
 | PORTED | icbm/classic/content/missile/logic/targeting/BasicTargetData.java | ResourceLocation→Identifier、Vec3d→Vec3、INBTSerializable→ISavable；getRegistry() 返回 ICBMClassicAPI.MISSILE_TARGET_DATA_REGISTRY | S4.01 |
-| TODO | icbm/classic/content/missile/tracker/LoadedChunkPair.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/tracker/MissileTrackerData.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/tracker/MissileTrackerHandler.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/tracker/MissileTrackerWorld.java | 导弹实体与飞行逻辑 | S4 |
+| DROPPED（MissileChunkEvent 与 TrackedChunk 直接承载 ChunkPos + timeLeft，无外部引用） | icbm/classic/content/missile/tracker/LoadedChunkPair.java | 1.12 临时数据类，26.3 统一由 MissileChunkEvent 与内部 TrackedChunk 承载 | S4.03 |
+| PORTED | icbm/classic/content/missile/tracker/MissileTrackerData.java | RecordCodecBuilder 编解码（ticks/target/data/preLoadChunkTimer 键语义），支持 Vec3 map/list 双向解码；实体数据通过 TagValueOutput/saveWithoutId 序列化 | S4.03 |
+| PORTED | icbm/classic/content/missile/tracker/MissileTrackerHandler.java | 静态门禁与生命周期调度（simulateMissile 校验/EnteringSimQueue 事件/discard）；ServerLevelEvents 与 ServerTickEvents 驱动 | S4.03 |
+| PORTED | icbm/classic/content/missile/tracker/MissileTrackerWorld.java | extends SavedData，持有 missileList/missileSpawnList/trackedChunks；每 20 tick 驱动模拟；到达目标后强加载中心+4邻区块（MissileChunkEvent.Load/Unload 事件与原版 setChunkForced API）；到期后于目标上空重构并生成实体 | S4.03 |
 | PORTED | icbm/classic/content/potion/ContagiousPoison.java | 不再继承 Potion：改普通应用器，效果集合与时长/倍率照抄（chemical/contagious 两套），CustomPotionEffect 仍承载无 curative 列表的语义 | S3.05 |
 | DROPPED（1.12 里没有具体子类实例化，仅抽象壳；效果注册改由 content/reg/ModEffects 完成） | icbm/classic/content/potion/CustomPotion.java | 自注册进 Potion 注册表的构造逻辑由 ModEffects.register() 取代 | S3.05 |
 | PORTED | icbm/classic/content/potion/CustomPotionEffect.java | 26.3 MobEffectInstance 无 curative 列表，保留同名包装类以承载效果实例并记录差异 | S3.05 |
@@ -599,15 +599,15 @@
 | PORTED | icbm/classic/lib/tile/ITick.java | 纯接口，动作与方块实体 tick 复用 | S1.08（S2.02/S4 复用） |
 | TODO | icbm/classic/lib/tile/TickAction.java |  | — |
 | TODO | icbm/classic/lib/tile/TickDoOnce.java |  | — |
-| TODO | icbm/classic/lib/tracker/EventTracker.java |  | — |
-| TODO | icbm/classic/lib/tracker/EventTrackerData.java |  | — |
-| TODO | icbm/classic/lib/tracker/EventTrackerEntry.java |  | — |
-| TODO | icbm/classic/lib/tracker/EventTrackerField.java |  | — |
-| TODO | icbm/classic/lib/tracker/EventTrackerHelpers.java |  | — |
-| TODO | icbm/classic/lib/tracker/EventTrackerNode.java |  | — |
-| TODO | icbm/classic/lib/tracker/EventTrackerType.java |  | — |
-| TODO | icbm/classic/lib/tracker/IEventTrackerListener.java |  | — |
-| TODO | icbm/classic/lib/tracker/ListenerEntry.java |  | — |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTracker.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerData.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerEntry.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerField.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerHelpers.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerNode.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerType.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/IEventTrackerListener.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
+| DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/ListenerEntry.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
 | MERGED → 由 S1.09 的 lib/thread/BlockEditQueue.java 取代 | icbm/classic/lib/transform/BlockEditHandler.java | 1.12 用 addScheduledTask 排队方块修改；本步不移植，S1.09 以 BlockEditQueue 在主线程按预算应用 | S1.01 |
 | PORTED | icbm/classic/lib/transform/PosDistanceSorter.java | Vec3d→Vec3、EnumFacing→Direction（javap 核对） | S1.01 |
 | PORTED | icbm/classic/lib/transform/RotationHelper.java | Vec3d→Vec3、MathHelper→Mth（wrapDegrees 返回 double） | S1.01 |

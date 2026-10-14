@@ -30,6 +30,7 @@ import icbm.classic.content.reg.ModEntities;
 import icbm.classic.content.reg.ModItems;
 import icbm.classic.content.reg.ModMenus;
 import icbm.classic.content.reg.ModSounds;
+import icbm.classic.content.missile.tracker.MissileTrackerHandler;
 import icbm.classic.lib.actions.ActionSystem;
 import icbm.classic.lib.actions.WorkTickingActionHandler;
 import icbm.classic.lib.buildable.BuildableObjectRegistry;
@@ -149,6 +150,12 @@ public final class ICBMClassic implements ModInitializer {
         // stop clears everything left over.
         ServerLevelEvents.UNLOAD.register((server, level) -> WorkTickingActionHandler.onLevelUnload(level));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> WorkTickingActionHandler.clearAll());
+
+        // Missile tracker simulates missiles across unloaded chunks (S4.03, docs/architecture/overview.md §7).
+        ServerLevelEvents.LOAD.register((server, level) -> MissileTrackerHandler.onLevelLoad(level));
+        ServerLevelEvents.UNLOAD.register((server, level) -> MissileTrackerHandler.onLevelUnload(level));
+        ServerTickEvents.END_LEVEL_TICK.register(MissileTrackerHandler::onLevelTick);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> MissileTrackerHandler.clearAll());
 
         LOGGER.info("ICBM-Classic initializing (26.3 port)");
     }

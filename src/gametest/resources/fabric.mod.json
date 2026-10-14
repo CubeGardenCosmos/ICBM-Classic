@@ -42,6 +42,7 @@
       "icbm.classic.test.command.CommandGameTest",
       "icbm.classic.test.missile.MissileSystemGameTest",
       "icbm.classic.test.missile.MissileFlightGameTest",
+      "icbm.classic.test.missile.MissileTrackerGameTest",
     ]
   },
   "depends": {

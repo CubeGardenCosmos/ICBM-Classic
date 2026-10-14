@@ -9,6 +9,7 @@ import icbm.classic.api.reg.obj.IBuilderRegistry;
 import icbm.classic.config.missile.ConfigMissile;
 import icbm.classic.content.missile.entity.EntityMissile;
 import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
+import icbm.classic.content.missile.tracker.MissileTrackerHandler;
 import icbm.classic.lib.buildable.BuildableObject;
 import icbm.classic.lib.saving.SaveHandler;
 import net.minecraft.core.BlockPos;
@@ -28,6 +29,7 @@ import net.minecraft.world.phys.Vec3;
 public class ArcFlightLogic extends BuildableObject<ArcFlightLogic, IBuilderRegistry<IMissileFlightLogic>> implements IMissileFlightLogic
 {
     public static final Identifier REG_NAME = ICBMConstants.id("path.arc");
+
 
     public boolean hasStartedFlight = false;
     /**
@@ -247,8 +249,17 @@ public class ArcFlightLogic extends BuildableObject<ArcFlightLogic, IBuilderRegi
             // Sim system
             if (shouldSimulate(entity))
             {
-                // TODO(S4.03): hand the missile over to the off chunk simulation (MissileTrackerHandler)
-                wasSimulationBlocked = true;
+                if (entity instanceof EntityExplosiveMissile explosiveMissile)
+                {
+                    if (!MissileTrackerHandler.simulateMissile(explosiveMissile))
+                    {
+                        wasSimulationBlocked = true;
+                    }
+                }
+                else
+                {
+                    wasSimulationBlocked = true;
+                }
             }
         }
     }
