@@ -103,7 +103,7 @@ public final class ModItems
         registerFormItems(ExplosiveForm.BOMB_CART, EXPLOSIVE_BOMB_CARTS);
         registerFormItems(ExplosiveForm.BOMBLET, EXPLOSIVE_BOMBLETS);
 
-        // TODO(S4.06 / S5.08 / S6) cluster missile, held item missile, parachute, balloon, tools, battery
+        // TODO(S5.08 / S6) tools, battery
     }
 
     /** Registers one placeholder item per explosive enabled for the form, plus the matching block item for {@link ExplosiveForm#BLOCK}. */

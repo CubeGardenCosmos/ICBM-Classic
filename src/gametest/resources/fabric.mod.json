@@ -39,7 +39,8 @@
       "icbm.classic.test.entity.PrimedExplosiveGameTest",
       "icbm.classic.test.entity.BeamSmokeGameTest",
       "icbm.classic.test.block.ExplosiveBlockGameTest",
-      "icbm.classic.test.command.CommandGameTest"
+      "icbm.classic.test.command.CommandGameTest",
+      "icbm.classic.test.missile.MissileSystemGameTest",
     ]
   },
   "depends": {

@@ -17,7 +17,7 @@
 | PORTED | com/builtbroken/jlib/data/vector/Pos3D.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
 | PORTED | com/builtbroken/jlib/lang/StringHelpers.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
 | DROPPED（无 proxy） | icbm/classic/CommonProxy.java | Fabric 无 proxy，逻辑并入入口类 | — |
-| PORTED | icbm/classic/ICBMClassic.java | Forge 入口 → Fabric ModInitializer；每次阶段性追加注册调用（S3.02 加 WorkTickingActionHandler 事件接线、S3.05 加 ModEffects.register） | S0.03、S3.02、S3.05 |
+| PORTED | icbm/classic/ICBMClassic.java | Forge 入口 → Fabric ModInitializer；每次阶段性追加注册调用（S3.02 加 WorkTickingActionHandler 事件接线、S3.05 加 ModEffects.register、S4.01 加 setupMissileRegistries()：TARGET_DATA/FLIGHT_LOGIC 建表+注册事件+lock） | S0.03、S3.02、S3.05、S4.01 |
 | TODO | icbm/classic/ICBMConstants.java |  | — |
 | DROPPED（1.12 的开发工具，把爆炸物注册表写成 JSON 配方） | icbm/classic/RecipeGeneration.java | 配方改由 datagen ICBMRecipeProvider 生成 | S2.08 |
 | PORTED | icbm/classic/api/EnumTier.java | StringRepresentable + ChatFormatting；getLocalizedName 改 Component.translatable（LanguageUtility 未移植，getName→getSerializedName）；S2.10 键改 icbmclassic.tier.* | S1.10、S2.10 |
@@ -397,10 +397,10 @@
 | TODO | icbm/classic/content/items/behavior/GrenadeDispenseBehavior.java |  | — |
 | TODO | icbm/classic/content/missile/MissileEventHandler.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/CapabilityEmpMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/CapabilityMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/EntityMissile.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/entity/CapabilityMissile.java | 去 Forge Capability 外壳（删 register/CapabilityManager），保留类名；implements IMissile, ISavable；triggerFlightLogic/launch 改用 missile.level()/getX/getY/getZ、ModSounds.MISSILE_LAUNCH + Level#playSound、RadarRegistry.add；SAVE_LOGIC 用 SaveHandler（nodeBuildableObject target/flight、nodeSavable source） | S4.01 |
+| PORTED | icbm/classic/content/missile/entity/EntityMissile.java | abstract EntityMissile<E> extends EntityProjectile<E> implements IMissile，委托 missileCapability；删 IEntityAdditionalSpawnData/IPacketIDReceiver/PACKET_DESC，改 SynchedEntityData（DATA_RENDER_STACK/DATA_SMOKE_COLOR）；processInitialInteract→interact(Player,InteractionHand,Vec3)；getMountedYOffset→getPassengerAttachmentPoint；setDead→remove(RemovalReason)；hurtServer 实现 hasHealth+TIER 生命值；鸡骑乘彩蛋接 ModSounds.MEEP 与 CapSpaceChicken 附件；存档用 nodeSavable(missile) | S4.01 |
 | TODO | icbm/classic/content/missile/entity/anti/EntitySurfaceToAirMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/anti/SAMTargetData.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/entity/anti/SAMTargetData.java | BuildableObject<SAMTargetData, IBuilderRegistry<IMissileTarget>> 实现 IMissileTarget，REG_NAME 为 anti.missile；seekByAABB（getEntitiesOfClass）与 seekByRadar（RadarRegistry）；队列限制 5 个目标 | S4.04 |
 | TODO | icbm/classic/content/missile/entity/anti/item/CapabilitySAMStack.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/anti/item/ItemSurfaceToAirMissile.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/explosive/EntityExplosiveMissile.java | 导弹实体与飞行逻辑 | S4 |
@@ -412,26 +412,26 @@
 | TODO | icbm/classic/content/missile/entity/itemstack/item/ItemHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissileDecraft.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/TargetRangeDet.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/logic/TargetRangeDet.java | 近炸触发器：world.isRemote→level().isClientSide()；读 BallisticTargetingData.impactHeightOffset 或 cluster 偏移；inRange 接近目标距离时触发 explosive.doExplosion 并 discard() | S4.02 |
 | TODO | icbm/classic/content/missile/logic/flight/ArcFlightLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/BallisticFlightLogicOld.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/DeadFlightLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/DirectFlightLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/FollowTargetLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/WarmupFlightLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/move/MoveByFacingLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/move/MoveByVec3Logic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/move/MoveForTicksLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/prefab/AccelerateByFacingLogic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/prefab/AccelerateByVec3Logic.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/flight/prefab/FlightLogic.java | 导弹实体与飞行逻辑 | S4 |
+| DROPPED（ADR 0002：不迁移 1.12 存档） | icbm/classic/content/missile/logic/flight/BallisticFlightLogicOld.java | 未在 26.3 注册（注册表也不注册其 ballistic 名）；1.12 只在注册、chunk unload 模拟、getMountedYOffset 与 EntityMissileDataFixer 里出现，后两处均为旧存档兼容路径 | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/DeadFlightLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/DirectFlightLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/FollowTargetLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/WarmupFlightLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/move/MoveByFacingLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/move/MoveByVec3Logic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/move/MoveForTicksLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/prefab/AccelerateByFacingLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/prefab/AccelerateByVec3Logic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/flight/prefab/FlightLogic.java | 类型/API 对照表替换（INBTSerializable→ISavable/SaveHandler、EnumFacing→Direction、Vec3d→Vec3、motion→getDeltaMovement/setDeltaMovement、rotation→setYRot/setXRot 并同步 yRotO/xRotO） | S4.01 |
 | PORTED | icbm/classic/content/missile/logic/source/ActionSource.java | 动作框架数据层（IActionSource/IActionCause 实现），S4 直接复用 | S1.08（S4 复用） |
 | PORTED | icbm/classic/content/missile/logic/source/cause/ActionCause.java | 动作框架数据层（IActionSource/IActionCause 实现），S4 直接复用 | S1.08（S4 复用） |
 | PORTED | icbm/classic/content/missile/logic/source/cause/CausedByBlock.java | 动作框架数据层（IActionSource/IActionCause 实现），S4 直接复用 | S1.08（S4 复用） |
-| TODO | icbm/classic/content/missile/logic/source/cause/EntityCause.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/source/cause/RedstoneCause.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/targeting/BallisticTargetingData.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/logic/targeting/BasicTargetData.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/logic/source/cause/EntityCause.java | getName→getName().getString()、getUniqueID→getUUID、EntityPlayer→Player；新增 getEntity(Level) 用 Level#getEntity(UUID) 延迟解析（1.12 只有运行缓存） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/source/cause/RedstoneCause.java | EnumFacing→Direction、nodeFacing→nodeDirection；构造改为 (Level, BlockPos, BlockState, Direction) | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/targeting/BallisticTargetingData.java | Vec3d→Vec3；INBTSerializable→ISavable（ValueInput/ValueOutput，键 x/y/z/firingDelay/impact_height 不变） | S4.01 |
+| PORTED | icbm/classic/content/missile/logic/targeting/BasicTargetData.java | ResourceLocation→Identifier、Vec3d→Vec3、INBTSerializable→ISavable；getRegistry() 返回 ICBMClassicAPI.MISSILE_TARGET_DATA_REGISTRY | S4.01 |
 | TODO | icbm/classic/content/missile/tracker/LoadedChunkPair.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/tracker/MissileTrackerData.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/tracker/MissileTrackerHandler.java | 导弹实体与飞行逻辑 | S4 |
@@ -465,7 +465,7 @@
 | PORTED | icbm/classic/lib/actions/ActionBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/ActionDataBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/ActionDataGeneric.java | 动作系统（ISavable + SaveHandler） | S1.08 |
-| PORTED | icbm/classic/lib/actions/ActionSystem.java | 动作系统（ISavable + SaveHandler）；S3.05 注册 icbmclassic:entity.spawn、S3.07 注册 icbmclassic:emp.area | S1.08、S3.05、S3.07 |
+| PORTED | icbm/classic/lib/actions/ActionSystem.java | 动作系统（ISavable + SaveHandler）；S3.05 注册 icbmclassic:entity.spawn、S3.07 注册 icbmclassic:emp.area、S4.01 注册 entity/block/block.redstone 三个导弹 cause | S1.08、S3.05、S3.07、S4.01 |
 | PORTED | icbm/classic/lib/actions/PotentialAction.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/PotentialActionImp.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/PotentialActionKnown.java | 动作系统（ISavable + SaveHandler） | S1.08 |
@@ -491,7 +491,7 @@
 | PORTED | icbm/classic/lib/capability/emp/CapabilityEmpKill.java | setDead→discard | S1.10 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosive.java | 删 ICapabilitySerializable，改 ISavable（EXPLOSIVE_ID 走 ValueOutput/ValueInput） | S1.10 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveEntity.java | ISavable；ItemEntity 掉落、ItemStack.isSameItem、level.isClientSide() | S1.10 |
-| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStack.java | 构造签名 (ItemStack, Identifier)；自定义项存档走 IBuilderRegistry#save/load；S3.09 新增静态 fromStack(ItemStack)（BlockItem#getBlock instanceof ExplosiveBlock → 爆炸 id，替代 1.12 的 ItemStack#getCapability(EXPLOSIVE_CAPABILITY)）；构造器里「从组件读自定义项」的 TODO(S2.05) 保留给 S4.06 设置管线 | S1.10、S3.09 |
+| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStack.java | 构造签名 (ItemStack, Identifier)；自定义项存档走 IBuilderRegistry#save/load；S3.09 新增静态 fromStack(ItemStack)（BlockItem#getBlock instanceof ExplosiveBlock → 爆炸 id，替代 1.12 的 ItemStack#getCapability(EXPLOSIVE_CAPABILITY)）；S4.05 fromStack 再识别扁平形态物品（ExplosiveFormItem#getExplosiveId，手雷/炸弹矿车）；构造器里「从组件读自定义项」的 TODO(S2.05) 保留给 S4.06 设置管线 | S1.10、S3.09、S4.05 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStatic.java | INBTSerializable→ISavable（空实现，与 1.12 一致） | S1.10 |
 | DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSData.java | DROPPED（改用 icbmclassic:gps_data 数据组件，S2.04/S5.08） | S1.10 |
 | DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSDataItem.java | DROPPED（同上；物品数据组件） | S1.10 |

@@ -16,6 +16,9 @@ import icbm.classic.content.actions.conditionals.ConditionAnd;
 import icbm.classic.content.actions.conditionals.ConditionOR;
 import icbm.classic.content.actions.conditionals.ConditionTargetDistance;
 import icbm.classic.content.actions.conditionals.ConditionalImpact;
+import icbm.classic.content.missile.logic.source.cause.CausedByBlock;
+import icbm.classic.content.missile.logic.source.cause.EntityCause;
+import icbm.classic.content.missile.logic.source.cause.RedstoneCause;
 import icbm.classic.lib.actions.conditionals.timer.TimerCondition;
 import icbm.classic.lib.actions.conditionals.timer.TimerTickingStatus;
 import icbm.classic.lib.actions.listners.ActionListenerHandler;
@@ -102,7 +105,6 @@ public final class ActionSystem {
         // Register defaults
         // 1.12: new ActionDataEmpArea().register()
         registry.register(ActionDataEmpArea.REG_NAME, ActionDataEmpArea::new);
-        // TODO(S4): 注册 content/cluster/action/ActionDataCluster
         // 1.12: ICBMClassicAPI.ACTION_REGISTRY.register(ACTION_ENTITY_SPAWN, () -> new ActionDataGeneric(...))
         registry.register(ACTION_ENTITY_SPAWN,
                 () -> new ActionDataGeneric(ACTION_ENTITY_SPAWN,
@@ -123,11 +125,12 @@ public final class ActionSystem {
         ICBMClassicAPI.ACTION_CAUSE_REGISTRY = registry;
 
         // Register defaults
-        // TODO(S4): 注册 content/missile/logic/source/cause/EntityCause
-        // TODO(S4): 注册 content/missile/logic/source/cause/CausedByBlock
         // TODO(S5): 注册 content/blocks/launcher/screen/BlockScreenCause
-        // TODO(S4): 注册 content/missile/logic/source/cause/RedstoneCause
         registry.register(CauseByTimer.REG_NAME, CauseByTimer::new);
+        // S4.01: missile causes (1.12 registered these in ActionSystem as well)
+        registry.register(EntityCause.REG_NAME, EntityCause::new);
+        registry.register(CausedByBlock.REG_NAME, CausedByBlock::new);
+        registry.register(RedstoneCause.REG_NAME, RedstoneCause::new);
 
         //Fire registry event
         ActionCauseRegistryEvent.EVENT.invoker().onRegisterActionCauses(registry);

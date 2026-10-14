@@ -1,10 +1,24 @@
 package icbm.classic;
 
 import icbm.classic.api.ICBMClassicAPI;
+import icbm.classic.api.missiles.parts.IMissileFlightLogic;
+import icbm.classic.api.missiles.parts.IMissileTarget;
+import icbm.classic.api.reg.events.MissileFlightLogicRegistryEvent;
+import icbm.classic.api.reg.events.MissileTargetRegistryEvent;
 import icbm.classic.api.reg.events.ProjectileDataRegistryEvent;
 import icbm.classic.command.ICBMCommands;
 import icbm.classic.config.ConfigThread;
 import icbm.classic.config.core.ConfigManager;
+import icbm.classic.content.missile.logic.flight.ArcFlightLogic;
+import icbm.classic.content.missile.logic.flight.DeadFlightLogic;
+import icbm.classic.content.missile.logic.flight.DirectFlightLogic;
+import icbm.classic.content.missile.logic.flight.FollowTargetLogic;
+import icbm.classic.content.missile.logic.flight.WarmupFlightLogic;
+import icbm.classic.content.missile.logic.flight.move.MoveByFacingLogic;
+import icbm.classic.content.missile.logic.flight.move.MoveByVec3Logic;
+import icbm.classic.content.missile.logic.flight.move.MoveForTicksLogic;
+import icbm.classic.content.missile.logic.targeting.BallisticTargetingData;
+import icbm.classic.content.missile.logic.targeting.BasicTargetData;
 import icbm.classic.content.reg.ExplosiveInit;
 import icbm.classic.content.reg.ModBlockEntities;
 import icbm.classic.content.reg.ModBlocks;
@@ -18,6 +32,7 @@ import icbm.classic.content.reg.ModMenus;
 import icbm.classic.content.reg.ModSounds;
 import icbm.classic.lib.actions.ActionSystem;
 import icbm.classic.lib.actions.WorkTickingActionHandler;
+import icbm.classic.lib.buildable.BuildableObjectRegistry;
 import icbm.classic.lib.lookup.IcbmLookups;
 import icbm.classic.lib.projectile.ProjectileDataRegistry;
 import icbm.classic.lib.radar.RadarRegistry;
@@ -50,6 +65,9 @@ public final class ICBMClassic implements ModInitializer {
     public void onInitialize() {
         // 初始化顺序见 docs/architecture/overview.md §5，后续步骤按顺序在此追加调用
         ConfigManager.loadAll();
+        // Missile builder registries (S4.01): 1.12 created them in preInit just before ActionSystem.setup()
+        // (ICBMClassic#handleMissileTargetRegistry / #handleMissileFlightRegistry), overview §5 item 2.
+        setupMissileRegistries();
         // Action system registries (conditions, causes, statuses, actions, potentials), overview §5 item 2.
         ActionSystem.setup();
         // API lookups replacing the 1.12 Forge capabilities + data attachments (S1.10, porting-guide §2.6).
@@ -133,5 +151,49 @@ public final class ICBMClassic implements ModInitializer {
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> WorkTickingActionHandler.clearAll());
 
         LOGGER.info("ICBM-Classic initializing (26.3 port)");
+    }
+
+    /**
+     * Builds the missile builder registries and locks them.
+     * <p>
+     * 1.12 did this in preInit ({@code handleMissileTargetRegistry} / {@code handleMissileFlightRegistry}).
+     * The registries have to exist before any content asks for them, so they are built here with the other
+     * builder registries (overview.md §5 item 2). {@code BallisticFlightLogicOld} is not registered: the class
+     * is dropped with the 1.12 save compatibility (ADR 0002).
+     */
+    private static void setupMissileRegistries() {
+        final BuildableObjectRegistry<IMissileTarget> targetRegistry = new BuildableObjectRegistry<>("TARGET_DATA", "missile.target");
+        ICBMClassicAPI.MISSILE_TARGET_DATA_REGISTRY = targetRegistry;
+
+        // Default types
+        targetRegistry.register(BasicTargetData.REG_NAME, BasicTargetData::new);
+        targetRegistry.register(BallisticTargetingData.REG_NAME, BallisticTargetingData::new);
+        // 1.12 reserved the SAM target name with a builder answering null; SAMTargetData is ported in S4.04
+        targetRegistry.register(ICBMConstants.id("anti.missile"), () -> null); //Can't be restored from save but reserving name
+
+        //Fire registry event
+        MissileTargetRegistryEvent.EVENT.invoker().onRegisterTargets(targetRegistry);
+
+        //Lock to prevent late registry
+        targetRegistry.lock();
+
+        final BuildableObjectRegistry<IMissileFlightLogic> flightRegistry = new BuildableObjectRegistry<>("FLIGHT_LOGIC", "missile.flight");
+        ICBMClassicAPI.MISSILE_FLIGHT_LOGIC_REGISTRY = flightRegistry;
+
+        // Register defaults
+        flightRegistry.register(DirectFlightLogic.REG_NAME, DirectFlightLogic::new);
+        flightRegistry.register(ArcFlightLogic.REG_NAME, ArcFlightLogic::new);
+        flightRegistry.register(WarmupFlightLogic.REG_NAME, WarmupFlightLogic::new);
+        flightRegistry.register(MoveByFacingLogic.REG_NAME, MoveByFacingLogic::new);
+        flightRegistry.register(MoveByVec3Logic.REG_NAME, MoveByVec3Logic::new);
+        flightRegistry.register(MoveForTicksLogic.REG_NAME, MoveForTicksLogic::new);
+        flightRegistry.register(DeadFlightLogic.REG_NAME, DeadFlightLogic::new);
+        flightRegistry.register(FollowTargetLogic.REG_NAME, FollowTargetLogic::new);
+
+        //Fire registry event
+        MissileFlightLogicRegistryEvent.EVENT.invoker().onRegisterFlightLogic(flightRegistry);
+
+        //Lock to prevent late registry
+        flightRegistry.lock();
     }
 }

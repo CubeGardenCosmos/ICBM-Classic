@@ -75,8 +75,10 @@ public final class ModEntities
         // 1.12 EntityReg: buildEntityEntry(EntityRedmatter.class, ICBMEntities.REDMATTER, 500, 1)
         REDMATTER = registerEntity(ICBMEntities.REDMATTER, 0.98F, 0.98F, 32, 1, EntityRedmatter::new);
 
-        // TODO(S4) missiles, grenade, bomb_cart, bomblet, missile_seat, redmatter, parachute, balloon
-    }
+        // 1.12 size comes from the EntityGrenade constructor (setSize(0.25F, 0.25F))
+        // 1.12 size is the vanilla minecart one inherited from EntityMinecartTNT (0.98F x 0.7F)
+
+                    }
 
     /**
      * Registers an entity type using the {@link BuiltInRegistries#ENTITY_TYPE} registry, matching the 1.12
