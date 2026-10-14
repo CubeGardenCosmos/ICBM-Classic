@@ -8,6 +8,7 @@ import icbm.classic.api.missiles.parts.IMissileTarget;
 import icbm.classic.api.reg.obj.IBuilderRegistry;
 import icbm.classic.config.missile.ConfigMissile;
 import icbm.classic.content.missile.entity.EntityMissile;
+import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
 import icbm.classic.lib.buildable.BuildableObject;
 import icbm.classic.lib.saving.SaveHandler;
 import net.minecraft.core.BlockPos;

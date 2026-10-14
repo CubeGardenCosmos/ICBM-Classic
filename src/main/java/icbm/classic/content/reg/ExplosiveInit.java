@@ -18,6 +18,7 @@ import icbm.classic.content.blast.gas.BlastColor;
 import icbm.classic.content.blast.gas.BlastContagious;
 import icbm.classic.content.blast.gas.BlastDebilitation;
 import icbm.classic.content.blast.ender.BlastEnder;
+import icbm.classic.content.blast.ender.EnderBlastCustomization;
 import icbm.classic.content.blast.BlastEndothermic;
 import icbm.classic.content.blast.BlastExothermic;
 import icbm.classic.content.blast.BlastFire;
@@ -32,6 +33,7 @@ import icbm.classic.content.blast.threaded.BlastNuclear;
 import icbm.classic.content.blast.threaded.BlastThermobaric;
 import icbm.classic.content.blocks.explosive.ExplosiveBlockEntity;
 import icbm.classic.content.entity.EntityFragments;
+import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
 import icbm.classic.api.actions.data.ActionFields;
 import icbm.classic.api.refs.ICBMEntities;
 import icbm.classic.lib.data.ExplosiveSettings;
@@ -52,6 +54,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -295,7 +298,7 @@ public final class ExplosiveInit
         // 1.12: new BlastEnder().setBlastSize(ConfigBlast.ender.scale)
         ICBMExplosives.ENDER = newEx(EnumTier.THREE, "ender",
                 (w, x, y, z, s) -> new BlastEnder().setBlastSize(ConfigBlast.ender.scale).setBlastWorld(w).setBlastPosition(x, y, z));
-        ICBMClassicAPI.EX_MISSILE_REGISTRY.setInteractionListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::todoEnderMissileCoordSet);
+        ICBMClassicAPI.EX_MISSILE_REGISTRY.setInteractionListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::enderMissileCoordSet);
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setActivationListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::enderBlockCoordSet);
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.ENDER.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.ENDER);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.ENDER.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.ENDER);
@@ -398,13 +401,42 @@ public final class ExplosiveInit
     }
 
     /**
-     * TODO(S3.07) the ender explosive stores the teleport target on the missile through
-     * {@code EnderBlastCustomization} + the {@code icbmclassic:gps_data} component. 1.12 also
-     * registered this callback on the missile content registry, which was an empty stub there, so this
-     * simply keeps the call site until the ender blast is ported.
+     * Reads the target of the GPS item the player holds and stores it on the missile's explosive stack.
+     * 1.12 had an empty callback stub; 26.3 follows the same path as {@link #encodeEnderCoordSet}.
      */
-    private static boolean todoEnderMissileCoordSet(Entity entity, Player player, InteractionHand hand)
+    private static boolean enderMissileCoordSet(Entity entity, Player player, InteractionHand hand)
     {
+        final ItemStack stack = player.getItemInHand(hand);
+        final GpsData gpsData = stack.get(ModDataComponents.GPS_DATA);
+        if (gpsData != null)
+        {
+            final GlobalPos position = gpsData.pos().orElse(null);
+            if (position != null)
+            {
+                if (entity instanceof EntityExplosiveMissile missile)
+                {
+                    ItemStack missileStack = missile.toStack();
+                    if (missileStack.isEmpty())
+                    {
+                        final Item item = ModItems.EXPLOSIVE_MISSILES.get(ICBMExplosives.ENDER.getRegistryKey());
+                        missileStack = item != null ? new ItemStack(item) : ItemStack.EMPTY;
+                    }
+                    else
+                    {
+                        missileStack = missileStack.copy();
+                    }
+                    missileStack.set(ModDataComponents.EXPLOSIVE_SETTINGS, new ExplosiveSettings(position));
+                    missile.explosive.setStack(missileStack);
+                    missile.explosive.addCustomization(new EnderBlastCustomization(position));
+                }
+                player.sendSystemMessage(Component.translatable("icbmclassic.message.launcher.toolTargetSet"));
+            }
+            else
+            {
+                player.sendSystemMessage(Component.translatable("icbmclassic.message.launcher.noTargetInTool"));
+            }
+            return true;
+        }
         return false;
     }
 

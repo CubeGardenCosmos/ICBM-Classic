@@ -1,8 +1,15 @@
 package icbm.classic.content.items;
 
+import icbm.classic.api.EnumTier;
+import icbm.classic.api.ICBMClassicHelpers;
+import icbm.classic.api.reg.IExplosiveData;
 import icbm.classic.content.reg.ExplosiveForms;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
+
+import java.util.function.Consumer;
 
 /**
  * Flat explosive item (missile, grenade, bomb cart, bomblet). 1.12 had one item class per form with the
@@ -35,5 +42,26 @@ public class ExplosiveFormItem extends Item
     public ExplosiveForms.ExplosiveForm getForm()
     {
         return form;
+    }
+
+    /**
+     * Appends the explosive tier line 1.12 {@code ItemBlockExplosive#getDetailedInfo} produced for the flat
+     * explosive items. Shared by {@link ItemGrenade} and {@link ItemBombCart} (S4.05); call it from
+     * {@code appendHoverText}.
+     * <p>
+     * 1.12: {@code TextFormatting.DARK_RED + LanguageUtility.getLocal("info.misc.tier") + ": " +
+     * tierData.getTooltipColor() + tierData.getLocalizedName()} and only when the tier is not
+     * {@code EnumTier.NONE}.
+     */
+    protected void appendExplosiveTier(Consumer<Component> tooltip)
+    {
+        final IExplosiveData data = ICBMClassicHelpers.getExplosive(explosiveId, true);
+        if (data != null && data.getTier() != EnumTier.NONE)
+        {
+            final EnumTier tier = data.getTier();
+            tooltip.accept(Component.translatable("icbmclassic.tooltip.misc.tier").withStyle(ChatFormatting.DARK_RED)
+                    .append(": ")
+                    .append(Component.translatable("icbmclassic.tier." + tier.getSerializedName()).withStyle(tier.getTooltipColor())));
+        }
     }
 }

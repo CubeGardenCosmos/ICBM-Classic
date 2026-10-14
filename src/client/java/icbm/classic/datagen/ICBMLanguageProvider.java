@@ -122,6 +122,8 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         ENTITY_NAMES.put("light_beam", "Light Beam");
         ENTITY_NAMES.put("smoke", "Smoke");
         ENTITY_NAMES.put("redmatter", "Red Matter");
+        ENTITY_NAMES.put("explosive_missile", "Explosive Missile");
+        ENTITY_NAMES.put("generic_missile", "Generic Missile");
     }
 
     public ICBMLanguageProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries)

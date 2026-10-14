@@ -2,6 +2,8 @@ package icbm.classic.lib.explosive.reg;
 
 import icbm.classic.api.ICBMClassicAPI;
 import icbm.classic.api.data.EntityInteractionFunction;
+import icbm.classic.api.ICBMClassicHelpers;
+import icbm.classic.api.caps.IExplosive;
 import icbm.classic.api.events.MissileEvent;
 import icbm.classic.api.missiles.IMissile;
 import icbm.classic.api.reg.content.IExMissileRegistry;
@@ -9,6 +11,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import icbm.classic.content.reg.ModItems;
+import net.minecraft.world.item.Item;
+
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
@@ -25,6 +32,10 @@ import java.util.function.Consumer;
 @Deprecated
 public class ExMissileContentReg extends ExplosiveContentRegistry implements IExMissileRegistry
 {
+    private final Map<Identifier, Consumer<IMissile>> launchCallbacks = new HashMap<>();
+    private final Map<Identifier, Consumer<IMissile>> updateCallbacks = new HashMap<>();
+    private final Map<Identifier, EntityInteractionFunction> interactionCallbacks = new HashMap<>();
+
     public ExMissileContentReg()
     {
         super(ICBMClassicAPI.EX_MISSILE);
@@ -33,26 +44,26 @@ public class ExMissileContentReg extends ExplosiveContentRegistry implements IEx
     @Override
     public ItemStack getDeviceStack(Identifier regName)
     {
-        // TODO(S2.05) return the flat "<ex>_missile" item once ModItems exists
-        return ItemStack.EMPTY;
+        final Item item = ModItems.EXPLOSIVE_MISSILES.get(regName);
+        return item != null ? new ItemStack(item) : ItemStack.EMPTY;
     }
 
     @Override
     public void setLaunchListener(Identifier exName, Consumer<IMissile> eventCallback)
     {
-        // TODO(S4.02) 1.12 kept this as an empty stub
+        launchCallbacks.put(exName, eventCallback);
     }
 
     @Override
     public void setMissileUpdateListener(Identifier exName, Consumer<IMissile> eventCallback)
     {
-        // TODO(S4.02) 1.12 kept this as an empty stub
+        updateCallbacks.put(exName, eventCallback);
     }
 
     @Override
     public void setInteractionListener(Identifier exName, EntityInteractionFunction function)
     {
-        // TODO(S4.02) 1.12 kept this as an empty stub
+        interactionCallbacks.put(exName, function);
     }
 
     @Override
@@ -60,17 +71,43 @@ public class ExMissileContentReg extends ExplosiveContentRegistry implements IEx
     {
         // 1.12: MinecraftForge.EVENT_BUS.post(new MissileEvent.PostLaunch(missile, missile.getMissileEntity()))
         MissileEvent.PostLaunch.EVENT.invoker().onPostLaunch(new MissileEvent.PostLaunch(missile, missile.getMissileEntity()));
+        final IExplosive explosive = ICBMClassicHelpers.getExplosive(missile.getMissileEntity());
+        if (explosive != null && explosive.getExplosiveData() != null)
+        {
+            final Consumer<IMissile> callback = launchCallbacks.get(explosive.getExplosiveData().getRegistryKey());
+            if (callback != null)
+            {
+                callback.accept(missile);
+            }
+        }
     }
 
     @Override
     public void triggerFlightUpdate(IMissile missile)
     {
-        // 1.12 kept this as an empty stub
+        final IExplosive explosive = ICBMClassicHelpers.getExplosive(missile.getMissileEntity());
+        if (explosive != null && explosive.getExplosiveData() != null)
+        {
+            final Consumer<IMissile> callback = updateCallbacks.get(explosive.getExplosiveData().getRegistryKey());
+            if (callback != null)
+            {
+                callback.accept(missile);
+            }
+        }
     }
 
     @Override
     public boolean onInteraction(Entity entity, Player player, InteractionHand hand)
     {
+        final IExplosive explosive = ICBMClassicHelpers.getExplosive(entity);
+        if (explosive != null && explosive.getExplosiveData() != null)
+        {
+            final EntityInteractionFunction callback = interactionCallbacks.get(explosive.getExplosiveData().getRegistryKey());
+            if (callback != null)
+            {
+                return callback.onInteraction(entity, player, hand);
+            }
+        }
         return false;
     }
 }

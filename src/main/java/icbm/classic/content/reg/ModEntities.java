@@ -8,6 +8,8 @@ import icbm.classic.content.entity.EntityLightBeam;
 import icbm.classic.content.entity.EntitySmoke;
 import icbm.classic.content.blast.redmatter.EntityRedmatter;
 import icbm.classic.content.entity.flyingblock.EntityFlyingBlock;
+import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
+import icbm.classic.content.missile.entity.explosive.EntityMissileActionable;
 import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -51,6 +53,12 @@ public final class ModEntities
     /** Redmatter, 1.12 {@code redmatter} (500 blocks / 1 → 32 chunks / 1) */
     public static EntityType<EntityRedmatter> REDMATTER;
 
+    /** Explosive missile, 1.12 {@code explosive_missile} (500 blocks / 1 → 32 chunks / 1, S4.02) */
+    public static EntityType<EntityExplosiveMissile> EXPLOSIVE_MISSILE;
+
+    /** Generic actionable missile, 1.12 {@code generic_missile} (500 blocks / 1 → 32 chunks / 1, S4.02) */
+    public static EntityType<EntityMissileActionable> GENERIC_MISSILE;
+
     private ModEntities() {}
 
     /** Registers every entity type. Called from {@code ICBMClassic#onInitialize}. */
@@ -78,7 +86,14 @@ public final class ModEntities
         // 1.12 size comes from the EntityGrenade constructor (setSize(0.25F, 0.25F))
         // 1.12 size is the vanilla minecart one inherited from EntityMinecartTNT (0.98F x 0.7F)
 
-                    }
+        // 1.12 EntityReg: buildEntityEntry(EntityExplosiveMissile.class, ICBMEntities.MISSILE_EXPLOSIVE, 500, 1)
+        EXPLOSIVE_MISSILE = registerEntity(ICBMEntities.MISSILE_EXPLOSIVE, 0.5F, 0.5F, 32, 1, EntityExplosiveMissile::new);
+        // 1.12 EntityReg: buildEntityEntry(EntityMissileActionable.class, ICBMEntities.MISSILE_GENERIC, 500, 1)
+        GENERIC_MISSILE = registerEntity(ICBMEntities.MISSILE_GENERIC, 0.5F, 0.5F, 32, 1, EntityMissileActionable::new);
+
+        IcbmLookups.EMP_RECEIVER_ENTITY.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE);
+        IcbmLookups.MISSILE.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE);
+    }
 
     /**
      * Registers an entity type using the {@link BuiltInRegistries#ENTITY_TYPE} registry, matching the 1.12

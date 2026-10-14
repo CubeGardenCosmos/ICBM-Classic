@@ -389,22 +389,22 @@
 | TODO | icbm/classic/content/items/ItemDefuser.java |  | — |
 | TODO | icbm/classic/content/items/ItemGrenade.java | S2.05 注册 ExplosiveFormItem 占位（10 个平铺化手雷）；S4.05 换成真实手雷物品 | S2.05、S4.05 |
 | TODO | icbm/classic/content/items/ItemLaserDetonator.java |  | — |
-| TODO | icbm/classic/content/items/ItemMissile.java | S2.05 注册 ExplosiveFormItem 占位（23 个平铺化导弹）；S4.02 换成真实导弹物品 | S2.05、S4.02 |
+| PORTED | icbm/classic/content/items/ItemMissile.java | 继承 ExplosiveFormItem；appendHoverText 显示等级（appendExplosiveTier）与 collectInformation；ModItems 注册 23 个平铺物品并注册 IcbmLookups.MISSILE_STACK | S2.05、S4.02 |
 | TODO | icbm/classic/content/items/ItemRadarGun.java |  | — |
 | TODO | icbm/classic/content/items/ItemRemoteDetonator.java |  | — |
 | TODO | icbm/classic/content/items/ItemRocketLauncher.java |  | — |
 | TODO | icbm/classic/content/items/behavior/BombCartDispenseBehavior.java |  | — |
 | TODO | icbm/classic/content/items/behavior/GrenadeDispenseBehavior.java |  | — |
 | TODO | icbm/classic/content/missile/MissileEventHandler.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/CapabilityEmpMissile.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/entity/CapabilityEmpMissile.java | 实现 IEMPReceiver（Level 版签名）；setDead→discard、createExplosion→level.explode(…, ExplosionInteraction.NONE)、rand→level.getRandom；S4.02 回填 EntityExplosiveMissile/EntityMissileActionable 分支，SAM 分支改判 IRadioTargetAssignable | S4.01、S4.02 |
 | PORTED | icbm/classic/content/missile/entity/CapabilityMissile.java | 去 Forge Capability 外壳（删 register/CapabilityManager），保留类名；implements IMissile, ISavable；triggerFlightLogic/launch 改用 missile.level()/getX/getY/getZ、ModSounds.MISSILE_LAUNCH + Level#playSound、RadarRegistry.add；SAVE_LOGIC 用 SaveHandler（nodeBuildableObject target/flight、nodeSavable source） | S4.01 |
 | PORTED | icbm/classic/content/missile/entity/EntityMissile.java | abstract EntityMissile<E> extends EntityProjectile<E> implements IMissile，委托 missileCapability；删 IEntityAdditionalSpawnData/IPacketIDReceiver/PACKET_DESC，改 SynchedEntityData（DATA_RENDER_STACK/DATA_SMOKE_COLOR）；processInitialInteract→interact(Player,InteractionHand,Vec3)；getMountedYOffset→getPassengerAttachmentPoint；setDead→remove(RemovalReason)；hurtServer 实现 hasHealth+TIER 生命值；鸡骑乘彩蛋接 ModSounds.MEEP 与 CapSpaceChicken 附件；存档用 nodeSavable(missile) | S4.01 |
 | TODO | icbm/classic/content/missile/entity/anti/EntitySurfaceToAirMissile.java | 导弹实体与飞行逻辑 | S4 |
 | PORTED | icbm/classic/content/missile/entity/anti/SAMTargetData.java | BuildableObject<SAMTargetData, IBuilderRegistry<IMissileTarget>> 实现 IMissileTarget，REG_NAME 为 anti.missile；seekByAABB（getEntitiesOfClass）与 seekByRadar（RadarRegistry）；队列限制 5 个目标 | S4.04 |
 | TODO | icbm/classic/content/missile/entity/anti/item/CapabilitySAMStack.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/anti/item/ItemSurfaceToAirMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/explosive/EntityExplosiveMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/explosive/EntityMissileActionable.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/entity/explosive/EntityExplosiveMissile.java | EntityMissile<EntityExplosiveMissile>，实现 IExplosive；持有 TargetRangeDet 与 CapabilityExplosiveEntity；根据 Tier 设置生命值；onDestroyedBy 爆炸/火焰时触发爆炸；tick 更新 TargetRangeDet；interact 触发 EX_MISSILE_REGISTRY 回调；actionOnImpact 调用 explosive.doExplosion；toStack 返回爆炸物 stack（空则回退平铺物品）；SaveHandler 存取 explosive | S4.02 |
+| PORTED | icbm/classic/content/missile/entity/explosive/EntityMissileActionable.java | EntityMissile<EntityMissileActionable>；PotentialAction + ActionFieldProvider（IMPACTED/HOST_ENTITY/HOST_POSITION/TARGET_POSITION）；onDestroyedBy 爆炸/火焰时触发 mainAction；tick 更新 mainAction；toStack 返回 originalStack；SaveHandler 存取 potential_action 与 original_stack | S4.02 |
 | TODO | icbm/classic/content/missile/entity/itemstack/EntityHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/itemstack/HeldActionMode.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/entity/itemstack/item/CapabilityHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
@@ -444,7 +444,7 @@
 | PORTED | icbm/classic/content/radioactive/RadioactiveHandler.java | BlockChanceOut 表照 1.12：stone→radioactive_stone、dirt/farmland/dirt_path/grass_block/mycelium→radioactive_dirt（chance 0.2）、Material.PLANTS/LEAVES/VINE 的方块→空气（复用 BlastBeam#isVegetation 的 26.3 标签表，须在数据包标签加载后 setup()）；配置源 icbmclassic/blast.json#nuclear.radioactive_replacements.list | S2.03、S3.08 |
 | MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品；S3.09 在既有 RegHelper 循环里保留 1.12 blockExplosive 的属性（map color FIRE、strength(2,0)、SoundType.CLOTH→WOOL），FACING 状态与共享方块实体在 ExplosiveBlock 内，属性本身未变 | S2.01、S3.09 |
 | MERGED → icbm/classic/content/reg/ModBlockEntities.java | icbm/classic/content/reg/BlockReg.java（registerTileEntity 部分） | GameRegistry.registerTileEntity(TileEntityExplosive) → Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, icbmclassic:explosive, FabricBlockEntityTypeBuilder.create(ExplosiveBlockEntity::new, <23 个平铺爆炸物方块>).build())，23 个方块共享一个类型（registry-ids.md §2）；S5.02–S5.06 的机器类型仍 TODO | S3.09 |
-| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块；S3.07 在实体类型建好后注册 EMP 接收器（IcbmLookups.init 早于本类） | S2.01、S3.02、S3.03、S3.06、S3.07 |
+| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块；S3.07 在实体类型建好后注册 EMP 接收器（IcbmLookups.init 早于本类）；S4.05 注册 grenade/bomb_cart | S2.01、S3.02、S3.03、S3.06、S3.07、S4.05 |
 | PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂逐个换成真实实现（S3.04–S3.08 全部完成，无 todoBlast 占位）；S3.09 末影激活监听器落地（todoEnderBlockCoordSet → 读 icbmclassic:gps_data 写 ExplosiveSettings#enderTarget 并提示 icbmclassic.message.launcher.toolTargetSet/noTargetInTool）；导弹侧 todoEnderMissileCoordSet 仍为 TODO(S3.07) | S2.02、S3.04、S3.05、S3.06、S3.07、S3.08、S3.09 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07） | S2.01 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
@@ -498,7 +498,7 @@
 | PORTED | icbm/classic/lib/capability/gps/GPSDataHelpers.java | Vec3 + Identifier 维度；TextComponent→Component.translatable、sendMessage→sendSystemMessage；S2.10 键改 icbmclassic.message.gps.*（chat.launcher.noTargetInTool → icbmclassic.message.gps.set.empty） | S1.10、S2.10 |
 | MERGED | icbm/classic/lib/capability/launcher/CapabilityMissileHolder.java | MERGED → vanilla Container 版（IItemHandlerModifiable → Container）；consumeMissile 走 IcbmLookups.MISSILE_STACK | S1.10 |
 | PORTED | icbm/classic/lib/capability/launcher/CapabilityMissileLauncher.java | 删 capability 注册；状态暂用 ActionResponses（TODO(S5.02) LauncherStatus） | S1.10 |
-| MERGED | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | MERGED → S4.02 实现（依赖 content/missile/entity/explosive/EntityExplosiveMissile） | S4.02 |
+| PORTED | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | 实现 ICapabilityMissileStack；getMissileId 生成 icbmclassic:missile[...]；newMissile 返回 EntityExplosiveMissile 的 missileCapability 并 setStack / initHealth；删 1.12 CapabilityManager | S4.02 |
 | PORTED | icbm/classic/lib/colors/ColorB.java | 纯数学颜色类，无 MC 类型（S3.05 随 colors 爆炸移植） | S3.05 |
 | PORTED | icbm/classic/lib/colors/ColorHelper.java | 纯数学颜色工具（S3.05 随 colors 爆炸移植） | S3.05 |
 | PORTED | icbm/classic/lib/data/BoundBlockPos.java | BlockPos/Vec3 边界盒实现 | S1.05（S1.10 复用） |
@@ -516,7 +516,7 @@
 | PORTED | icbm/classic/lib/explosive/reg/ExBlockContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存；S3.09 getDeviceStack 返回平铺 <ex>_explosive 方块物品（rot/mutation 无方块形态时返回 EMPTY），并实现 getActivationListener | S2.02、S3.09 |
 | PORTED | icbm/classic/lib/explosive/reg/ExGrenadeContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
 | PORTED | icbm/classic/lib/explosive/reg/ExMinecartContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
-| PORTED | icbm/classic/lib/explosive/reg/ExMissileContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExMissileContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；getDeviceStack 返回 ModItems.EXPLOSIVE_MISSILES；实现 setLaunchListener/setMissileUpdateListener/setInteractionListener 回调管理并在 triggerLaunch/triggerFlightUpdate/onInteraction 触发 | S2.02、S4.02 |
 | PORTED | icbm/classic/lib/explosive/reg/ExplosiveContentRegistry.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
 | PORTED | icbm/classic/lib/explosive/reg/ExplosiveData.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
 | PORTED | icbm/classic/lib/explosive/reg/ExplosiveRegistry.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |

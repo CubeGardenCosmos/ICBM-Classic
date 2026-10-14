@@ -4,6 +4,8 @@ import icbm.classic.api.actions.IAction;
 import icbm.classic.api.caps.IEMPReceiver;
 import icbm.classic.api.missiles.IMissile;
 import icbm.classic.api.radio.IRadioTargetAssignable;
+import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
+import icbm.classic.content.missile.entity.explosive.EntityMissileActionable;
 import icbm.classic.config.blast.ConfigBlast;
 import icbm.classic.content.missile.logic.flight.DeadFlightLogic;
 import net.minecraft.world.entity.Entity;
@@ -47,7 +49,13 @@ public class CapabilityEmpMissile implements IEMPReceiver
                 }
                 // Trigger firing circuits
                 else if(world.getRandom().nextFloat() <= ConfigBlast.emp.missiles.missileTriggerChance) {
-                    // TODO(S4.02): the explosive and actionable trigger branches belong to the content step
+                    if (missileEntity instanceof EntityExplosiveMissile explosiveMissile) {
+                        explosiveMissile.explosive.doExplosion(x, y, z, emp_blast.getSource());
+                    }
+                    else if (missileEntity instanceof EntityMissileActionable actionableMissile) {
+                        actionableMissile.getMainAction().doAction(world, x, y, z, emp_blast.getSource() != null ? emp_blast.getSource().getCause() : null);
+                    }
+                    else
                     if(missileEntity instanceof IRadioTargetAssignable) {
                         // 1.12 checked EntitySurfaceToAirMissile (ported in S4.04); the SAM now implements
                         // IRadioTargetAssignable instead of being referenced by content type (S1.05/S4.04)

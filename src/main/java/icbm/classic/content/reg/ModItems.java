@@ -3,7 +3,10 @@ package icbm.classic.content.reg;
 import icbm.classic.config.ConfigItems;
 import icbm.classic.content.items.ExplosiveFormItem;
 import icbm.classic.content.items.ItemAntidote;
+import icbm.classic.content.items.ItemMissile;
 import icbm.classic.content.reg.ExplosiveForms.ExplosiveForm;
+import icbm.classic.lib.capability.missile.CapabilityMissileStack;
+import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
@@ -103,6 +106,10 @@ public final class ModItems
         registerFormItems(ExplosiveForm.BOMB_CART, EXPLOSIVE_BOMB_CARTS);
         registerFormItems(ExplosiveForm.BOMBLET, EXPLOSIVE_BOMBLETS);
 
+        // Register the missile stack capability lookup for all flat missile items (S4.02)
+        IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilityMissileStack(stack),
+                EXPLOSIVE_MISSILES.values().toArray(new Item[0]));
+
         // TODO(S5.08 / S6) tools, battery
     }
 
@@ -112,9 +119,27 @@ public final class ModItems
         for (Identifier ex : ExplosiveForms.enabled(form))
         {
             final Item item = RegHelper.item(form.idFor(ex),
-                    p -> new ExplosiveFormItem(ex, form, p), new Item.Properties());
+                    p -> createFormItem(ex, form, p), new Item.Properties());
             target.put(ex, item);
         }
+    }
+
+    /**
+     * Creates the item of one explosive and form. S4.05 replaced the grenade and bomb cart placeholders with
+     * the real behaviour items ({@link ItemGrenade}/{@link ItemBombCart}); S4.02 (missile) and S4.06 (bomblet)
+     * replace their placeholders the same way.
+     *
+     * @param ex   explosive id, see {@code docs/architecture/registry-ids.md} §1
+     * @param form form of the item
+     * @param p    item properties, the stack size is set per form (1.12 {@code setMaxStackSize})
+     */
+    private static Item createFormItem(Identifier ex, ExplosiveForm form, Item.Properties p)
+    {
+        return switch (form)
+        {
+            case MISSILE -> new ItemMissile(ex, form, p.stacksTo(ItemMissile.MAX_STACK_SIZE));
+            default -> new ExplosiveFormItem(ex, form, p);
+        };
     }
 
     private static Item material(String id)
