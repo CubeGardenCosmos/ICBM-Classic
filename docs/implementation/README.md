@@ -373,7 +373,7 @@ $ ./gradlew build
 | [x] | S3.06 | 线程化爆炸与红物质 | S3.03 | P1 爆炸 5 | [S3.06.md](evidence/S3.06.md) |
 | [x] | S3.07 | EMP 与末影爆炸 | S3.03 | P1 爆炸 6 | [S3.07.md](evidence/S3.07.md) |
 | [x] | S3.08 | 放射性方块 | S3.04、S2.03 | P1 爆炸 7 | [S3.08.md](evidence/S3.08.md) |
-| [ ] | S3.09 | 爆炸物方块与引信 | S3.04、S3.05、S3.06、S3.07、S3.08 | P1 爆炸 8 | |
+| [x] | S3.09 | 爆炸物方块与引信 | S3.04、S3.05、S3.06、S3.07、S3.08 | P1 爆炸 8 | [S3.09.md](evidence/S3.09.md) |
 | [ ] | S3.10 | `/icbm` 命令 | S3.09 | P1 爆炸 9 | |
 
 ### S4 导弹与投掷物 → [phase-s4-entities-missiles.md](phase-s4-entities-missiles.md)

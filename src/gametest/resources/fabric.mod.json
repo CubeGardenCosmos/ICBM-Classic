@@ -37,7 +37,8 @@
       "icbm.classic.test.entity.FragmentsGameTest",
       "icbm.classic.test.entity.FlyingBlockGameTest",
       "icbm.classic.test.entity.PrimedExplosiveGameTest",
-      "icbm.classic.test.entity.BeamSmokeGameTest"
+      "icbm.classic.test.entity.BeamSmokeGameTest",
+      "icbm.classic.test.block.ExplosiveBlockGameTest"
     ]
   },
   "depends": {

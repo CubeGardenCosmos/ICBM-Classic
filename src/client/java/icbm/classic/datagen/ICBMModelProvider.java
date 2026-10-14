@@ -9,6 +9,7 @@ import net.minecraft.client.data.models.ItemModelOutput;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.BlockModelDefinitionGenerator;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelInstance;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
@@ -18,6 +19,7 @@ import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
 import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.sprite.Material;
@@ -149,7 +151,15 @@ public class ICBMModelProvider implements DataProvider
         output.flatItemModel(block.asItem(), material);
     }
 
-    /** One flat explosive block: top/side/bottom textures taken from the 1.12 block state. */
+    /**
+     * One flat explosive block: top/side/bottom textures taken from the 1.12 block state.
+     * <p>
+     * 1.12 {@code explosives.json} rotated the cube by the {@code rotation} property (the face the block was
+     * placed with): {@code up {}}, {@code down {x:180}}, {@code north {x:90}}, {@code south {x:270}},
+     * {@code east {x:90,y:90}}, {@code west {x:90,y:270}}. That is the vanilla
+     * {@code BlockModelGenerators#ROTATIONS_COLUMN_WITH_FACING} dispatch ({@code minecraft:barrel});
+     * {@code x:270} and {@code x:90,y:180} are the same rotation, the other five entries match as is.
+     */
     private static void explosiveBlock(ModelRegistrar output, Block block, Identifier explosive)
     {
         final ExplosiveTextures textures = EXPLOSIVE_TEXTURES.get(explosive.getPath());
@@ -163,7 +173,7 @@ public class ICBMModelProvider implements DataProvider
                 .put(TextureSlot.BOTTOM, texture("block/explosive/" + textures.bottom()))
                 .put(TextureSlot.PARTICLE, texture("block/explosive/" + textures.particle()));
         final Identifier model = CUBE_BOTTOM_TOP.create(block, mapping, output::model);
-        output.singleVariant(block, model);
+        output.facingVariants(block, model, BlockModelGenerators.ROTATIONS_COLUMN_WITH_FACING);
         output.blockItemModel(block, model);
     }
 
@@ -293,6 +303,18 @@ public class ICBMModelProvider implements DataProvider
         void singleVariant(Block block, Identifier model)
         {
             blockState(MultiVariantGenerator.dispatch(block, new MultiVariant(WeightedList.of(new Variant(model)))));
+        }
+
+        /**
+         * A block whose model is rotated per block state property, like vanilla's barrel/end rod
+         * ({@code MultiVariantGenerator#dispatch(Block, MultiVariant)} plus a {@link PropertyDispatch} of
+         * {@link VariantMutator}s).
+         */
+        void facingVariants(Block block, Identifier model, PropertyDispatch<VariantMutator> rotations)
+        {
+            blockState(MultiVariantGenerator
+                    .dispatch(block, new MultiVariant(WeightedList.of(new Variant(model))))
+                    .with(rotations));
         }
 
         void blockState(BlockModelDefinitionGenerator definition)

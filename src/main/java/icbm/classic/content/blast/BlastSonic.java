@@ -8,6 +8,7 @@ import icbm.classic.content.blast.thread.BasicResistanceCallBack;
 import icbm.classic.content.blast.thread.IThreadCallBack;
 import icbm.classic.content.blast.threaded.BlastThreaded;
 import icbm.classic.content.blocks.explosive.ExplosiveBlock;
+import icbm.classic.content.blocks.explosive.ExplosiveBlockEntity;
 import icbm.classic.content.entity.flyingblock.FlyingBlock;
 import icbm.classic.content.reg.ModSounds;
 import icbm.classic.lib.explosive.ThreadWorkBlast;
@@ -278,7 +279,11 @@ public class BlastSonic extends BlastThreaded implements IBlastTickable
                                 //Trigger explosions
                                 if (block instanceof ExplosiveBlock) //1.12: block == BlockReg.blockExplosive
                                 {
-                                    //TODO(S3.09) trigger the primed explosive once ExplosiveBlockEntity exists
+                                    //1.12: read the block entity at the position and trigger it when it is the explosive block entity
+                                    if (this.world().getBlockEntity(targetPosition) instanceof ExplosiveBlockEntity explosive)
+                                    {
+                                        explosive.trigger(false);
+                                    }
                                 }
 
                                 if (this.world().getRandom().nextFloat() < 0.1) {  //TODO add config for chance, increase chance if we fail to spawn a block

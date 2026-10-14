@@ -6,8 +6,10 @@ import icbm.classic.api.caps.IExplosive;
 import icbm.classic.api.explosion.IBlast;
 import icbm.classic.api.reg.IExplosiveCustomization;
 import icbm.classic.api.reg.IExplosiveData;
+import icbm.classic.content.blocks.explosive.ExplosiveBlock;
 import icbm.classic.lib.saving.ISavable;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -45,6 +47,29 @@ public class CapabilityExplosiveStack implements IExplosive, ISavable
     {
         this.stack = stack;
         this.explosiveId = explosiveId;
+    }
+
+    /**
+     * Builds the explosive of a flat explosive item (ADR 0002), the 26.3 replacement of
+     * {@code ItemStack#getCapability(ICBMClassicAPI.EXPLOSIVE_CAPABILITY, null)}.
+     * <p>
+     * A block explosive carries its id on the block (1.12 used the item metadata, and the flat block item is
+     * the only explosive item of this step); the flat missile, grenade and bomb cart items have their own id
+     * and are added by S4/S5.
+     *
+     * @param stack to read
+     * @return explosive of the stack, null when the item is not an explosive (1.12 {@code hasCapability})
+     */
+    @Nullable
+    public static CapabilityExplosiveStack fromStack(ItemStack stack)
+    {
+        if (stack != null && !stack.isEmpty()
+                && stack.getItem() instanceof BlockItem blockItem
+                && blockItem.getBlock() instanceof ExplosiveBlock explosiveBlock)
+        {
+            return new CapabilityExplosiveStack(stack, explosiveBlock.getExplosiveId());
+        }
+        return null;
     }
 
     public Identifier getExplosiveId()

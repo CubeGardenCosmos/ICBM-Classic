@@ -6,6 +6,7 @@ import icbm.classic.api.launcher.IMissileLauncher;
 import icbm.classic.api.missiles.IMissile;
 import icbm.classic.api.refs.ICBMExplosives;
 import icbm.classic.api.reg.IExplosiveData;
+import icbm.classic.lib.capability.ex.CapabilityExplosiveStack;
 import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -123,11 +124,9 @@ public final class ICBMClassicHelpers
      */
     public static IExplosive getExplosive(ItemStack stack)
     {
-        // TODO(S2.05) build a CapabilityExplosiveStack(stack, explosiveId) from the flat item id plus the
-        //  icbmclassic:explosive_settings data component. The item classes that carry the flat id are
-        //  registered by ModItems in S2.05, so this returns null until then. 1.12 used the Forge
-        //  EXPLOSIVE_CAPABILITY.
-        return null;
+        // TODO(S4/S5) the flat missile, grenade and bomb cart items carry their own explosive id, see
+        //  CapabilityExplosiveStack#fromStack
+        return CapabilityExplosiveStack.fromStack(stack);
     }
 
     /**

@@ -22,7 +22,7 @@
 | DROPPED（1.12 的开发工具，把爆炸物注册表写成 JSON 配方） | icbm/classic/RecipeGeneration.java | 配方改由 datagen ICBMRecipeProvider 生成 | S2.08 |
 | PORTED | icbm/classic/api/EnumTier.java | StringRepresentable + ChatFormatting；getLocalizedName 改 Component.translatable（LanguageUtility 未移植，getName→getSerializedName）；S2.10 键改 icbmclassic.tier.* | S1.10、S2.10 |
 | PORTED | icbm/classic/api/ICBMClassicAPI.java | 动作字段（S1.08）+ 本步补齐 MISSILE_TARGET_DATA/FLIGHT_LOGIC/PROJECTILE_DATA/EXPLOSIVE/EX_*/EXPLOSIVE_CUSTOMIZATION 注册表与 EX_* Identifier 常量；删全部 @CapabilityInject，改指向 IcbmLookups | S1.08、S1.10 |
-| PORTED | icbm/classic/api/ICBMClassicHelpers.java | 删 hasCapability/getCapability：getMissile 走 instanceof+IcbmLookups.MISSILE；isExplosive/getExplosive(Entity) 走 instanceof；getLauncher 走 IcbmLookups；getExplosive(ItemStack)/getGPSData 待数据组件（TODO S2.02/S2.04） | S1.10 |
+| PORTED | icbm/classic/api/ICBMClassicHelpers.java | 删 hasCapability/getCapability：getMissile 走 instanceof+IcbmLookups.MISSILE；isExplosive/getExplosive(Entity) 走 instanceof；getLauncher 走 IcbmLookups；S3.09 关闭 getExplosive(ItemStack) 的 TODO(S2.05)（改走 CapabilityExplosiveStack.fromStack），getGPSData 仍待 S2.04/S5.08 | S1.10、S3.09 |
 | PORTED | icbm/classic/api/actions/IAction.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/IActionData.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/IActionProvider.java | 动作系统 | S1.08 |
@@ -115,7 +115,7 @@
 | PORTED | icbm/classic/api/reg/IExplosiveCustomization.java | Identifier/ItemStack 不变 | S1.10 |
 | PORTED | icbm/classic/api/reg/IExplosiveData.java | EnumTier 保留；继承 IActionData | S1.10 |
 | PORTED | icbm/classic/api/reg/IExplosiveRegistry.java | ResourceLocation→Identifier | S1.10 |
-| PORTED | icbm/classic/api/reg/content/IExBlockRegistry.java | Identifier；引用 api/data/BlockActivateFunction | S1.10 |
+| PORTED | icbm/classic/api/reg/content/IExBlockRegistry.java | Identifier；引用 api/data/BlockActivateFunction；S3.09 新增 @Nullable getActivationListener(Identifier)（1.12 只写 map 不读，BlockActivateFunction#onActivate 无调用方，该 getter 随 26.3 的 ExplosiveBlock#useWithoutItem 调用而新增） | S1.10、S3.09 |
 | PORTED | icbm/classic/api/reg/content/IExFuseBlockRegistry.java | World→Level、Identifier | S1.10 |
 | PORTED | icbm/classic/api/reg/content/IExFuseEntityRegistry.java | Entity、Identifier | S1.10 |
 | PORTED | icbm/classic/api/reg/content/IExGrenadeRegistry.java | 无改动 | S1.10 |
@@ -241,7 +241,7 @@
 | PORTED | icbm/classic/content/blast/BlastMutation.java | 手工生成转换实体 → Mob#convertTo(EntityType, ConversionParams, AfterConversion)（新实体生成、旧实体 discard）；不改声音禁用的行为 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastRadioactiveBlockSwaps.java | 继承 BlastThreaded + IBlastTickable；替换表改用 RadioactiveHandler.radioactiveBlockSwaps（1.12 表重建，S3.08）；原先按 id 解析 radioactive_dirt/stone 的占位代码与其 warn 已删除 | S3.04、S3.08 |
 | PORTED | icbm/classic/content/blast/BlastShrapnel.java | setLocationAndAngles → setPos+setYRot/setXRot（含 yRotO/xRotO）；motion 写改 setDeltaMovement；六面环生成逻辑与 1.12 一致 | S3.04 |
-| PORTED | icbm/classic/content/blast/BlastSonic.java | 由 Blast 改继承 BlastThreaded，ThreadLargeExplosion 的射线收集并入 doRun(worker+快照)；每 4 tick 消费结果、区块半径增长、实体击退照 1.12 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastSonic.java | 由 Blast 改继承 BlastThreaded，ThreadLargeExplosion 的射线收集并入 doRun(worker+快照)；每 4 tick 消费结果、区块半径增长、实体击退照 1.12；S3.09 补回 1.12 的爆炸物方块连锁触发（block == BlockReg.blockExplosive → instanceof ExplosiveBlock，getTileEntity → getBlockEntity instanceof ExplosiveBlockEntity → trigger(false)） | S3.04、S3.09 |
 | PORTED | icbm/classic/content/blast/BlastStatus.java | new ResourceLocation(DOMAIN,…) → ICBMConstants.id(…)，ImmutableStatus 工厂不变 | S3.02 |
 | PORTED | icbm/classic/content/blast/BlastTNT.java | 射线/能量/推拉数学照抄（PushType 保留）；onBlockExploded+掉落 → BlockState#onExplosionHit + Block.popResource；爆炸物方块连锁留 TODO(S3.09)；粒子改 ServerLevel#sendParticles | S3.04 |
 | DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlast.java | IBlast 查询方法全部返回固定值，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
@@ -287,10 +287,10 @@
 | TODO | icbm/classic/content/blocks/emptower/TileEmpTowerFake.java | EMP 塔 | S5 |
 | TODO | icbm/classic/content/blocks/emptower/gui/ContainerEMPTower.java | EMP 塔 | S5 |
 | TODO | icbm/classic/content/blocks/emptower/gui/GuiEMPTower.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/explosive/BlockExplosive.java | 每个爆炸物一个 ExplosiveBlock + 共享 BlockEntity | S3.09 |
-| TODO | icbm/classic/content/blocks/explosive/ItemBlockExplosive.java | 每个爆炸物一个 ExplosiveBlock + 共享 BlockEntity | S3.09 |
-| TODO | icbm/classic/content/blocks/explosive/PropertyExplosive.java | 每个爆炸物一个 ExplosiveBlock + 共享 BlockEntity | S3.09 |
-| TODO | icbm/classic/content/blocks/explosive/TileEntityExplosive.java | 每个爆炸物一个 ExplosiveBlock + 共享 BlockEntity | S3.09 |
+| MERGED → icbm/classic/content/blocks/explosive/ExplosiveBlock.java | icbm/classic/content/blocks/explosive/BlockExplosive.java | ROTATION_PROP（PropertyDirection，6 向，默认 NORTH）→ FACING=BlockStateProperties.FACING，放置取 getClickedFace；setPlacedBy 保留红石通电检查 + 水平四向的火焰/熔岩扫描（FLOWING_LAVA 并入 LAVA）与 1.12 的 TODO 日志；neighborChanged → hasNeighborSignal；onBlockExploded → BlockBehaviour#onExplosionHit（在移除方块前调用，时机同 1.12；wasExploded 在 26.3 无调用方且在移除后）；onBlockActivated → useItemOn（hurtAndBreak/consume 保 1.12 创造豁免）+ useWithoutItem（调用注册的激活监听器，新增）；onEntityCollidedWithBlock(EntityArrow) → onProjectileHit + isOnFire；createNewTileEntity → newBlockEntity；静态 triggerExplosive 与 !isRemote 守卫照抄；rotate/mirror 与 onBlockAdded 按 1.12 未覆写保持不变 | S3.09 |
+| DROPPED（平铺化） | icbm/classic/content/blocks/explosive/ItemBlockExplosive.java | 平铺方块物品由 ModItems（RegHelper.blockItem）注册，无元数据/子类型（ADR 0002）；1.12 getSubItems 的循环 → ModCreativeTabs（23 项）；getDetailedInfo/嘲讽文本属工具提示管线（ExplosiveSettings，S4.06） | S3.09 |
+| DROPPED（平铺化） | icbm/classic/content/blocks/explosive/PropertyExplosive.java | 元数据驱动的爆炸物属性被「每个爆炸物一个平铺方块」取代（23 个，ADR 0002，registry-ids.md §1/§2），属性类及其 parse/getName 映射不再存在 | S3.09 |
+| MERGED → icbm/classic/content/blocks/explosive/ExplosiveBlockEntity.java | icbm/classic/content/blocks/explosive/TileEntityExplosive.java | capabilityExplosive → icbmclassic:explosive_settings 组件（applyImplicitComponents/collectImplicitComponents），并按 1.12 键名 explosive_stack 显式存档（值改为设置复合；1.12 的 toStack 带 TODO 会丢自定义数据，本步按步骤卡要求修好）；trigger(boolean) 1:1 照抄含 breaching 特例（HOST_DIRECTION=getDirection().getOpposite()）与两处 1.12 TODO；setFire(100) → igniteForSeconds(100)、spawnEntity → addFreshEntity、setBlockToAir → removeBlock(pos,false)；IRotatable 走方块状态，setDirection 用 Block.UPDATE_CLIENTS；hasBeenTriggered 保持公开、不复位、不存档（同 1.12）；删 getUpdatePacket/getUpdateTag/onDataPacket（26.3 无客户端可见状态）；无 getTicker（1.12 该 tile 不 tick） | S3.09 |
 | TODO | icbm/classic/content/blocks/launcher/FiringPackage.java | 发射台网络与巡航发射器 | S5 |
 | TODO | icbm/classic/content/blocks/launcher/LauncherBaseCapability.java | 发射台网络与巡航发射器 | S5 |
 | TODO | icbm/classic/content/blocks/launcher/LauncherLangs.java | 发射台网络与巡航发射器 | S5 |
@@ -442,9 +442,10 @@
 | PORTED | icbm/classic/content/potion/Poison.java | name/id 映射表与 protected/creative 判定照抄；两个被注释掉的护甲/方块防护分支保持注释状态（1.12 未启用） | S3.05 |
 | PORTED | icbm/classic/content/radioactive/BlockRadioactive.java | EnumType metadata → 两个实例 radioactive_dirt/radioactive_stone（ADR 0002，构造参数 Kind）；randomTick 与 scheduled tick 共用一个 decay 流程，randomTicks 由 decay_delay 门控；1.12 getBlockHardness/getExplosionResistance 的按类型数值进 Properties（Material.ROCK → requiresCorrectToolForDrops + 镐标签）；伤害源改 ModDamageTypes.RADIOACTIVE_BLOCK；randomDisplayTick → animateTick（playLocalSound）；1.12 的 TODO 与硬编码 20 tick wither 原样保留 | S2.03、S3.08 |
 | PORTED | icbm/classic/content/radioactive/RadioactiveHandler.java | BlockChanceOut 表照 1.12：stone→radioactive_stone、dirt/farmland/dirt_path/grass_block/mycelium→radioactive_dirt（chance 0.2）、Material.PLANTS/LEAVES/VINE 的方块→空气（复用 BlastBeam#isVegetation 的 26.3 标签表，须在数据包标签加载后 setup()）；配置源 icbmclassic/blast.json#nuclear.radioactive_replacements.list | S2.03、S3.08 |
-| MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品 | S2.01 |
+| MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品；S3.09 在既有 RegHelper 循环里保留 1.12 blockExplosive 的属性（map color FIRE、strength(2,0)、SoundType.CLOTH→WOOL），FACING 状态与共享方块实体在 ExplosiveBlock 内，属性本身未变 | S2.01、S3.09 |
+| MERGED → icbm/classic/content/reg/ModBlockEntities.java | icbm/classic/content/reg/BlockReg.java（registerTileEntity 部分） | GameRegistry.registerTileEntity(TileEntityExplosive) → Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, icbmclassic:explosive, FabricBlockEntityTypeBuilder.create(ExplosiveBlockEntity::new, <23 个平铺爆炸物方块>).build())，23 个方块共享一个类型（registry-ids.md §2）；S5.02–S5.06 的机器类型仍 TODO | S3.09 |
 | MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块；S3.07 在实体类型建好后注册 EMP 接收器（IcbmLookups.init 早于本类） | S2.01、S3.02、S3.03、S3.06、S3.07 |
-| PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂逐个换成真实实现（S3.04–S3.08 全部完成，无 todoBlast 占位） | S2.02、S3.04、S3.05、S3.06、S3.07、S3.08 |
+| PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂逐个换成真实实现（S3.04–S3.08 全部完成，无 todoBlast 占位）；S3.09 末影激活监听器落地（todoEnderBlockCoordSet → 读 icbmclassic:gps_data 写 ExplosiveSettings#enderTarget 并提示 icbmclassic.message.launcher.toolTargetSet/noTargetInTool）；导弹侧 todoEnderMissileCoordSet 仍为 TODO(S3.07) | S2.02、S3.04、S3.05、S3.06、S3.07、S3.08、S3.09 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07） | S2.01 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityBombCartDataFixer.java | 不迁移旧存档（ADR 0002） | — |
@@ -490,7 +491,7 @@
 | PORTED | icbm/classic/lib/capability/emp/CapabilityEmpKill.java | setDead→discard | S1.10 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosive.java | 删 ICapabilitySerializable，改 ISavable（EXPLOSIVE_ID 走 ValueOutput/ValueInput） | S1.10 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveEntity.java | ISavable；ItemEntity 掉落、ItemStack.isSameItem、level.isClientSide() | S1.10 |
-| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStack.java | 构造签名 (ItemStack, Identifier)；自定义项存档走 IBuilderRegistry#save/load；TODO(S2.02) 数据组件 | S1.10 |
+| PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStack.java | 构造签名 (ItemStack, Identifier)；自定义项存档走 IBuilderRegistry#save/load；S3.09 新增静态 fromStack(ItemStack)（BlockItem#getBlock instanceof ExplosiveBlock → 爆炸 id，替代 1.12 的 ItemStack#getCapability(EXPLOSIVE_CAPABILITY)）；构造器里「从组件读自定义项」的 TODO(S2.05) 保留给 S4.06 设置管线 | S1.10、S3.09 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStatic.java | INBTSerializable→ISavable（空实现，与 1.12 一致） | S1.10 |
 | DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSData.java | DROPPED（改用 icbmclassic:gps_data 数据组件，S2.04/S5.08） | S1.10 |
 | DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSDataItem.java | DROPPED（同上；物品数据组件） | S1.10 |
@@ -512,7 +513,7 @@
 | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/EnergySystemNull.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
 | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | icbm/classic/lib/energy/system/IEnergySystem.java | DROPPED（ADR 0003：S6 用 Team Reborn EnergyStorage 替代） | S1.07 |
 | PORTED | icbm/classic/lib/explosive/ThreadWorkBlast.java | 通用收集型工作，`doRun(int, LevelSnapshot)`/`onStarted(LevelSnapshot)`；被线程化爆炸（S3.02/S3.06）与 ExplosiveRegistry（S2.02）使用 | S1.09、S2.02 |
-| PORTED | icbm/classic/lib/explosive/reg/ExBlockContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
+| PORTED | icbm/classic/lib/explosive/reg/ExBlockContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存；S3.09 getDeviceStack 返回平铺 <ex>_explosive 方块物品（rot/mutation 无方块形态时返回 EMPTY），并实现 getActivationListener | S2.02、S3.09 |
 | PORTED | icbm/classic/lib/explosive/reg/ExGrenadeContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
 | PORTED | icbm/classic/lib/explosive/reg/ExMinecartContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |
 | PORTED | icbm/classic/lib/explosive/reg/ExMissileContentReg.java | 数值 ID 层删除（ADR 0002），改按 Identifier 键；1.12 的 IntHashMap 缓存合并为按名缓存 | S2.02 |

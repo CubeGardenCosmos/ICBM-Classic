@@ -30,9 +30,12 @@ import icbm.classic.content.blast.redmatter.ActionSpawnRedmatter;
 import icbm.classic.content.blast.threaded.BlastAntimatter;
 import icbm.classic.content.blast.threaded.BlastNuclear;
 import icbm.classic.content.blast.threaded.BlastThermobaric;
+import icbm.classic.content.blocks.explosive.ExplosiveBlockEntity;
 import icbm.classic.content.entity.EntityFragments;
 import icbm.classic.api.actions.data.ActionFields;
 import icbm.classic.api.refs.ICBMEntities;
+import icbm.classic.lib.data.ExplosiveSettings;
+import icbm.classic.lib.data.GpsData;
 import icbm.classic.lib.explosive.reg.ExBlockContentReg;
 import icbm.classic.lib.explosive.reg.ExGrenadeContentReg;
 import icbm.classic.lib.explosive.reg.ExMinecartContentReg;
@@ -40,12 +43,15 @@ import icbm.classic.lib.explosive.reg.ExMissileContentReg;
 import icbm.classic.lib.explosive.reg.ExplosiveRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -290,7 +296,7 @@ public final class ExplosiveInit
         ICBMExplosives.ENDER = newEx(EnumTier.THREE, "ender",
                 (w, x, y, z, s) -> new BlastEnder().setBlastSize(ConfigBlast.ender.scale).setBlastWorld(w).setBlastPosition(x, y, z));
         ICBMClassicAPI.EX_MISSILE_REGISTRY.setInteractionListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::todoEnderMissileCoordSet);
-        ICBMClassicAPI.EX_BLOCK_REGISTRY.setActivationListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::todoEnderBlockCoordSet);
+        ICBMClassicAPI.EX_BLOCK_REGISTRY.setActivationListener(ICBMExplosives.ENDER.getRegistryKey(), ExplosiveInit::enderBlockCoordSet);
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.ENDER.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.ENDER);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.ENDER.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.ENDER);
 
@@ -402,10 +408,49 @@ public final class ExplosiveInit
         return false;
     }
 
-    /** TODO(S3.09) same as {@link #todoEnderMissileCoordSet} but for the explosive block activation. */
-    private static boolean todoEnderBlockCoordSet(Level world, BlockPos pos, Player player, InteractionHand hand,
-                                                  Direction facing, float hitX, float hitY, float hitZ)
+    /**
+     * 1.12 {@code ExplosiveInit#enderBlockCoordSet} registered as the activation listener of the ender
+     * explosive block during S3.07; it stores the GPS target of the held item into the block's explosive
+     * capability. 26.3 keeps the same path with the {@code icbmclassic:explosive_settings} component holding
+     * the target ({@link ExplosiveSettings#enderTarget()}).
+     */
+    private static boolean enderBlockCoordSet(Level world, BlockPos pos, Player player, InteractionHand hand,
+                                              Direction facing, float hitX, float hitY, float hitZ)
     {
+        //1.12: tileEntity != null && tileEntity.hasCapability(ICBMClassicAPI.EXPLOSIVE_CAPABILITY, facing)
+        if (world.getBlockEntity(pos) instanceof ExplosiveBlockEntity explosiveBlockEntity)
+        {
+            return encodeEnderCoordSet(explosiveBlockEntity, player, hand);
+        }
+        return false;
+    }
+
+    /**
+     * Reads the target of the GPS item the player holds and stores it on the explosive block.
+     * 1.12 {@code ExplosiveInit#encodeEnderCoordSet} built an {@code EnderBlastCustomization} from
+     * {@code ICBMClassicHelpers#getGPSData(stack)} and attached it to the explosive capability; that helper
+     * still answers null until S5.08 reads the component, so the component is read directly here.
+     */
+    private static boolean encodeEnderCoordSet(ExplosiveBlockEntity provider, Player player, InteractionHand hand)
+    {
+        final ItemStack stack = player.getItemInHand(hand);
+        final GpsData gpsData = stack.get(ModDataComponents.GPS_DATA);
+        if (gpsData != null)
+        {
+            final GlobalPos position = gpsData.pos().orElse(null); //1.12: gpsData.getPosition()
+            if (position != null)
+            {
+                //1.12: provider.addCustomization(new EnderBlastCustomization(gpsData.getWorldId(), position))
+                // The 26.3 component has a single ender target field, so a new target replaces the old one
+                provider.setSettings(new ExplosiveSettings(position));
+                player.sendSystemMessage(Component.translatable("icbmclassic.message.launcher.toolTargetSet"));
+            }
+            else
+            {
+                player.sendSystemMessage(Component.translatable("icbmclassic.message.launcher.noTargetInTool"));
+            }
+            return true;
+        }
         return false;
     }
 }

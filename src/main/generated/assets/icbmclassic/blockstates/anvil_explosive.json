@@ -1,7 +1,30 @@
 {
   "variants": {
-    "": {
+    "facing=down": {
+      "model": "icbmclassic:block/anvil_explosive",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "icbmclassic:block/anvil_explosive",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "icbmclassic:block/anvil_explosive",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "icbmclassic:block/anvil_explosive",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
       "model": "icbmclassic:block/anvil_explosive"
+    },
+    "facing=west": {
+      "model": "icbmclassic:block/anvil_explosive",
+      "x": 90,
+      "y": 270
     }
   }
 }

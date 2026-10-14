@@ -46,7 +46,7 @@
 - [x] (5) 线程化爆炸与红物质（nuclear、thermobaric、antimatter、redmatter）。（S3.06 已完成；证据：[S3.06.md](../implementation/evidence/S3.06.md)）
 - [x] (6) EMP 与末影爆炸（emp、ender）。（S3.07 已完成；证据：[S3.07.md](../implementation/evidence/S3.07.md)）
 - [x] (7) 放射性方块（radioactive_dirt、radioactive_stone、rot 爆炸替换表）。（S3.08 已完成；证据：[S3.08.md](../implementation/evidence/S3.08.md)）
-- [ ] (8) 爆炸物方块与引信。
+- [x] (8) 爆炸物方块与引信（23 个平铺爆炸物方块、共享 ExplosiveBlockEntity、引信与激活）。（S3.09 已完成；证据：[S3.09.md](../implementation/evidence/S3.09.md)）
 - [ ] (9) `/icbm` 命令。
 
 ## 导弹

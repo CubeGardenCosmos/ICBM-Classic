@@ -5,9 +5,13 @@ import icbm.classic.api.data.BlockActivateFunction;
 import icbm.classic.api.data.WorldPosIntSupplier;
 import icbm.classic.api.data.WorldTickFunction;
 import icbm.classic.api.reg.content.IExBlockRegistry;
+import icbm.classic.content.reg.ModBlocks;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +40,12 @@ public class ExBlockContentReg extends ExplosiveContentRegistry implements IExBl
     @Override
     public ItemStack getDeviceStack(Identifier regName)
     {
-        // TODO(S2.05/S3.09) return the flat "<ex>_explosive" block item once ModItems/ModBlocks exist
-        return ItemStack.EMPTY;
+        // 1.12: new ItemStack(BlockReg.blockExplosive, 1, ICBMClassicHelpers.getExplosive(regName, false).getRegistryID())
+        // 26.3 items are flat (ADR 0002), so the block of the explosive is the device stack. 1.12 answered the
+        // item for every metadata value because one block held them all; the explosives without a block form
+        // (rot, mutation) have no device stack any more.
+        final Block block = ModBlocks.EXPLOSIVE_BLOCKS.get(regName);
+        return block == null ? ItemStack.EMPTY : new ItemStack(block);
     }
 
     @Override
@@ -56,6 +64,14 @@ public class ExBlockContentReg extends ExplosiveContentRegistry implements IExBl
     public void setActivationListener(Identifier exName, BlockActivateFunction function)
     {
         blockActivationCallback.put(exName, function);
+    }
+
+    /** See {@link IExBlockRegistry#getActivationListener(Identifier)}, read by {@code ExplosiveBlock}. */
+    @Nullable
+    @Override
+    public BlockActivateFunction getActivationListener(Identifier exName)
+    {
+        return blockActivationCallback.get(exName);
     }
 
     @Override

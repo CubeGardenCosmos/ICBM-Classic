@@ -209,6 +209,8 @@
   "icbmclassic.message.launcher.status.firing.delayed": "Launch Triggered; Firing in %s",
   "icbmclassic.message.launcher.status.launched": "Launch Triggered",
   "icbmclassic.message.launcher.status.ready": "Ready to fire",
+  "icbmclassic.message.launcher.noTargetInTool": "Tool does not contain any target data!",
+  "icbmclassic.message.launcher.toolTargetSet": "Target data transferred from tool.",
   "icbmclassic.message.launcher.toolFrequencySet": "Frequency set to %s",
   "icbmclassic.message.radar.redstone.off": "Radar set to not emit redstone",
   "icbmclassic.message.radar.redstone.on": "Radar set to emit redstone",

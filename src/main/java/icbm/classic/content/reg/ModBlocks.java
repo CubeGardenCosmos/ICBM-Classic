@@ -97,7 +97,10 @@ public final class ModBlocks
         //Block items are registered by ModItems, the same split as 1.12 BlockReg/ItemReg
 
         //Flat explosive blocks: one block per explosive instead of the 1.12 metadata container (ADR 0002)
-        // 1.12: BlockExplosive with Material.TNT, setHardness(2), setSoundType(SoundType.CLOTH)
+        // 1.12 BlockExplosive: Material.TNT (map colour FIRE, no explosion resistance), setHardness(2),
+        // setSoundType(SoundType.CLOTH) -> SoundType.WOOL. The block state (the placement facing) and the
+        // shared block entity (registry-ids.md §2) are added by ExplosiveBlock itself, so no property of the
+        // 1.12 block is missing here (S3.09).
         final BlockBehaviour.Properties explosive = BlockBehaviour.Properties.of()
                 .mapColor(MapColor.FIRE)
                 .strength(2f, 0f)
