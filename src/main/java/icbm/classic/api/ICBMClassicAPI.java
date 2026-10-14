@@ -56,7 +56,7 @@ public final class ICBMClassicAPI {
     public static IActionListenerHandler ACTION_LISTENER;
 
     /** Registry for projectile information */
-    public static IProjectileDataRegistry PROJECTILE_DATA_REGISTRY; // TODO(S3.01) assigned by the projectile content registration
+    public static IProjectileDataRegistry PROJECTILE_DATA_REGISTRY; // assigned by ICBMClassic#onInitialize (S3.01)
 
     //=========================
     //=== References ==========

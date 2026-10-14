@@ -1,5 +1,7 @@
 package icbm.classic;
 
+import icbm.classic.api.ICBMClassicAPI;
+import icbm.classic.api.reg.events.ProjectileDataRegistryEvent;
 import icbm.classic.config.ConfigThread;
 import icbm.classic.config.core.ConfigManager;
 import icbm.classic.content.reg.ExplosiveInit;
@@ -13,10 +15,12 @@ import icbm.classic.content.reg.ModMenus;
 import icbm.classic.content.reg.ModSounds;
 import icbm.classic.lib.actions.ActionSystem;
 import icbm.classic.lib.lookup.IcbmLookups;
+import icbm.classic.lib.projectile.ProjectileDataRegistry;
 import icbm.classic.lib.radar.RadarRegistry;
 import icbm.classic.lib.radio.RadioRegistry;
 import icbm.classic.lib.thread.BlockEditQueue;
 import icbm.classic.lib.thread.WorkerThreadManager;
+import icbm.classic.lib.world.ProjectileBlockInteraction;
 import icbm.classic.network.IcbmNetwork;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
@@ -57,6 +61,27 @@ public final class ICBMClassic implements ModInitializer {
         ModMenus.register();
         ModCreativeTabs.register();
         IcbmNetwork.registerPayloads();
+
+        // Projectile block interaction table (S3.01): 1.12 registered this next to the other world
+        // handlers during preInit (ICBMClassic#preInit).
+        ProjectileBlockInteraction.register();
+
+        // Projectile data registry (S3.01). 1.12 created the registry during preInit and locked it once the
+        // content systems had registered their own projectile types (ICBMClassic#handleProjectileDataRegistry);
+        // content steps insert their registrations before the lock.
+        final ProjectileDataRegistry projectileDataRegistry = new ProjectileDataRegistry();
+        ICBMClassicAPI.PROJECTILE_DATA_REGISTRY = projectileDataRegistry;
+        // 1.12 registered the vanilla defaults late (postInit, "needs to lock late as we need content to
+        // register some types"). 26.3 has a second reason: ItemStack can not be created while the mod is
+        // still initializing (porting-guide.md §9 note 5), so the vanilla conversions, the registry event
+        // and the lock run on the first server start.
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+            if (!projectileDataRegistry.isLocked()) {
+                projectileDataRegistry.registerVanillaDefaults();
+                ProjectileDataRegistryEvent.EVENT.invoker().onRegisterProjectileData(projectileDataRegistry);
+                projectileDataRegistry.lock();
+            }
+        });
 
         // Drop per-level radio state when a level unloads, and everything when the server stops
         // (docs/architecture/overview.md §5/§7).

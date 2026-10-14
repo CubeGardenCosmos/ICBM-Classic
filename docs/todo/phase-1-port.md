@@ -39,7 +39,7 @@
 
 ## 爆炸
 
-- [ ] (1) 投射物基类、爆炸框架与伤害类型。
+- [ ] (1) 投射物基类、爆炸框架与伤害类型。（部分：S3.01：`lib/projectile/**`、`lib/world/**` 与 `ICBMClassicAPI.PROJECTILE_DATA_REGISTRY` 接线已完成；爆炸框架与伤害类型留 S3.02；证据：../implementation/evidence/S3.01.md）
 - [ ] (2) 爆炸相关实体（碎片、飞行方块、光束、烟雾、点燃炸药）。
 - [ ] (3) 常规爆炸（condensed、shrapnel、incendiary、anvil、repulsive、attractive、fragmentation、sonic、breaching、exothermic、endothermic、antigravitational、rot、mutation）。
 - [ ] (4) 气体爆炸、药水效果、防护装备（debilitation、chemical、contagious、colors、smoke）。

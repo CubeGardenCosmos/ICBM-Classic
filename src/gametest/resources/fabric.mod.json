@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "environment": "*",
   "entrypoints": {
+    "main": [
+      "icbm.classic.test.TestModInitializer"
+    ],
     "fabric-gametest": [
       "icbm.classic.test.SmokeGameTest",
       "icbm.classic.test.lib.SaveHandlerGameTest",
@@ -22,7 +25,8 @@
       "icbm.classic.test.reg.LootAndTagGameTest",
       "icbm.classic.test.reg.RecipeGameTest",
       "icbm.classic.test.reg.SoundGameTest",
-      "icbm.classic.test.reg.LangGameTest"
+      "icbm.classic.test.reg.LangGameTest",
+      "icbm.classic.test.projectile.ProjectileGameTest"
     ]
   },
   "depends": {

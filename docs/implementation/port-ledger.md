@@ -540,18 +540,18 @@
 | DROPPED（26.3 原版同步手持物；调用方 ItemRadarGun/ItemLaserDetonator 在 S5.08 处理） | icbm/classic/lib/network/packet/PacketPlayerItem.java | 26.3 用原版手持物品同步 | S1.04 |
 | MERGED → src/main/java/icbm/classic/network/AirParticlePayload.java | icbm/classic/lib/network/packet/PacketSpawnAirParticle.java | 字段不变（维度改 Identifier）；粒子类型未移植，接收端先 debug 日志，S4.07 补完 | S1.04 |
 | MERGED → src/main/java/icbm/classic/network/BlockExplosionFxPayload.java | icbm/classic/lib/network/packet/PacketSpawnBlockExplosion.java | 字段不变（维度改 Identifier）；粒子类型未移植，接收端先 debug 日志，S4.07 补完 | S1.04 |
-| TODO | icbm/classic/lib/projectile/CachedProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/CapabilityProjectileStack.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/EntityProjectile.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/InGroundData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/ProjectileDataRegistry.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/ProjectileItemConversion.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/ProjectileStack.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/vanilla/ArrowProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/vanilla/EntitySpawnProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/vanilla/ItemProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/vanilla/SpectralArrowProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
-| TODO | icbm/classic/lib/projectile/vanilla/TippedArrowProjectileData.java | 投射物基类与爆炸相关实体 | S3.01、S3.03 |
+| PORTED | icbm/classic/lib/projectile/CachedProjectileData.java | 类型替换；apply 的 `instance != null` 条件按 1.12 原样保留（缓存不生效是 1.12 既有行为） | S3.01 |
+| DROPPED（26.3 无 Capability 系统，见 porting-guide §2.6；物品直接暴露投射物数据） | icbm/classic/lib/projectile/CapabilityProjectileStack.java | 物品/栈直接提供 IProjectileStack，S4.06 接入货柜与集束内容 | S3.01 |
+| PORTED | icbm/classic/lib/projectile/EntityProjectile.java | 直系继承 Entity（EntityICBM 属 S5.01，hasHealth/canBeDestroyed 暂内联）；onUpdate→tick、rayTraceBlocks→ClipContext、实体射线→ProjectileUtil、IEntityAdditionalSpawnData→SynchedEntityData(freezeMotion)；伤害源与 EntityPlayerSeat 排除留 S3.02/S4.06 | S3.01 |
+| PORTED | icbm/classic/lib/projectile/InGroundData.java | INBTSerializable→ISavable；getMaterial() 删除（26.3 无 Material，改判 state.isAir()） | S3.01 |
+| PORTED | icbm/classic/lib/projectile/ProjectileDataRegistry.java | ResourceLocation→Identifier、ForgeRegistries→BuiltInRegistries、ItemMonsterPlacer→SpawnEggItem（单一生成蛋物品拆成逐生怪蛋物品）；1.12 的 IProjectileStack capability 查询留 TODO S4.06；接线在 ICBMClassic#onInitialize | S3.01 |
+| PORTED | icbm/classic/lib/projectile/ProjectileItemConversion.java | 类型替换，行为不变 | S3.01 |
+| PORTED | icbm/classic/lib/projectile/ProjectileStack.java | INBTSerializable→ISavable、nodeBuildableObject 保留；类型参数由 EntityParachute（S4.06）暂放为 Entity | S3.01 |
+| PORTED | icbm/classic/lib/projectile/vanilla/ArrowProjectileData.java | EntityTippedArrow→Arrow(EntityTypes.ARROW)、pickupStatus→AbstractArrow.pickup | S3.01 |
+| PORTED | icbm/classic/lib/projectile/vanilla/EntitySpawnProjectileData.java | ForgeRegistries→BuiltInRegistries（DefaultedRegistry 先 containsKey）、newInstance→EntityType.create、NBT 读取改 TagValueInput+Entity#load 并还原 UUID | S3.01 |
+| PORTED | icbm/classic/lib/projectile/vanilla/ItemProjectileData.java | EntityItem→ItemEntity（位置构造器）、setInfinitePickupDelay→setNeverPickUp | S3.01 |
+| PORTED | icbm/classic/lib/projectile/vanilla/SpectralArrowProjectileData.java | 1.12 误用 EntityTippedArrow；26.3 按语义改用 SpectralArrow(EntityTypes.SPECTRAL_ARROW) | S3.01 |
+| PORTED | icbm/classic/lib/projectile/vanilla/TippedArrowProjectileData.java | setPotionEffect→Arrow 以拾取物品栈构造（药水来自 DataComponents.POTION_CONTENTS） | S3.01 |
 | PORTED | icbm/classic/lib/radar/RadarEntity.java | world→Level，字段直读 getX/getY/getZ，`getEntityId`→`getId`，`ChunkPos` 用 `net.minecraft.world.level` record | S1.06 |
 | PORTED | icbm/classic/lib/radar/RadarMap.java | `dimID`→`ResourceKey<Level> dimension`，`remove(Chunk)`→`remove(ChunkPos)`，其余行为照 1.12 | S1.06 |
 | PORTED | icbm/classic/lib/radar/RadarRegistry.java | 按 `ResourceKey<Level>` 分表；Forge 订阅者改为 `onChunkUnload`/`onLevelTick`/`clear`/`clearAll` | S1.06 |
@@ -622,8 +622,8 @@
 | PORTED | icbm/classic/lib/transform/vector/Location.java | World→Level；IB/ValueInput 世界解析构造删除；BlockFaceShape(枚举)→isFaceSturdy；playSound 用 playLocalSound 的 distanceDelay | S1.01 |
 | PORTED | icbm/classic/lib/transform/vector/Point.java | NBTTagCompound→ValueInput/ValueOutput（键名 X/Y 保留） | S1.01 |
 | PORTED | icbm/classic/lib/transform/vector/Pos.java | Vec3d→Vec3、EnumFacing→Direction；Entity 旋转字段改 getYRot/getXRot 与 yRotO/xRotO | S1.01 |
-| TODO | icbm/classic/lib/world/IProjectileBlockInteraction.java |  | — |
-| TODO | icbm/classic/lib/world/ProjectileBlockInteraction.java |  | — |
+| PORTED | icbm/classic/lib/world/IProjectileBlockInteraction.java | World→Level、Vec3d→Vec3、EnumFacing→Direction、IBlockState→BlockState；EnumHitReactions 不变 | S3.01 |
+| PORTED | icbm/classic/lib/world/ProjectileBlockInteraction.java | Material 表→方块标签表（LEAVES/SNOW/IMPERMEABLE）、Blocks.PORTAL→NETHER_PORTAL、末地传送门委托 BlockState#entityInside、breakBlock 去掉 Forge 的 canEntityDestroy 守卫；register() 在 ICBMClassic#onInitialize 调用 | S3.01 |
 | DROPPED（ADR 0006） | icbm/classic/mods/ModInteraction.java | 联动模组代码删除（ADR 0006） | — |
 | DROPPED（ADR 0006） | icbm/classic/mods/ModProxy.java | 联动模组代码删除（ADR 0006） | — |
 | DROPPED（ADR 0006） | icbm/classic/mods/jei/CargoItemWrapper.java | 联动模组代码删除（ADR 0006） | — |
