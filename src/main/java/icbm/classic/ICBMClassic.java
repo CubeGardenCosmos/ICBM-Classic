@@ -9,6 +9,7 @@ import icbm.classic.content.reg.ModBlockEntities;
 import icbm.classic.content.reg.ModBlocks;
 import icbm.classic.content.reg.ModCreativeTabs;
 import icbm.classic.content.reg.ModDataComponents;
+import icbm.classic.content.reg.ModEffects;
 import icbm.classic.content.reg.ModEntities;
 import icbm.classic.content.reg.ModItems;
 import icbm.classic.content.reg.ModMenus;
@@ -55,6 +56,8 @@ public final class ICBMClassic implements ModInitializer {
         // first (items and blocks reference both while being constructed), then content, then the tab.
         ModSounds.register();
         ModDataComponents.register();
+        // Custom mob effects (S3.05): the gas blasts and the antidote reference them by holder
+        ModEffects.register();
         ModBlocks.register();
         ModItems.register();
         ModBlockEntities.register();

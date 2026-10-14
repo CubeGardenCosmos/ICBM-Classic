@@ -10,6 +10,7 @@ import icbm.classic.api.actions.data.ActionFields;
 import icbm.classic.api.actions.status.IActionStatus;
 import icbm.classic.api.reg.events.*;
 import icbm.classic.content.actions.causeby.CauseByTimer;
+import icbm.classic.content.actions.entity.ActionSpawnEntity;
 import icbm.classic.content.actions.conditionals.ConditionAnd;
 import icbm.classic.content.actions.conditionals.ConditionOR;
 import icbm.classic.content.actions.conditionals.ConditionTargetDistance;
@@ -100,7 +101,12 @@ public final class ActionSystem {
         // Register defaults
         // TODO(S3.07): 注册 content/actions/emp/ActionDataEmpArea
         // TODO(S4): 注册 content/cluster/action/ActionDataCluster
-        // TODO(S3.05): 注册 content/actions/entity/ActionSpawnEntity（ACTION_ENTITY_SPAWN）
+        // 1.12: ICBMClassicAPI.ACTION_REGISTRY.register(ACTION_ENTITY_SPAWN, () -> new ActionDataGeneric(...))
+        registry.register(ACTION_ENTITY_SPAWN,
+                () -> new ActionDataGeneric(ACTION_ENTITY_SPAWN,
+                        (w, x, y, z, s, d) -> new ActionSpawnEntity(w, new Vec3(x, y, z), s, d),
+                        ActionSpawnEntity.FIELDS
+                ));
 
         //Fire registry event
         ActionRegistryEvent.EVENT.invoker().onRegisterActions(registry);

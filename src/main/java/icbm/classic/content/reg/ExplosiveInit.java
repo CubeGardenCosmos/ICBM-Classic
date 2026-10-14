@@ -9,8 +9,13 @@ import icbm.classic.api.reg.IExplosiveData;
 import icbm.classic.api.reg.events.ExplosiveContentRegistryEvent;
 import icbm.classic.api.reg.events.ExplosiveRegistryEvent;
 import icbm.classic.config.blast.ConfigBlast;
+import icbm.classic.content.actions.entity.ActionSpawnEntity;
 import icbm.classic.content.blast.BlastAntiGravitational;
 import icbm.classic.content.blast.BlastBreach;
+import icbm.classic.content.blast.gas.BlastChemical;
+import icbm.classic.content.blast.gas.BlastColor;
+import icbm.classic.content.blast.gas.BlastContagious;
+import icbm.classic.content.blast.gas.BlastDebilitation;
 import icbm.classic.content.blast.BlastEndothermic;
 import icbm.classic.content.blast.BlastExothermic;
 import icbm.classic.content.blast.BlastFire;
@@ -20,6 +25,8 @@ import icbm.classic.content.blast.BlastShrapnel;
 import icbm.classic.content.blast.BlastSonic;
 import icbm.classic.content.blast.BlastTNT;
 import icbm.classic.content.entity.EntityFragments;
+import icbm.classic.api.actions.data.ActionFields;
+import icbm.classic.api.refs.ICBMEntities;
 import icbm.classic.lib.explosive.reg.ExBlockContentReg;
 import icbm.classic.lib.explosive.reg.ExGrenadeContentReg;
 import icbm.classic.lib.explosive.reg.ExMinecartContentReg;
@@ -34,6 +41,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Registers every explosive of the mod (registry-ids.md §1) together with the content types that can
@@ -116,14 +124,25 @@ public final class ExplosiveInit
 
 
         // 1.12: new BlastDebilitation().setDuration(ConfigBlast.debilitation.duration).setBlastSize(ConfigBlast.debilitation.size)
-        ICBMExplosives.DEBILITATION = newEx(EnumTier.ONE, "debilitation", todoBlast("debilitation", "S3.05"));
+        ICBMExplosives.DEBILITATION = newEx(EnumTier.ONE, "debilitation",
+                (w, x, y, z, s) -> new BlastDebilitation()
+                        .setDuration(ConfigBlast.debilitation.duration)
+                        .setBlastWorld(w).setBlastPosition(x, y, z)
+                        .setBlastSize(ConfigBlast.debilitation.size));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.DEBILITATION.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.DEBILITATION);
         ICBMClassicAPI.EX_GRENADE_REGISTRY.setFuseSupplier(ICBMExplosives.DEBILITATION.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.GRENADES.DEBILITATION);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.DEBILITATION.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.DEBILITATION);
 
 
         // 1.12: new BlastChemical().setToxicityBuildup(...).setToxicityScale(...).setToxicityMinDamage(...).setDuration(...).setBlastSize(ConfigBlast.chemical.size)
-        ICBMExplosives.CHEMICAL = newEx(EnumTier.ONE, "chemical", todoBlast("chemical", "S3.05"));
+        ICBMExplosives.CHEMICAL = newEx(EnumTier.ONE, "chemical",
+                (w, x, y, z, s) -> new BlastChemical()
+                        .setToxicityBuildup(ConfigBlast.chemical.toxicityBuildup)
+                        .setToxicityScale(ConfigBlast.chemical.toxicityScale)
+                        .setToxicityMinDamage(ConfigBlast.chemical.toxicityMinDamage)
+                        .setDuration(ConfigBlast.chemical.duration)
+                        .setBlastWorld(w).setBlastPosition(x, y, z)
+                        .setBlastSize(ConfigBlast.chemical.size));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.CHEMICAL.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.CHEMICAL);
         ICBMClassicAPI.EX_GRENADE_REGISTRY.setFuseSupplier(ICBMExplosives.CHEMICAL.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.GRENADES.CHEMICAL);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.CHEMICAL.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.CHEMICAL);
@@ -179,7 +198,14 @@ public final class ExplosiveInit
 
 
         // 1.12: new BlastContagious().setToxicityScale(...).setToxicityBuildup(...).setToxicityMinDamage(...).setDuration(...).setBlastSize(ConfigBlast.contagious.size)
-        ICBMExplosives.CONTAGIOUS = newEx(EnumTier.TWO, "contagious", todoBlast("contagious", "S3.05"));
+        ICBMExplosives.CONTAGIOUS = newEx(EnumTier.TWO, "contagious",
+                (w, x, y, z, s) -> new BlastContagious()
+                        .setToxicityScale(ConfigBlast.contagious.toxicityScale)
+                        .setToxicityBuildup(ConfigBlast.contagious.toxicityBuildup)
+                        .setToxicityMinDamage(ConfigBlast.contagious.toxicityMinDamage)
+                        .setDuration(ConfigBlast.contagious.duration)
+                        .setBlastSize(ConfigBlast.contagious.size)
+                        .setBlastWorld(w).setBlastPosition(x, y, z));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.CONTAGIOUS.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.CONTAGIOUS);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.CONTAGIOUS.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.CONTAGIOUS);
 
@@ -284,9 +310,16 @@ public final class ExplosiveInit
 
         //=================== New Explosives not part of classic original
         // 1.12: new BlastColor().setBlastSize(ConfigBlast.colorful.scale)
-        ICBMExplosives.COLOR = newEx(EnumTier.ONE, "colors", todoBlast("colors", "S3.05"));
+        ICBMExplosives.COLOR = newEx(EnumTier.ONE, "colors",
+                (w, x, y, z, s) -> new BlastColor().setBlastSize(ConfigBlast.colorful.scale).setBlastWorld(w).setBlastPosition(x, y, z));
         // 1.12: ActionSpawnEntity(w, new Vec3d(x, y, z), s, ICBMExplosives.SMOKE) with ActionFields.ENTITY_REG_NAME = ICBMEntities.SMOKE
-        ICBMExplosives.SMOKE = newEx(EnumTier.ONE, "smoke", todoBlast("smoke", "S3.05"));
+        ICBMExplosives.SMOKE = newEx(EnumTier.ONE, "smoke",
+                (w, x, y, z, s) -> {
+                    //1.12: new ActionSpawnEntity(world, new Vec3d(x, y, z), source, ICBMExplosives.SMOKE)
+                    final ActionSpawnEntity actionSpawnEntity = new ActionSpawnEntity(w, new Vec3(x, y, z), s, ICBMExplosives.SMOKE);
+                    actionSpawnEntity.setValue(ActionFields.ENTITY_REG_NAME, ICBMEntities.SMOKE);
+                    return actionSpawnEntity;
+                });
 
         // Fire registry event for explosives, then lock everything (no new explosives or content types after this)
         ExplosiveRegistryEvent.EVENT.invoker().onRegisterExplosives(registry);

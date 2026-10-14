@@ -17,7 +17,7 @@
 | PORTED | com/builtbroken/jlib/data/vector/Pos3D.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
 | PORTED | com/builtbroken/jlib/lang/StringHelpers.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
 | DROPPED（无 proxy） | icbm/classic/CommonProxy.java | Fabric 无 proxy，逻辑并入入口类 | — |
-| TODO | icbm/classic/ICBMClassic.java |  | — |
+| PORTED | icbm/classic/ICBMClassic.java | Forge 入口 → Fabric ModInitializer；每次阶段性追加注册调用（S3.02 加 WorkTickingActionHandler 事件接线、S3.05 加 ModEffects.register） | S0.03、S3.02、S3.05 |
 | TODO | icbm/classic/ICBMConstants.java |  | — |
 | DROPPED（1.12 的开发工具，把爆炸物注册表写成 JSON 配方） | icbm/classic/RecipeGeneration.java | 配方改由 datagen ICBMRecipeProvider 生成 | S2.08 |
 | PORTED | icbm/classic/api/EnumTier.java | StringRepresentable + ChatFormatting；getLocalizedName 改 Component.translatable（LanguageUtility 未移植，getName→getSerializedName）；S2.10 键改 icbmclassic.tier.* | S1.10、S2.10 |
@@ -228,7 +228,7 @@
 | MERGED → S3.07 | icbm/classic/content/actions/emp/ActionDataEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
 | MERGED → S3.07 | icbm/classic/content/actions/emp/ActionEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
 | MERGED → S3.07 | icbm/classic/content/actions/emp/EmpHandler.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
-| MERGED → S3.05 | icbm/classic/content/actions/entity/ActionSpawnEntity.java | 生成实体动作，随内容实体在 S3.05 移植 | S3.05 |
+| PORTED | icbm/classic/content/actions/entity/ActionSpawnEntity.java | 生成实体动作；实体存档走 TagValueOutput/TagValueInput（1.12 writeToNBT+merge+readFromNBT）；注册到 ACTION_REGISTRY 的 icbmclassic:entity.spawn（ActionSystem.setup） | S3.05 |
 | PORTED | icbm/classic/content/blast/Blast.java | 26.3 的 Explosion 是接口 → 改为 implements（不再 extends 构造器）；删 Forge onExplosionStart 钩子与 doExplosionA/B；线程字段（thread/threadResults/ThreadExplosion）随 S3.06 重建一并删除；保留 1.12 缺陷 getBlastSource 自递归；S3.04 补回 1.12 从 Explosion 继承的 affectedBlockPositions/getAffectedBlockPositions | S3.02、S3.04 |
 | PORTED | icbm/classic/content/blast/BlastAntiGravitational.java | 去掉旧 ThreadSmallExplosion 字段，只用 doRun + getThreadResults()；飞行方块生成/实体抬升/RUNNING_TICKS 照抄 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastBeam.java | 两次 worker 遍历跑在 S1.09 框架（每次 capture 独立快照、结果回主线程）；光束/飞行方块/换块/计时顺序与 1.12 的 8 个 has* 标志一致；createExplosion → level.explode | S3.04 |
@@ -248,11 +248,11 @@
 | DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlastVelocity.java | onBlastApplyMotion 恒返回 false，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
 | TODO | icbm/classic/content/blast/ender/BlastEnder.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/ender/EnderBlastCustomization.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/gas/BlastChemical.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/gas/BlastColor.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/gas/BlastContagious.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/gas/BlastDebilitation.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/gas/BlastGasBase.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/gas/BlastChemical.java | 伤害源改 ModDamageTypes.CHEMICAL；毒性累积/最小伤害照抄；毒作用改施加注册的 TOXIN 效果 | S3.05 |
+| PORTED | icbm/classic/content/blast/gas/BlastColor.java | 颜色爆炸照抄（依赖 lib/colors 两个纯数学类） | S3.05 |
+| PORTED | icbm/classic/content/blast/gas/BlastContagious.java | 伤害源改 ModDamageTypes.CONTAGIOUS；传染分支照抄；作用改注册的 VIRUS 效果 | S3.05 |
+| PORTED | icbm/classic/content/blast/gas/BlastDebilitation.java | 效果集合与持续时间照抄，改用 addEffect | S3.05 |
+| PORTED | icbm/classic/content/blast/gas/BlastGasBase.java | 气体云逐 tick 逻辑（扩云/路径/粒子/实体扫描）照抄；粒子改 ServerLevel#sendParticles 的 ColorParticleOption；防护门槛用 ProtectiveArmorHandler | S3.05 |
 | PORTED | icbm/classic/content/blast/helpers/BlastBlockHelpers.java | Forge IFluidBlock 删除 → LiquidBlock（原版+模组流体方块都继承它）；BlockLiquid→LiquidBlock、LEVEL 属性同名 | S3.02 |
 | PORTED | icbm/classic/content/blast/imp/BlastBase.java | 无 Explosion 父类；保留 1.12 缺陷 Math.min(blastSize,1) 与 locked/buildBlast 语义 | S3.02 |
 | TODO | icbm/classic/content/blast/redmatter/ActionSpawnRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
@@ -381,8 +381,8 @@
 | PORTED | icbm/classic/content/entity/flyingblock/EntityFlyingBlock.java | 继承移植后的 EntityProjectile；方块状态走 EntityDataSerializers.BLOCK_STATE（S4.07 渲染用）；落地放回方块/掉落逻辑照抄；gravity 钩子改名 getProjectileGravity（26.3 getGravity 为 final） | S3.03 |
 | PORTED | icbm/classic/content/entity/flyingblock/FlyingBlock.java | 静态生成/白名单/配置加载照抄；spawn 回调在 addFreshEntity 前推同步数据（等价 1.12 spawn data 时机） | S3.03 |
 | TODO | icbm/classic/content/entity/flyingblock/RenderEntityBlock.java | 渲染器，改写成 26.3 EntityRenderer 的工作在 S4.07（步骤卡 S3.03 明确排除） | S4.07 |
-| TODO | icbm/classic/content/gas/ProtectiveArmorHandler.java | 气体爆炸 | S3.05 |
-| PORTED | icbm/classic/content/items/ItemAntidote.java | 食用改 food/consumable 组件；效果清除改 finishUsingItem（显式清单，S3.05 补 ICBM 效果） | S2.04 |
+| PORTED | icbm/classic/content/gas/ProtectiveArmorHandler.java | 配置项改 ConfigMain.protectiveArmor（item_ratings 字符串列表，ItemStackConfigList.FloatOut 已在 S1.02 移植）；护甲槽用 EquipmentSlotGroup.ARMOR 的人类槽位 | S3.05 |
+| PORTED | icbm/classic/content/items/ItemAntidote.java | 食用改 food/consumable 组件；效果清除改 finishUsingItem，清单在 S3.05 补齐（4 个 ICBM 效果 + gas 用到的原版效果） | S2.04、S3.05 |
 | TODO | icbm/classic/content/items/ItemBattery.java |  | — |
 | TODO | icbm/classic/content/items/ItemBombCart.java | S2.05 注册 ExplosiveFormItem 占位（23 个平铺化炸弹矿车）；S4.05 换成真实物品 | S2.05、S4.05 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/items/ItemCrafting.java | 元数据子类型改为 10 个平铺化普通 Item；OreDictionary → c: 标签（S2.07） | S2.04 |
@@ -436,10 +436,10 @@
 | TODO | icbm/classic/content/missile/tracker/MissileTrackerData.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/tracker/MissileTrackerHandler.java | 导弹实体与飞行逻辑 | S4 |
 | TODO | icbm/classic/content/missile/tracker/MissileTrackerWorld.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/potion/ContagiousPoison.java | 药水效果 | S3.05 |
-| TODO | icbm/classic/content/potion/CustomPotion.java | 药水效果 | S3.05 |
-| TODO | icbm/classic/content/potion/CustomPotionEffect.java | 药水效果 | S3.05 |
-| TODO | icbm/classic/content/potion/Poison.java | 药水效果 | S3.05 |
+| PORTED | icbm/classic/content/potion/ContagiousPoison.java | 不再继承 Potion：改普通应用器，效果集合与时长/倍率照抄（chemical/contagious 两套），CustomPotionEffect 仍承载无 curative 列表的语义 | S3.05 |
+| DROPPED（1.12 里没有具体子类实例化，仅抽象壳；效果注册改由 content/reg/ModEffects 完成） | icbm/classic/content/potion/CustomPotion.java | 自注册进 Potion 注册表的构造逻辑由 ModEffects.register() 取代 | S3.05 |
+| PORTED | icbm/classic/content/potion/CustomPotionEffect.java | 26.3 MobEffectInstance 无 curative 列表，保留同名包装类以承载效果实例并记录差异 | S3.05 |
+| PORTED | icbm/classic/content/potion/Poison.java | name/id 映射表与 protected/creative 判定照抄；两个被注释掉的护甲/方块防护分支保持注释状态（1.12 未启用） | S3.05 |
 | TODO | icbm/classic/content/radioactive/BlockRadioactive.java | 平铺化方块 | S2.03、S3.08 |
 | TODO | icbm/classic/content/radioactive/RadioactiveHandler.java | 平铺化方块 | S2.03、S3.08 |
 | MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品 | S2.01 |
@@ -498,8 +498,8 @@
 | MERGED | icbm/classic/lib/capability/launcher/CapabilityMissileHolder.java | MERGED → vanilla Container 版（IItemHandlerModifiable → Container）；consumeMissile 走 IcbmLookups.MISSILE_STACK | S1.10 |
 | PORTED | icbm/classic/lib/capability/launcher/CapabilityMissileLauncher.java | 删 capability 注册；状态暂用 ActionResponses（TODO(S5.02) LauncherStatus） | S1.10 |
 | MERGED | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | MERGED → S4.02 实现（依赖 content/missile/entity/explosive/EntityExplosiveMissile） | S4.02 |
-| TODO | icbm/classic/lib/colors/ColorB.java |  | — |
-| TODO | icbm/classic/lib/colors/ColorHelper.java |  | — |
+| PORTED | icbm/classic/lib/colors/ColorB.java | 纯数学颜色类，无 MC 类型（S3.05 随 colors 爆炸移植） | S3.05 |
+| PORTED | icbm/classic/lib/colors/ColorHelper.java | 纯数学颜色工具（S3.05 随 colors 爆炸移植） | S3.05 |
 | PORTED | icbm/classic/lib/data/BoundBlockPos.java | BlockPos/Vec3 边界盒实现 | S1.05（S1.10 复用） |
 | TODO | icbm/classic/lib/data/FaceRotations.java |  | — |
 | TODO | icbm/classic/lib/data/IMachineInfo.java |  | — |
