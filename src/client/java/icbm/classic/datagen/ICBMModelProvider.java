@@ -124,6 +124,11 @@ public class ICBMModelProvider implements DataProvider
         // vanilla renders the pressure plate item with the unpressed model, the family provider leaves that to us
         output.blockItemModel(ModBlocks.GLASS_PRESSURE_PLATE, ModelLocationUtils.getModelLocation(ModBlocks.GLASS_PRESSURE_PLATE));
 
+        // 1.12 BlockRadioactive: models/block/radioactive_{dirt,stone}.json were block/cube_all with the
+        // radioactive/<type>/side texture, one state per metadata value (S3.08, ADR 0002)
+        trivialCube(output, ModBlocks.RADIOACTIVE_DIRT, texture("block/radioactive/dirt/side"));
+        trivialCube(output, ModBlocks.RADIOACTIVE_STONE, texture("block/radioactive/stone/side"));
+
         // Flat explosive blocks (registry-ids.md §1 form B)
         ModBlocks.EXPLOSIVE_BLOCKS.forEach((explosive, block) -> explosiveBlock(output, block, explosive));
     }

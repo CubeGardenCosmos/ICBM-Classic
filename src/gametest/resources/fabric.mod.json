@@ -30,6 +30,7 @@
       "icbm.classic.test.blast.BlastLifecycleGameTest",
       "icbm.classic.test.blast.BasicBlastsGameTest",
       "icbm.classic.test.blast.EnderBlastGameTest",
+      "icbm.classic.test.block.RadioactiveGameTest",
       "icbm.classic.test.blast.GasBlastsGameTest",
       "icbm.classic.test.blast.ThreadedBlastsGameTest",
       "icbm.classic.test.blast.EmpBlastsGameTest",

@@ -45,7 +45,7 @@
 - [x] (4) 气体爆炸、药水效果、防护装备（debilitation、chemical、contagious、colors、smoke）。（S3.05 已完成；证据：[S3.05.md](../implementation/evidence/S3.05.md)）
 - [x] (5) 线程化爆炸与红物质（nuclear、thermobaric、antimatter、redmatter）。（S3.06 已完成；证据：[S3.06.md](../implementation/evidence/S3.06.md)）
 - [x] (6) EMP 与末影爆炸（emp、ender）。（S3.07 已完成；证据：[S3.07.md](../implementation/evidence/S3.07.md)）
-- [ ] (7) 放射性方块。
+- [x] (7) 放射性方块（radioactive_dirt、radioactive_stone、rot 爆炸替换表）。（S3.08 已完成；证据：[S3.08.md](../implementation/evidence/S3.08.md)）
 - [ ] (8) 爆炸物方块与引信。
 - [ ] (9) `/icbm` 命令。
 

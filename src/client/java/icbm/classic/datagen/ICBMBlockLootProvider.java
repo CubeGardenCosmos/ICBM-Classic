@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
  * for every block by default, so the reinforced glass drops itself without silk touch as well. Every block
  * therefore drops itself.
  * <p>
- * The machines (S5) and the radioactive blocks (S3.08) get their tables when they are registered.
+ * The machines (S5) get their tables when they are registered.
  */
 public class ICBMBlockLootProvider extends FabricBlockLootSubProvider
 {
@@ -37,6 +37,9 @@ public class ICBMBlockLootProvider extends FabricBlockLootSubProvider
         dropSelf(ModBlocks.FIRE_SPIKES);
         dropSelf(ModBlocks.GLASS_BUTTON);
         dropSelf(ModBlocks.GLASS_PRESSURE_PLATE);
+        // 1.12 damageDropped returned the metadata value, so both types dropped themselves (S3.08)
+        dropSelf(ModBlocks.RADIOACTIVE_DIRT);
+        dropSelf(ModBlocks.RADIOACTIVE_STONE);
         ModBlocks.EXPLOSIVE_BLOCKS.values().forEach(this::dropSelf);
     }
 }

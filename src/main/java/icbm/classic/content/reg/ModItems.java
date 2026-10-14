@@ -60,7 +60,6 @@ public final class ModItems
     {
         //Block items for the blocks registered by ModBlocks (1.12 ItemBlock / ItemBlockSubTypes)
         // TODO(S2.05) RegHelper.blockItem(<flat explosive blocks>)
-        // TODO(S3.08) RegHelper.blockItem(ModBlocks.RADIOACTIVE_DIRT/STONE)
         // TODO(S5) RegHelper.blockItem(<machines>)
         RegHelper.blockItem(ModBlocks.CONCRETE);
         RegHelper.blockItem(ModBlocks.COMPACT_CONCRETE);
@@ -72,6 +71,8 @@ public final class ModItems
         RegHelper.blockItem(ModBlocks.GLASS_BUTTON);
         RegHelper.blockItem(ModBlocks.GLASS_PRESSURE_PLATE);
         ModBlocks.EXPLOSIVE_BLOCKS.values().forEach(RegHelper::blockItem);
+        RegHelper.blockItem(ModBlocks.RADIOACTIVE_DIRT);
+        RegHelper.blockItem(ModBlocks.RADIOACTIVE_STONE);
 
         //Crafting materials: 1.12 ItemCrafting("ingot", "steel", "copper") and friends, one item per entry
         STEEL_INGOT = material("steel_ingot");

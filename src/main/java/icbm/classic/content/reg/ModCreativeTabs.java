@@ -95,6 +95,10 @@ public final class ModCreativeTabs
         accept(output, ModItems.SALTPETER_BALL);
         accept(output, ModItems.ANTIDOTE);
         accept(output, ModItems.MISSILE_MODULE);
+        // 1.12 ItemReg registered the radioactive block item last among the block items (ItemReg:157), so the
+        // leftover pass puts them right before the crafting materials
+        accept(output, ModBlocks.RADIOACTIVE_DIRT);
+        accept(output, ModBlocks.RADIOACTIVE_STONE);
 
         //Crafting materials (the 1.12 collection appended them last)
         accept(output, ModItems.STEEL_INGOT);

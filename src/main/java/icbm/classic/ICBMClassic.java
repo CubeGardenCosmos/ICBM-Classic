@@ -9,6 +9,7 @@ import icbm.classic.content.reg.ModBlockEntities;
 import icbm.classic.content.reg.ModBlocks;
 import icbm.classic.content.reg.ModCreativeTabs;
 import icbm.classic.content.reg.ModDataComponents;
+import icbm.classic.content.radioactive.RadioactiveHandler;
 import icbm.classic.content.reg.ModEffects;
 import icbm.classic.content.reg.ModEntities;
 import icbm.classic.content.reg.ModItems;
@@ -27,6 +28,7 @@ import icbm.classic.network.IcbmNetwork;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -86,6 +88,10 @@ public final class ICBMClassic implements ModInitializer {
                 projectileDataRegistry.lock();
             }
         });
+
+        // The radioactive swap table reads block tags (vegetation check), so it is built once the static
+        // registry tags are bound (1.12 rebuilt it on the config reload event)
+        CommonLifecycleEvents.TAGS_LOADED.register((registryAccess, client) -> RadioactiveHandler.setup());
 
         // Drop per-level radio state when a level unloads, and everything when the server stops
         // (docs/architecture/overview.md §5/§7).

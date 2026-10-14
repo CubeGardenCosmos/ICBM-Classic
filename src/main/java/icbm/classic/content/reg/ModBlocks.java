@@ -5,6 +5,7 @@ import icbm.classic.content.blocks.BlockGlassPressurePlate;
 import icbm.classic.content.blocks.BlockReinforcedGlass;
 import icbm.classic.content.blocks.BlockSpikes;
 import icbm.classic.content.blocks.explosive.ExplosiveBlock;
+import icbm.classic.content.radioactive.BlockRadioactive;
 import icbm.classic.content.reg.ExplosiveForms.ExplosiveForm;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
@@ -49,6 +50,11 @@ public final class ModBlocks
     public static Block GLASS_BUTTON;
     /** 1.12 {@code glassPressurePlate}: everything sensitive, glass sound. */
     public static Block GLASS_PRESSURE_PLATE;
+
+    /** 1.12 {@code radioactive} meta 0 (dirt), random ticks spread the decay. */
+    public static Block RADIOACTIVE_DIRT;
+    /** 1.12 {@code radioactive} meta 1 (stone), random ticks spread the decay. */
+    public static Block RADIOACTIVE_STONE;
 
     /**
      * Flat explosive blocks by explosive id (registry-ids.md §1, form B). S3.09 turns these into working
@@ -103,7 +109,13 @@ public final class ModBlocks
             EXPLOSIVE_BLOCKS.put(ex, block);
         }
 
-        // TODO(S3.08) radioactive_dirt, radioactive_stone
+        //Radioactive blocks: 1.12 used one block with two metadata values (radioactive/0 dirt, /1 stone),
+        // ADR 0002 flattens it into one block per type (registry-ids.md §2)
+        RADIOACTIVE_DIRT = RegHelper.block("radioactive_dirt",
+                p -> new BlockRadioactive(BlockRadioactive.Kind.DIRT, p), BlockRadioactive.properties(BlockRadioactive.Kind.DIRT));
+        RADIOACTIVE_STONE = RegHelper.block("radioactive_stone",
+                p -> new BlockRadioactive(BlockRadioactive.Kind.STONE, p), BlockRadioactive.properties(BlockRadioactive.Kind.STONE));
+
         // TODO(S5) launcher network, radar station, EMP tower
     }
 

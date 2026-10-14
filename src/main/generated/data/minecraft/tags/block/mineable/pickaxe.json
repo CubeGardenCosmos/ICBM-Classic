@@ -7,6 +7,8 @@
     "icbmclassic:poison_spikes",
     "icbmclassic:fire_spikes",
     "icbmclassic:glass_button",
-    "icbmclassic:glass_pressure_plate"
+    "icbmclassic:glass_pressure_plate",
+    "icbmclassic:radioactive_dirt",
+    "icbmclassic:radioactive_stone"
   ]
 }

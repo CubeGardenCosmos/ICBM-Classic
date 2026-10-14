@@ -15,10 +15,10 @@ import java.util.concurrent.CompletableFuture;
  * block ever set one, so no {@code minecraft:needs_iron_tool}/{@code needs_stone_tool} tag is generated
  * (step card S2.07 point 2).
  * <p>
- * Pickaxe blocks are the 1.12 {@code Material.ROCK} concrete, the {@code Material.IRON} spikes and the
- * vanilla button/pressure plate behaviour of the glass button and plate. The reinforced glass
- * ({@code Material.GLASS}) and the flat explosive blocks ({@code Material.TNT}) stay without a tool tag,
- * exactly like vanilla glass and TNT.
+ * Pickaxe blocks are the 1.12 {@code Material.ROCK} concrete, spikes and radioactive blocks, the
+ * {@code Material.IRON} spikes and the vanilla button/pressure plate behaviour of the glass button and
+ * plate. The reinforced glass ({@code Material.GLASS}) and the flat explosive blocks ({@code Material.TNT})
+ * stay without a tool tag, exactly like vanilla glass and TNT.
  */
 public class ICBMBlockTagProvider extends FabricTagsProvider.BlockTagsProvider
 {
@@ -38,6 +38,9 @@ public class ICBMBlockTagProvider extends FabricTagsProvider.BlockTagsProvider
                 RegHelper.blockKey("poison_spikes"),
                 RegHelper.blockKey("fire_spikes"),
                 RegHelper.blockKey("glass_button"),
-                RegHelper.blockKey("glass_pressure_plate"));
+                RegHelper.blockKey("glass_pressure_plate"),
+                // 1.12 BlockRadioactive was Material.ROCK with no harvest level set (S3.08)
+                RegHelper.blockKey("radioactive_dirt"),
+                RegHelper.blockKey("radioactive_stone"));
     }
 }

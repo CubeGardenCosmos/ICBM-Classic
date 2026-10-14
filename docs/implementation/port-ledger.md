@@ -239,7 +239,7 @@
 | PORTED | icbm/classic/content/blast/BlastFire.java | 放火用 BaseFireBlock.getState + canSurvive；其余照抄 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastHelpers.java | Int3Consumer/Int3Looper 改自 api.data，循环与停止语义不变 | S3.02 |
 | PORTED | icbm/classic/content/blast/BlastMutation.java | 手工生成转换实体 → Mob#convertTo(EntityType, ConversionParams, AfterConversion)（新实体生成、旧实体 discard）；不改声音禁用的行为 | S3.04 |
-| PORTED | icbm/classic/content/blast/BlastRadioactiveBlockSwaps.java | 继承 BlastThreaded + IBlastTickable；替换表先用 BuiltInRegistries.BLOCK 按 id 解析 radioactive_dirt/stone（缺则跳过并 warn），TODO(S3.08) 换成 RadioactiveHandler 的表 | S3.04 |
+| PORTED | icbm/classic/content/blast/BlastRadioactiveBlockSwaps.java | 继承 BlastThreaded + IBlastTickable；替换表改用 RadioactiveHandler.radioactiveBlockSwaps（1.12 表重建，S3.08）；原先按 id 解析 radioactive_dirt/stone 的占位代码与其 warn 已删除 | S3.04、S3.08 |
 | PORTED | icbm/classic/content/blast/BlastShrapnel.java | setLocationAndAngles → setPos+setYRot/setXRot（含 yRotO/xRotO）；motion 写改 setDeltaMovement；六面环生成逻辑与 1.12 一致 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastSonic.java | 由 Blast 改继承 BlastThreaded，ThreadLargeExplosion 的射线收集并入 doRun(worker+快照)；每 4 tick 消费结果、区块半径增长、实体击退照 1.12 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastStatus.java | new ResourceLocation(DOMAIN,…) → ICBMConstants.id(…)，ImmutableStatus 工厂不变 | S3.02 |
@@ -440,8 +440,8 @@
 | DROPPED（1.12 里没有具体子类实例化，仅抽象壳；效果注册改由 content/reg/ModEffects 完成） | icbm/classic/content/potion/CustomPotion.java | 自注册进 Potion 注册表的构造逻辑由 ModEffects.register() 取代 | S3.05 |
 | PORTED | icbm/classic/content/potion/CustomPotionEffect.java | 26.3 MobEffectInstance 无 curative 列表，保留同名包装类以承载效果实例并记录差异 | S3.05 |
 | PORTED | icbm/classic/content/potion/Poison.java | name/id 映射表与 protected/creative 判定照抄；两个被注释掉的护甲/方块防护分支保持注释状态（1.12 未启用） | S3.05 |
-| TODO | icbm/classic/content/radioactive/BlockRadioactive.java | 平铺化方块 | S2.03、S3.08 |
-| TODO | icbm/classic/content/radioactive/RadioactiveHandler.java | 平铺化方块 | S2.03、S3.08 |
+| PORTED | icbm/classic/content/radioactive/BlockRadioactive.java | EnumType metadata → 两个实例 radioactive_dirt/radioactive_stone（ADR 0002，构造参数 Kind）；randomTick 与 scheduled tick 共用一个 decay 流程，randomTicks 由 decay_delay 门控；1.12 getBlockHardness/getExplosionResistance 的按类型数值进 Properties（Material.ROCK → requiresCorrectToolForDrops + 镐标签）；伤害源改 ModDamageTypes.RADIOACTIVE_BLOCK；randomDisplayTick → animateTick（playLocalSound）；1.12 的 TODO 与硬编码 20 tick wither 原样保留 | S2.03、S3.08 |
+| PORTED | icbm/classic/content/radioactive/RadioactiveHandler.java | BlockChanceOut 表照 1.12：stone→radioactive_stone、dirt/farmland/dirt_path/grass_block/mycelium→radioactive_dirt（chance 0.2）、Material.PLANTS/LEAVES/VINE 的方块→空气（复用 BlastBeam#isVegetation 的 26.3 标签表，须在数据包标签加载后 setup()）；配置源 icbmclassic/blast.json#nuclear.radioactive_replacements.list | S2.03、S3.08 |
 | MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品 | S2.01 |
 | MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块；S3.07 在实体类型建好后注册 EMP 接收器（IcbmLookups.init 早于本类） | S2.01、S3.02、S3.03、S3.06、S3.07 |
 | PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂逐个换成真实实现（S3.04–S3.08 全部完成，无 todoBlast 占位） | S2.02、S3.04、S3.05、S3.06、S3.07、S3.08 |

@@ -375,8 +375,14 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
         return state.is(Blocks.WATER);
     }
 
-    /** 1.12 {@code Material.LEAVES || Material.VINE || Material.PLANTS} */
-    protected static boolean isVegetation(BlockState state)
+    /**
+     * 1.12 {@code Material.LEAVES || Material.VINE || Material.PLANTS}
+     * <p>
+     * Shared by the beam blasts and the nuclear rot table
+     * ({@link icbm.classic.content.radioactive.RadioactiveHandler}), which replaced the same 1.12 material
+     * checks with air.
+     */
+    public static boolean isVegetation(BlockState state)
     {
         return state.is(BlockTags.LEAVES) //Material.LEAVES
                 || state.is(Blocks.VINE) || state.is(Blocks.GLOW_LICHEN) //Material.VINE

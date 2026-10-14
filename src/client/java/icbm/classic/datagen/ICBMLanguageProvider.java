@@ -38,6 +38,9 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
     /** Form -> English name used by the flat names and the {@code icbmclassic.form.*} templates. */
     private static final Map<ExplosiveForm, String> FORM_NAMES = new LinkedHashMap<>();
 
+    /** Entity type id -> English name; 1.12 never named its entities in the lang file (S3.03/S4). */
+    private static final Map<String, String> ENTITY_NAMES = new LinkedHashMap<>();
+
     /** Flat id -> English name of the content that is not an explosive form (1.12 ".name" values). */
     private static final Map<String, String> NAMES = new LinkedHashMap<>();
 
@@ -87,6 +90,10 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         NAMES.put("glass_button", "Glass Button");
         NAMES.put("glass_pressure_plate", "Glass Pressure Plate");
 
+        //Radioactive blocks (S3.08), the 1.12 "icbmclassic.block.radioactive.<meta>.name" values
+        NAMES.put("radioactive_dirt", "Radioactive Dirt");
+        NAMES.put("radioactive_stone", "Radioactive Stone");
+
         //Materials and simple items (S2.04)
         NAMES.put("steel_ingot", "Steel Ingot");
         NAMES.put("copper_ingot", "Copper Ingot");
@@ -105,6 +112,16 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         NAMES.put("antidote", "Antidote");
         NAMES.put("empty_bomblet", "Droplet");
         NAMES.put("missile_module", "Missile Module");
+
+        //Entity types. 1.12 registered no entity name in its lang file, so these are port side additions
+        // built from the 1.12 registry ids and class purpose (registry-ids.md §4)
+        ENTITY_NAMES.put("explosion_holder", "Explosion Holder");
+        ENTITY_NAMES.put("fragment", "Fragments");
+        ENTITY_NAMES.put("flying_block", "Flying Block");
+        ENTITY_NAMES.put("primed_explosive", "Primed Explosive");
+        ENTITY_NAMES.put("light_beam", "Light Beam");
+        ENTITY_NAMES.put("smoke", "Smoke");
+        ENTITY_NAMES.put("redmatter", "Red Matter");
     }
 
     public ICBMLanguageProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries)
@@ -138,11 +155,15 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
                 builder.add("item.icbmclassic." + item.getPath(), nameOf(names, item));
             }
         }
-        //No entity type is registered yet (registry-ids.md §4, S4/S7); fail loudly if one appears here
         for (Identifier entity : keysOf(BuiltInRegistries.ENTITY_TYPE))
         {
-            throw new IllegalStateException("no English name for entity " + entity
-                    + ", add it to ICBMLanguageProvider");
+            final String name = ENTITY_NAMES.get(entity.getPath());
+            if (name == null)
+            {
+                throw new IllegalStateException("no English name for entity " + entity
+                        + ", add it to ICBMLanguageProvider");
+            }
+            builder.add("entity.icbmclassic." + entity.getPath(), name);
         }
     }
 
