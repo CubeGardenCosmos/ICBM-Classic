@@ -6,6 +6,7 @@ import icbm.classic.api.data.D3Consumer;
 import icbm.classic.api.data.IWorldPosition;
 import icbm.classic.api.missiles.IMissileAiming;
 import icbm.classic.api.missiles.projectile.IProjectileThrowable;
+import icbm.classic.content.reg.ModDamageTypes;
 import icbm.classic.lib.saving.SaveHandler;
 import icbm.classic.lib.transform.vector.Pos;
 import icbm.classic.lib.world.IProjectileBlockInteraction;
@@ -58,12 +59,10 @@ public abstract class EntityProjectile<PROJECTILE extends EntityProjectile<PROJE
 
     /**
      * 1.12 held the generic "icbmclassic:projectile" damage source here. 26.3 builds damage sources from
-     * data pack damage types, so the type and its {@code damage_type} json are registered by S3.02
-     * ({@code ModDamageTypes}); {@link #getImpactDamageSource(Entity, float, HitResult)} answers null until then.
+     * data pack damage types, so the type now lives in {@code icbmclassic:projectile}
+     * ({@link icbm.classic.content.reg.ModDamageTypes#PROJECTILE}) and
+     * {@link #getImpactDamageSource(Entity, float, HitResult)} resolves it per level.
      */
-    // TODO(S3.02) return ModDamageTypes.source(level(), PROJECTILE)
-
-    // Default is motionY *= 0.9800000190734863D
     public static final float DEFAULT_GRAVITY = 0.05F;
 
     /**
@@ -551,8 +550,7 @@ public abstract class EntityProjectile<PROJECTILE extends EntityProjectile<PROJE
      * @return damage source to use, null to skip damage
      */
     protected @Nullable DamageSource getImpactDamageSource(Entity entityHit, float velocity, HitResult hit) {
-        // TODO(S3.02): return the icbmclassic:projectile damage source once the damage types are registered
-        return null;
+        return ModDamageTypes.source(level(), ModDamageTypes.PROJECTILE);
     }
 
     /**

@@ -14,6 +14,7 @@ import icbm.classic.content.reg.ModItems;
 import icbm.classic.content.reg.ModMenus;
 import icbm.classic.content.reg.ModSounds;
 import icbm.classic.lib.actions.ActionSystem;
+import icbm.classic.lib.actions.WorkTickingActionHandler;
 import icbm.classic.lib.lookup.IcbmLookups;
 import icbm.classic.lib.projectile.ProjectileDataRegistry;
 import icbm.classic.lib.radar.RadarRegistry;
@@ -108,6 +109,12 @@ public final class ICBMClassic implements ModInitializer {
                 WorkerThreadManager.INSTANCE.killThreads();
             }
         });
+
+        // Active blast tracking (S3.02): 1.12 was a Forge @Mod.EventBusSubscriber on WorldEvent.Unload
+        // (WorkTickingActionHandler#worldUnload). A level unload clears the blasts of that level, a server
+        // stop clears everything left over.
+        ServerLevelEvents.UNLOAD.register((server, level) -> WorkTickingActionHandler.onLevelUnload(level));
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> WorkTickingActionHandler.clearAll());
 
         LOGGER.info("ICBM-Classic initializing (26.3 port)");
     }

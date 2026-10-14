@@ -229,22 +229,22 @@
 | MERGED → S3.07 | icbm/classic/content/actions/emp/ActionEmpArea.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
 | MERGED → S3.07 | icbm/classic/content/actions/emp/EmpHandler.java | 依赖爆炸配置与方块替换，随 EMP 爆炸在 S3.07 移植 | S3.07 |
 | MERGED → S3.05 | icbm/classic/content/actions/entity/ActionSpawnEntity.java | 生成实体动作，随内容实体在 S3.05 移植 | S3.05 |
-| TODO | icbm/classic/content/blast/Blast.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/Blast.java | 26.3 的 Explosion 是接口 → 改为 implements（不再 extends 构造器）；删 Forge onExplosionStart 钩子与 doExplosionA/B；线程字段（thread/threadResults/ThreadExplosion）随 S3.06 重建一并删除；保留 1.12 缺陷 getBlastSource 自递归 | S3.02 |
 | TODO | icbm/classic/content/blast/BlastAntiGravitational.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastBeam.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastBreach.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastEndothermic.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastExothermic.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastFire.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastHelpers.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/BlastHelpers.java | Int3Consumer/Int3Looper 改自 api.data，循环与停止语义不变 | S3.02 |
 | TODO | icbm/classic/content/blast/BlastMutation.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastRadioactiveBlockSwaps.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastShrapnel.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/BlastSonic.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/BlastStatus.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/BlastStatus.java | new ResourceLocation(DOMAIN,…) → ICBMConstants.id(…)，ImmutableStatus 工厂不变 | S3.02 |
 | TODO | icbm/classic/content/blast/BlastTNT.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/caps/CapabilityBlast.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/caps/CapabilityBlastVelocity.java | 各爆炸实现 | S3.02–S3.07 |
+| DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlast.java | IBlast 查询方法全部返回固定值，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
+| DROPPED（26.3 无 Capability 系统；1.12 中该类只是空实现且无调用方） | icbm/classic/content/blast/caps/CapabilityBlastVelocity.java | onBlastApplyMotion 恒返回 false，唯一作用是 CapabilityManager.INSTANCE.register | S3.02 |
 | TODO | icbm/classic/content/blast/ender/BlastEnder.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/ender/EnderBlastCustomization.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/gas/BlastChemical.java | 各爆炸实现 | S3.02–S3.07 |
@@ -252,8 +252,8 @@
 | TODO | icbm/classic/content/blast/gas/BlastContagious.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/gas/BlastDebilitation.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/gas/BlastGasBase.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/helpers/BlastBlockHelpers.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/imp/BlastBase.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/helpers/BlastBlockHelpers.java | Forge IFluidBlock 删除 → LiquidBlock（原版+模组流体方块都继承它）；BlockLiquid→LiquidBlock、LEVEL 属性同名 | S3.02 |
+| PORTED | icbm/classic/content/blast/imp/BlastBase.java | 无 Explosion 父类；保留 1.12 缺陷 Math.min(blastSize,1) 与 locked/buildBlast 语义 | S3.02 |
 | TODO | icbm/classic/content/blast/redmatter/ActionSpawnRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/redmatter/DamageSourceRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
 | TODO | icbm/classic/content/blast/redmatter/EntityRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
@@ -265,9 +265,9 @@
 | TODO | icbm/classic/content/blast/redmatter/render/RenderRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
 | PORTED | icbm/classic/content/blast/thread/BasicResistanceCallBack.java | 默认抗性回调；1.12 的 Blast 字段与 IFluidBlock 检查删除（26.3 `Block#getExplosionResistance()` 无参），可安全用于工作线程 | S1.09 |
 | PORTED | icbm/classic/content/blast/thread/IThreadCallBack.java | World→Level、Block、BlockPos、IPos3D；工作线程调用时 level 为 null（不向工作线程暴露世界） | S1.09 |
-| MERGED → S3.02 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadExplosion.java | 1.12 的 thread-per-blast 设计（Thread 子类 + doRun(World, Location)）与 26.3 快照/预算队列架构不兼容，随爆炸框架在 S3.02 重写 | S3.02 |
-| MERGED → S3.02 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadLargeExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随爆炸框架在 S3.02 重写 | S3.02 |
-| MERGED → S3.02 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadSmallExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随爆炸框架在 S3.02 重写 | S3.02 |
+| MERGED → S3.06 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadExplosion.java | 1.12 的 thread-per-blast 设计（Thread 子类 + doRun(World, Location)）与 26.3 快照/预算队列架构不兼容；S3.02 已从 Blast 删除线程字段，改写落在 S3.06 | S3.06 |
+| MERGED → S3.06 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadLargeExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随线程化爆炸在 S3.06 重写 | S3.06 |
+| MERGED → S3.06 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadSmallExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随线程化爆炸在 S3.06 重写 | S3.06 |
 | MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastAntimatter.java | 反物质爆炸（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
 | MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastNuclear.java | 核爆（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
 | MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastThermobaric.java | 温压爆炸（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
@@ -369,7 +369,7 @@
 | TODO | icbm/classic/content/cluster/missile/ItemClusterMissile.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/cluster/missile/RecipeCluster.java | 集束导弹与子弹药 | S4 |
 | TODO | icbm/classic/content/entity/EntityBombCart.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
-| TODO | icbm/classic/content/entity/EntityExplosion.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
+| PORTED | icbm/classic/content/entity/EntityExplosion.java | IEntityAdditionalSpawnData 删除 → 爆炸 ID/偏移走 SynchedEntityData，blast 只在服务端构造；setDead→discard、readEntityFromNBT→readAdditionalSaveData(ValueInput)；注册为 explosion_holder（7 区块/5 tick） | S3.02 |
 | TODO | icbm/classic/content/entity/EntityExplosive.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
 | TODO | icbm/classic/content/entity/EntityFragments.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
 | TODO | icbm/classic/content/entity/EntityGrenade.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
@@ -442,7 +442,7 @@
 | TODO | icbm/classic/content/radioactive/BlockRadioactive.java | 平铺化方块 | S2.03、S3.08 |
 | TODO | icbm/classic/content/radioactive/RadioactiveHandler.java | 平铺化方块 | S2.03、S3.08 |
 | MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品 | S2.01 |
-| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002） | S2.01 |
+| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块 | S2.01、S3.02 |
 | PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂为 S3 占位（throw） | S2.02 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07） | S2.01 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
@@ -467,7 +467,7 @@
 | PORTED | icbm/classic/lib/actions/PotentialAction.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/PotentialActionImp.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/PotentialActionKnown.java | 动作系统（ISavable + SaveHandler） | S1.08 |
-| MERGED → S3.02 | icbm/classic/lib/actions/WorkTickingActionHandler.java | 依赖 api.explosion.IBlast + content.blast.Blast（S3.02），并入爆炸线程处理 | S3.02 |
+| PORTED | icbm/classic/lib/actions/WorkTickingActionHandler.java | Forge @Mod.EventBusSubscriber + WorldEvent.Unload → ServerLevelEvents.UNLOAD/SERVER_STOPPED 接线；ArrayList→CopyOnWriteArrayList，add/remove 收 IBlast（步骤卡要求），新增 clearAll | S3.02 |
 | PORTED | icbm/classic/lib/actions/conditionals/Condition.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/conditionals/timer/TimerCondition.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/conditionals/timer/TimerTickingStatus.java | 动作系统（ISavable + SaveHandler） | S1.08 |

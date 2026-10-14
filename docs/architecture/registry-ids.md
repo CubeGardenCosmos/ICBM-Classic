@@ -150,7 +150,10 @@ DROPPED：1.12 中注释掉的圣诞节怪物（`skeleton.xmas.*`、`zombie.xmas
   `power_down`(powerdown)、`redmatter`、`sonic_wave`(sonicwave)、`meep`、`radioactive_tick`。
   字幕键固定为 `subtitles.icbmclassic.<id>`；`.ogg` 文件名沿用 1.12（如 `missileinair_short.ogg`），不随事件 ID 改名。
   1.12 的 `SoundCategory`（除 `meep` 为 NEUTRAL 外均为 BLOCKS）在 26.3 由播放点传入 `SoundSource`，不写进 `sounds.json`。
-- 伤害类型（数据包 `damage_type`）：`missile_impact`、`radioactive_block`、`chemical_gas`、`contagious_gas`、`shrapnel`、`antimatter`、`redmatter`。来源：`grep -rn 'DamageSource("' legacy-1.12/src`；以 grep 结果为准，在 S3.02 证据中列出最终清单。
+- 伤害类型（数据包 `damage_type`，S3.02 定稿，来源为 `grep -rn 'new DamageSource(\|new EntityDamageSource' legacy-1.12/src`）：`projectile`、`spikes`、`bomblet`、`radioactive_block`、`chemical`、`contagious`、`redmatter`、`missile_impact`。
+  json 的 `message_id` 取 `icbmclassic.<id>`（`missile_impact` 例外，保留 1.12 的 `missile`），因此死亡消息键为 `death.attack.icbmclassic.<id>`，与 S2.10 迁移后的 `en_us.json` 一致。
+  1.12 的 `icbmclassic:projectile` 带 `.setProjectile()` → 26.3 加入标签 `minecraft:is_projectile`；`DamageSourceRedmatter` 的 `setDamageBypassesArmor`/`setDamageIsAbsolute` → 标签 `minecraft:bypasses_armor`、`minecraft:bypasses_enchantments`、`minecraft:bypasses_effects` 与 `"scaling": "never"`。
+  1.12 计划中的 `chemical_gas`、`contagious_gas`、`shrapnel`、`antimatter` 并未在 1.12 代码中出现（化学/传染伤害源 id 为 `icbm.chemical`/`icbm.contagious`，破片实体沿用原版 `arrow` 类型，反物质沿用原版爆炸伤害），已按实际 grep 结果替换。
 - 方块实体类型：见 §2 第三列。
 - 粒子类型：S4.07 根据 `client/fx` 确定后补入本表。
 - API Lookup ID：`missile`、`missile_launcher`、`missile_holder`、`emp_receiver`。

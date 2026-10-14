@@ -26,7 +26,8 @@
       "icbm.classic.test.reg.RecipeGameTest",
       "icbm.classic.test.reg.SoundGameTest",
       "icbm.classic.test.reg.LangGameTest",
-      "icbm.classic.test.projectile.ProjectileGameTest"
+      "icbm.classic.test.projectile.ProjectileGameTest",
+      "icbm.classic.test.blast.BlastLifecycleGameTest"
     ]
   },
   "depends": {
