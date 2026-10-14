@@ -2,6 +2,7 @@ package icbm.classic;
 
 import icbm.classic.api.ICBMClassicAPI;
 import icbm.classic.api.reg.events.ProjectileDataRegistryEvent;
+import icbm.classic.command.ICBMCommands;
 import icbm.classic.config.ConfigThread;
 import icbm.classic.config.core.ConfigManager;
 import icbm.classic.content.reg.ExplosiveInit;
@@ -26,6 +27,7 @@ import icbm.classic.lib.thread.WorkerThreadManager;
 import icbm.classic.lib.world.ProjectileBlockInteraction;
 import icbm.classic.network.IcbmNetwork;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
@@ -67,6 +69,11 @@ public final class ICBMClassic implements ModInitializer {
         ModMenus.register();
         ModCreativeTabs.register();
         IcbmNetwork.registerPayloads();
+
+        // Command tree (S3.10): 1.12 registered a CommandEntryPoint("icbm", ICBMCommands.ICBM_COMMAND) with
+        // the Forge command registry during pre init; Fabric's CommandRegistrationCallback replaces that
+        // event. The command output uses the icbmclassic.command.* keys migrated in S2.10.
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> ICBMCommands.init(dispatcher));
 
         // Projectile block interaction table (S3.01): 1.12 registered this next to the other world
         // handlers during preInit (ICBMClassic#preInit).

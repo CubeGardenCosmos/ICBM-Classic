@@ -163,19 +163,19 @@
 | TODO | icbm/classic/client/render/entity/item/RenderAsItem.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/render/entity/item/RenderItemImp.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/render/entity/layer/LayerChickenHelmet.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/command/CommandUtils.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/ICBMCommands.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/sub/CommandHelp.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/sub/CommandLag.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/sub/CommandRemove.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/sub/blast/CommandBlastList.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/sub/blast/CommandBlastSpread.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/sub/blast/CommandBlastTrigger.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/system/CommandEntryPoint.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/system/CommandGroup.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/system/ICommandGroup.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/system/ISubCommand.java | Brigadier 命令 | S3.10 |
-| TODO | icbm/classic/command/system/SubCommand.java | Brigadier 命令 | S3.10 |
+| PORTED | icbm/classic/command/CommandUtils.java | 只保留 isICBMEntity/isMissile/getEntities（loadedEntityList → ServerLevel#getAllEntities、getEntitiesWithinAABB → Level#getEntitiesOfClass）；removeFront/parseRadius/getNumber/getWorld 由 Brigadier 参数类型取代（Vec3Argument.vec3(false)、DimensionArgument、IntegerArgumentType）；isConsoleSender 替代 1.12 的 `sender instanceof MinecraftServer`（26.3 无法读取 CommandSourceStack 的 CommandSource）；EntityBombDroplet/EntityGrenade 待 S4/S5 补回，1.12 TODO 原样保留 | S3.10 |
+| PORTED | icbm/classic/command/ICBMCommands.java | 命令树改 Brigadier（literal/then/executes）；根节点 requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)) 保 1.12 权限等级 2；组节点空参数执行显示该组 help；注册经 Fabric CommandRegistrationCallback（ICBMClassic#onInitialize），输出用 S2.10 迁移的 icbmclassic.command.* 键 | S3.10 |
+| PORTED | icbm/classic/command/sub/CommandHelp.java | 保留 1.12 displayHelp + collectHelpForAll/WorldOnly/ServerOnly 三段逻辑（HelpLine 记录 usage 与三组帮助串，按有无实体决定 world-only 行、按 isConsoleSender 决定 server-only 行）；help 输出仍是无翻译键字面量（1.12 TextComponentString） | S3.10 |
+| PORTED | icbm/classic/command/sub/CommandLag.java | `[radius]` 默认 1000；ICBM 实体过滤 + WorkTickingActionHandler.removeNear 清理；消息 icbmclassic.command.lag.remove（1.12 把 double range 塞进 %3$d 槽，26.3 只支持 %s，值已改 %s 见 S3.10 证据「差异」） | S3.10 |
+| PORTED | icbm/classic/command/sub/CommandRemove.java | 两种形态拆成 Brigadier 分支：`<type> [radius]`（仅世界中发送者，控制台报 1.12 的未知命令消息）与 `<type> <dim> <x> <y> <z> [radius]`；buildSelector、all/missile(s)/explosion(s)/ex 别名、未知类型不删任何实体、tab 建议 all/missile/explosion 照抄；setDead → Entity#discard | S3.10 |
+| PORTED | icbm/classic/command/sub/blast/CommandBlastList.java | 按 id 排序列出 EXPLOSIVE_REGISTRY 全部爆炸物；输出仍是 1.12 的字面量 "Explosive Types: "（1.12 的 translate TODO 保留） | S3.10 |
+| PORTED | icbm/classic/command/sub/blast/CommandBlastSpread.java | 单一 8 参数形态 `<count> <distance> <id> <dim> <x> <y> <z> <scale>`；count/distance 保 1.12 CommandBase.parseInt(min 1)；告示串 icbmclassic.command.spread.started 参数顺序与 1.12 相同（维度 id/世界类型 → 维度标识/维度类型注册名），网格坐标计算与逐条 doAction 照抄 | S3.10 |
+| PORTED | icbm/classic/command/sub/blast/CommandBlastTrigger.java | 短式 `<id> <size>`（仅世界中发送者）与长式 `<id> <dim> <x> <y> <z> <size>`，保留 1.12 的 trigger 节点名；scale<=0 报 icbmclassic.command.blast.error.scale.zero；id 建议来自 EXPLOSIVE_REGISTRY；getExplosive 改 allowNull=true 查询（1.12 经 helper 查询永远返回 condensed，错误分支不可达）；1.12 未使用的 TRANSLATION_TRIGGERED/THREADING 等常量不保留 | S3.10 |
+| MERGED → icbm/classic/command/ICBMCommands.java | icbm/classic/command/system/CommandEntryPoint.java | Forge ICommand 入口（权限等级 2、原始 args 转发、tab 补全）→ 根 literal 节点 + requires(Commands.LEVEL_GAMEMASTERS)，1.12 的权限 2 不变 | S3.10 |
+| MERGED → icbm/classic/command/ICBMCommands.java | icbm/classic/command/system/CommandGroup.java | 父子关系 → `literal(...).then(...)`；MapWithDefault 的「未知子命令走 help」改为 Brigadier 自身未知命令错误，空参数仍显示该组 help | S3.10 |
+| MERGED → icbm/classic/command/ICBMCommands.java | icbm/classic/command/system/ICommandGroup.java | 组接口（getSubCommands/registerCommand/getUsage）由树结构与 CommandHelp.HelpLine 列表取代 | S3.10 |
+| MERGED → icbm/classic/command/sub/CommandHelp.java + 各命令节点的 executes | icbm/classic/command/system/ISubCommand.java | handleCommand → executes(...)；displayHelp/getUsage/collectHelp* → HelpLine + CommandHelp.displayHelp；getTabSuggestions → SuggestionProvider | S3.10 |
+| MERGED → icbm/classic/command/sub/CommandHelp.java（HelpLine） | icbm/classic/command/system/SubCommand.java | 抽象基类（name/parent/usage/默认 help 三组）→ 各命令类的 NAME/HELP_LINE 常量与 executes 分支 | S3.10 |
 | PORTED | icbm/classic/config/ConfigBattery.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
 | PORTED | icbm/classic/config/ConfigClient.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
 | PORTED | icbm/classic/config/ConfigDebug.java | 改写为 @IcbmConfig JSON 配置 | S1.02 |
