@@ -40,12 +40,15 @@ import net.minecraft.world.phys.Vec3;
  *     <li>{@code canTriggerWalking()} no longer exists (blocks decide trampling themselves) and
  *     {@code canBeCollidedWith()} is {@link #isPickable()} (kept as an explicit override to mirror 1.12,
  *     it is the 26.3 default).</li>
- *     <li>1.12 also held a client side size lerp handler used only by the renderer, that belongs to the S4.07
- *     render step.</li>
+ *     <li>1.12 also held a client side size lerp handler used only by the renderer
+ *     ({@code RedmatterClientLogic}); 26.3 keeps it as {@link #clientVisualSize} plus
+ *     {@link #lerpClientVisualSize(float)}, which the S4.07 renderer calls. No client class is referenced,
+ *     so the field exists on both sides and is only ever written on the client.</li>
  * </ul>
  * The renderer (S4.07) reads {@link #getBlastSize()} through the synced data, {@code tickCount} for its
- * animations and {@code ConfigBlast.redmatter.RENDER_SCALE}/{@code RENDER_COLORED_BEAMS}; it needs no other
- * field from this class.
+ * animations, {@link #clientVisualSize} for the lerped size and
+ * {@code ConfigBlast.redmatter.RENDER_SCALE}/{@code RENDER_COLORED_BEAMS}; it needs no other field from this
+ * class.
  * <p>
  * Created by Dark(DarkGuardsman, Robin) on 4/19/2020.
  */
@@ -64,6 +67,22 @@ public class EntityRedmatter extends Entity
 
     //Handlers
     public final RedmatterLogic redmatterLogic = new RedmatterLogic(this);
+
+    /**
+     * 1.12 {@code RedmatterClientLogic#visualSize}: the smoothly changing size the renderer draws with. It is
+     * client side only, the renderer is the only writer (see {@link #lerpClientVisualSize(float)}).
+     */
+    public float clientVisualSize = 0.0F;
+
+    /**
+     * 1.12 {@code RedmatterClientLogic#lerpSize}, triggered from the render once per frame.
+     *
+     * @param deltaTick percentage of time passed (0.0 - 1.0f)
+     */
+    public void lerpClientVisualSize(float deltaTick)
+    {
+        this.clientVisualSize = this.clientVisualSize + deltaTick * (getBlastSize() - this.clientVisualSize);
+    }
 
     /** Actual size of the redmatter */
     private static final EntityDataAccessor<Float> SIZE_DATA = SynchedEntityData.defineId(EntityRedmatter.class, EntityDataSerializers.FLOAT);

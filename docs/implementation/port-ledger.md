@@ -137,8 +137,8 @@
 | PORTED | icbm/classic/api/reg/obj/IBuilderRegistry.java | save/load 改走 ValueOutput/ValueInput（键 id + data 子节点）；删 1.12 的 save(NBTTagList) 默认方法 | S1.03（S1.10 复用） |
 | PORTED | icbm/classic/api/tile/IRotatable.java | EnumFacing→Direction | S1.10 |
 | PORTED | icbm/classic/api/tile/IRotation.java | EnumFacing→Direction | S1.10 |
-| TODO | icbm/classic/client/ClientProxy.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/ClientReg.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
+| TODO | icbm/classic/client/ClientProxy.java | 客户端类移入 client 源集；渲染注册部分已由 S4.07（拆分：S3 实体）在 IcbmEntityRenderers 落地，spawnSmoke/spawnAirParticle/spawnPadSmoke 的粒子生成仍待 S4.07 的粒子部分 | S2.06、S4.07、S5.07 |
+| MERGED → icbm/classic/client/render/IcbmEntityRenderers.java | icbm/classic/client/ClientReg.java | RenderingRegistry.registerEntityRenderingHandler 逐实体注册 → Fabric EntityRendererRegistry#register，由 ICBMClassicClient#onInitializeClient 调用；S4.07 拆分（S3 实体）已注册 7 个类型：RenderExBlock/RenderFragments/RenderEntityBlock/RenderLightBeam/RenderRedmatter 各自一个 EntityRenderer，RenderExplosion/RenderSmoke 映射为原版 NoopRenderer；另加 ClientLifecycleEvents.CLIENT_STARTED 自检（遍历 icbmclassic 实体类型，用 EntityRenderDispatcher#getRenderer(EntityRenderState) 探针报告缺失渲染器）。导弹/手雷/炸弹矿车/座椅/降落伞的渲染器待 S4.07 正式步骤 | S4.07（拆分：S3 实体） |
 | MERGED → icbm/classic/content/reg/ModCreativeTabs.java | icbm/classic/client/ICBMCreativeTab.java | 1.12 客户端排序表改为 main 源集的 displayItems；内容按 ID 查表，未注册的跳过 | S2.05 |
 | MERGED → icbm/classic/content/reg/ModSounds.java | icbm/classic/client/ICBMSounds.java | 16 个 SoundEvent 注册 + assets/icbmclassic/sounds.json（字幕键 subtitles.icbmclassic.*）；1.12 SoundCategory 改由播放点传 SoundSource | S2.09 |
 | TODO | icbm/classic/client/SpikeMeshDefinition.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
@@ -153,13 +153,13 @@
 | TODO | icbm/classic/client/models/ModelChickenHelmet.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/models/ModelICBM.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/render/entity/RenderEntityItem2.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/render/entity/RenderExBlock.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/render/entity/RenderExplosion.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/render/entity/RenderFragments.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/render/entity/RenderLightBeam.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
+| PORTED → icbm/classic/client/render/entity/RenderExBlock.java + state/ExBlockRenderState.java | icbm/classic/client/render/entity/RenderExBlock.java | 方块外观：1.12 blockExplosive + ROTATION_PROP=UP + EX_PROP=爆炸物数据 → 26.3 按 id 查 ModBlocks.EXPLOSIVE_BLOCKS 取平铺方块 + FACING=UP（硬编码，1.12 的 TODO get direction from rotation 原样保留）；renderBlockBrightness → BlockModelResolver#update + BlockModelRenderState#submit；引信膨胀与白闪照 TntRenderer 范式（膨胀保留 1.12 的 f^3，不用原版 f^4；白闪用 overlay 而非第二遍几何）；rot/mutation 无平铺方块形态时不渲染并告警 | S3.09、S4.07（拆分：S3 实体） |
+| MERGED → 原版 NoopRenderer | icbm/classic/client/render/entity/RenderExplosion.java | 1.12 的 doRender 是空实现（getEntityTexture 返回 models/grey.png 但从不使用）→ 26.3 直接注册原版 NoopRenderer，语义等价；注意 1.12 未注册渲染器只是隐形，26.3 会让渲染线程 NPE，所以这个映射是必需的 | S4.07（拆分：S3 实体） |
+| PORTED → icbm/classic/client/render/entity/RenderFragments.java + state/FragmentsRenderState.java | icbm/classic/client/render/entity/RenderFragments.java | 两条分支照抄：铁砧分支用 MovingBlockRenderState + submitMovingBlock 提交 Blocks.ANVIL/CHIPPED_ANVIL（1.12 的 BlockAnvil.DAMAGE 数值属性在 26.3 是方块变体，随机水平 FACING 与 1.12 的 TODO 保留）；普通碎片分支把 1.12 的 2 个尾羽面 + 4 次 90 度旋转面用 submitCustomGeometry + entityCutout(fragment.png) 逐面提交（顶点/UV 逐字照抄，全亮光照替代 1.12 的 disableLighting）；arrowShake 在 1.12 就不同步，客户端恒 0，行为保持一致 | S4.07（拆分：S3 实体） |
+| PORTED → icbm/classic/client/render/entity/RenderLightBeam.java + state/LightBeamRenderState.java | icbm/classic/client/render/entity/RenderLightBeam.java | 轴对齐光柱（内层 beamSize、外层 beamGlowSize）照抄 1.12 的四角/四边/UV 布局，用 submitCustomGeometry + RenderTypes.beaconBeam(...,false/true) 提交；高度 255 - (int)y 与 y-5 偏移这两个 1.12 hack 保留；动画 UV frac(t*0.2 - floor(t*0.1)) 与外层静态 UV 照抄；1.12 的 alphaFunc/disableFog/贴图 clamp 由 RenderType 决定（差异见证据）；shouldRender 恒 true 对应 1.12 的无限渲染包围盒 | S4.07（拆分：S3 实体） |
 | TODO | icbm/classic/client/render/entity/RenderMissile.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/render/entity/RenderSeat.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
-| TODO | icbm/classic/client/render/entity/RenderSmoke.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
+| MERGED → 原版 NoopRenderer | icbm/classic/client/render/entity/RenderSmoke.java | 1.12 doRender 只调 super、getEntityTexture 返回 null、shadowSize 0，实际视觉来自实体每 tick 生成的原版烟粒子 → 26.3 注册 NoopRenderer；粒子部分属于 S4.07 正式步骤 | S4.07（拆分：S3 实体） |
 | TODO | icbm/classic/client/render/entity/item/RenderAsItem.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/render/entity/item/RenderItemImp.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
 | TODO | icbm/classic/client/render/entity/layer/LayerChickenHelmet.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
@@ -262,8 +262,8 @@
 | PORTED | icbm/classic/content/blast/redmatter/caps/CapRedmatterPull.java | 拉拽逻辑照抄；由 RedmatterLogic 直接读字段，不再经 capability | S3.06 |
 | PORTED | icbm/classic/content/blast/redmatter/logic/RedmatterBlockCollector.java | 静态方块收集器照抄（纯整数数学 + Direction 顺序不变）；1.12 本就在主线程路径调用，未引入快照 | S3.06 |
 | PORTED | icbm/classic/content/blast/redmatter/logic/RedmatterLogic.java | 主逻辑照抄（移动/合并/方块销毁/实体伤害）；1.12 的合并-移动 TODO 原样保留；每 tick 预算常量不变 | S3.06 |
-| TODO | icbm/classic/content/blast/redmatter/render/RedmatterClientLogic.java | 客户端渲染/插值，按步骤卡排除，改写成 26.3 EntityRenderer 的工作在 S4.07 | S4.07 |
-| TODO | icbm/classic/content/blast/redmatter/render/RenderRedmatter.java | 客户端渲染/插值，按步骤卡排除，改写成 26.3 EntityRenderer 的工作在 S4.07 | S4.07 |
+| PORTED → icbm/classic/content/blast/redmatter/EntityRedmatter.java（clientVisualSize + lerpClientVisualSize） | icbm/classic/content/blast/redmatter/render/RedmatterClientLogic.java | 1.12 挂在实体上的客户端尺寸插值处理器：visualSize 字段 + lerpSize(deltaTick) 一次性方法照抄进实体（不引用任何客户端类，服务端只是存在不用）；渲染器每帧先拷走上一帧的值再 lerp，等价于 1.12 的“先绘制后 lerp” | S4.07（拆分：S3 实体） |
+| PORTED → icbm/classic/client/render/entity/RenderRedmatter.java + state/RedmatterRenderState.java | icbm/classic/content/blast/redmatter/render/RenderRedmatter.java | 三部分全部改成提交式渲染：黑盘（blackhole.png 双面纹理四边形，按 -ticksExisted 绕 Y 旋转）、黑球与脉冲外壳（1.12 的即时模式球体 → 32x32 球面网格三角形，颜色/脉冲周期/半径公式照抄）、光束（1.12 的末影龙死亡射线副本 → RenderTypes.dragonRays + 同样的 seed 432 随机序列、6 次随机旋转、beamCount/timeScale/rotationScale 公式与颜色缓存 randomColorsForBeams 照抄）；渲染器不再自行平移，位置由 26.3 分发器提供 | S4.07（拆分：S3 实体） |
 | PORTED | icbm/classic/content/blast/thread/BasicResistanceCallBack.java | 默认抗性回调；1.12 的 Blast 字段与 IFluidBlock 检查删除（26.3 `Block#getExplosionResistance()` 无参），可安全用于工作线程 | S1.09 |
 | PORTED | icbm/classic/content/blast/thread/IThreadCallBack.java | World→Level、Block、BlockPos、IPos3D；工作线程调用时 level 为 null（不向工作线程暴露世界） | S1.09 |
 | MERGED → S3.06 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadExplosion.java | 1.12 的 thread-per-blast 设计（Thread 子类 + doRun(World, Location)）与 26.3 快照/预算队列架构不兼容；S3.02 已从 Blast 删除线程字段，改写落在 S3.06 | S3.06 |
@@ -380,7 +380,7 @@
 | PORTED | icbm/classic/content/entity/flyingblock/BlockCaptureData.java | INBTSerializable<NBTTagCompound> → ISavable(ValueInput/ValueOutput)；键名原样（block_state/source_stack/block_entity） | S3.03 |
 | PORTED | icbm/classic/content/entity/flyingblock/EntityFlyingBlock.java | 继承移植后的 EntityProjectile；方块状态走 EntityDataSerializers.BLOCK_STATE（S4.07 渲染用）；落地放回方块/掉落逻辑照抄；gravity 钩子改名 getProjectileGravity（26.3 getGravity 为 final） | S3.03 |
 | PORTED | icbm/classic/content/entity/flyingblock/FlyingBlock.java | 静态生成/白名单/配置加载照抄；spawn 回调在 addFreshEntity 前推同步数据（等价 1.12 spawn data 时机） | S3.03 |
-| TODO | icbm/classic/content/entity/flyingblock/RenderEntityBlock.java | 渲染器，改写成 26.3 EntityRenderer 的工作在 S4.07（步骤卡 S3.03 明确排除） | S4.07 |
+| PORTED → icbm/classic/client/render/entity/RenderEntityBlock.java（沿用原版 FallingBlockRenderState） | icbm/classic/content/entity/flyingblock/RenderEntityBlock.java | 渲染被掀起的方块：26.3 用 FallingBlockRenderState + MovingBlockRenderState + submitMovingBlock（原版落地管线），变换等价于 1.12 的 translate(y+0.5) + rotate(-90,Y) + translate(-0.5,-0.5,0.5)（推导见证据）；shadowRadius 0.5；1.12 本来就不应用实体旋转，保持一致；1.12 的 failedBlocks + try/catch 回退无等价触发点（26.3 提交是延迟的，缺模型时由原版给占位模型），已记录为差异 | S4.07（拆分：S3 实体） |
 | PORTED | icbm/classic/content/gas/ProtectiveArmorHandler.java | 配置项改 ConfigMain.protectiveArmor（item_ratings 字符串列表，ItemStackConfigList.FloatOut 已在 S1.02 移植）；护甲槽用 EquipmentSlotGroup.ARMOR 的人类槽位 | S3.05 |
 | PORTED | icbm/classic/content/items/ItemAntidote.java | 食用改 food/consumable 组件；效果清除改 finishUsingItem，清单在 S3.05 补齐（4 个 ICBM 效果 + gas 用到的原版效果） | S2.04、S3.05 |
 | TODO | icbm/classic/content/items/ItemBattery.java |  | — |
