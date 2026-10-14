@@ -6,6 +6,7 @@ import icbm.classic.content.entity.EntityExplosive;
 import icbm.classic.content.entity.EntityFragments;
 import icbm.classic.content.entity.EntityLightBeam;
 import icbm.classic.content.entity.EntitySmoke;
+import icbm.classic.content.blast.redmatter.EntityRedmatter;
 import icbm.classic.content.entity.flyingblock.EntityFlyingBlock;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -46,6 +47,9 @@ public final class ModEntities
     /** Gas cloud of smoke style blasts, 1.12 {@code smoke} (100 blocks / 15 → 7 chunks / 15) */
     public static EntityType<EntitySmoke> SMOKE;
 
+    /** Redmatter, 1.12 {@code redmatter} (500 blocks / 1 → 32 chunks / 1) */
+    public static EntityType<EntityRedmatter> REDMATTER;
+
     private ModEntities() {}
 
     /** Registers every entity type. Called from {@code ICBMClassic#onInitialize}. */
@@ -63,6 +67,8 @@ public final class ModEntities
         LIGHT_BEAM = registerEntity(ICBMEntities.BEAM, 1.0F, 1.0F, 5, 5, EntityLightBeam::new);
         // 1.12 EntityReg: buildEntityEntry(EntitySmoke.class, ICBMEntities.SMOKE, 100, 15)
         SMOKE = registerEntity(ICBMEntities.SMOKE, 1.0F, 1.0F, 7, 15, EntitySmoke::new);
+        // 1.12 EntityReg: buildEntityEntry(EntityRedmatter.class, ICBMEntities.REDMATTER, 500, 1)
+        REDMATTER = registerEntity(ICBMEntities.REDMATTER, 0.98F, 0.98F, 32, 1, EntityRedmatter::new);
 
         // TODO(S4) missiles, grenade, bomb_cart, bomblet, missile_seat, redmatter, parachute, balloon
     }

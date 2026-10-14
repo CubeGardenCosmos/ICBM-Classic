@@ -43,7 +43,7 @@
 - [x] (2) 爆炸相关实体（碎片、飞行方块、光束、烟雾、点燃炸药）。（S3.03 已完成；证据：[S3.03.md](../implementation/evidence/S3.03.md)）
 - [x] (3) 常规爆炸（condensed、shrapnel、incendiary、anvil、repulsive、attractive、fragmentation、sonic、breaching、exothermic、endothermic、antigravitational、rot、mutation）。（S3.04 已完成；证据：[S3.04.md](../implementation/evidence/S3.04.md)）
 - [x] (4) 气体爆炸、药水效果、防护装备（debilitation、chemical、contagious、colors、smoke）。（S3.05 已完成；证据：[S3.05.md](../implementation/evidence/S3.05.md)）
-- [ ] (5) 线程化爆炸与红物质（nuclear、thermobaric、antimatter、redmatter）。
+- [x] (5) 线程化爆炸与红物质（nuclear、thermobaric、antimatter、redmatter）。（S3.06 已完成；证据：[S3.06.md](../implementation/evidence/S3.06.md)）
 - [ ] (6) EMP 与末影爆炸。
 - [ ] (7) 放射性方块。
 - [ ] (8) 爆炸物方块与引信。

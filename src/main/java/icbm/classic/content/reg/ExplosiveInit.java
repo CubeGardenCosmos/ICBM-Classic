@@ -24,6 +24,10 @@ import icbm.classic.content.blast.BlastRadioactiveBlockSwaps;
 import icbm.classic.content.blast.BlastShrapnel;
 import icbm.classic.content.blast.BlastSonic;
 import icbm.classic.content.blast.BlastTNT;
+import icbm.classic.content.blast.redmatter.ActionSpawnRedmatter;
+import icbm.classic.content.blast.threaded.BlastAntimatter;
+import icbm.classic.content.blast.threaded.BlastNuclear;
+import icbm.classic.content.blast.threaded.BlastThermobaric;
 import icbm.classic.content.entity.EntityFragments;
 import icbm.classic.api.actions.data.ActionFields;
 import icbm.classic.api.refs.ICBMEntities;
@@ -234,7 +238,8 @@ public final class ExplosiveInit
         // 12 -> Regen
 
         // 1.12: new BlastThermobaric().setEnergy(ConfigBlast.thermobaric.energy).setBlastSize(ConfigBlast.thermobaric.scale)
-        ICBMExplosives.THERMOBARIC = newEx(EnumTier.TWO, "thermobaric", todoBlast("thermobaric", "S3.06"));
+        ICBMExplosives.THERMOBARIC = newEx(EnumTier.TWO, "thermobaric",
+                (w, x, y, z, s) -> new BlastThermobaric().setEnergy(ConfigBlast.thermobaric.energy).setBlastSize(ConfigBlast.thermobaric.scale).setBlastWorld(w).setBlastPosition(x, y, z));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.THERMOBARIC.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.THERMOBARIC);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.THERMOBARIC.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.THERMOBARIC);
 
@@ -242,7 +247,8 @@ public final class ExplosiveInit
 
         //=================== Tier 3
         // 1.12: new BlastNuclear().setEnergy(ConfigBlast.nuclear.energy).setBlastSize(ConfigBlast.nuclear.scale)
-        ICBMExplosives.NUCLEAR = newEx(EnumTier.THREE, "nuclear", todoBlast("nuclear", "S3.06"));
+        ICBMExplosives.NUCLEAR = newEx(EnumTier.THREE, "nuclear",
+                (w, x, y, z, s) -> new BlastNuclear().setEnergy(ConfigBlast.nuclear.energy).setBlastSize(ConfigBlast.nuclear.scale).setBlastWorld(w).setBlastPosition(x, y, z));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.NUCLEAR.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.NUCLEAR);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.NUCLEAR.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.NUCLEAR);
 
@@ -288,14 +294,18 @@ public final class ExplosiveInit
 
         //=================== Tier 4
         // 1.12: new BlastAntimatter().setBlastSize(ConfigBlast.antimatter.size)
-        ICBMExplosives.ANTIMATTER = newEx(EnumTier.FOUR, "antimatter", todoBlast("antimatter", "S3.06"));
+        ICBMExplosives.ANTIMATTER = newEx(EnumTier.FOUR, "antimatter",
+                (w, x, y, z, s) -> new BlastAntimatter()
+                        .setBlastSize(ConfigBlast.antimatter.size)
+                        .setBlastWorld(w).setBlastPosition(x, y, z));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.ANTIMATTER.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.ANTIMATTER);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.ANTIMATTER.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.ANTIMATTER);
 
         //TODO add config (disable by default) for alarm audio
 
         // 1.12: new ActionSpawnRedmatter(w, new Vec3d(x, y, z), s, ICBMExplosives.REDMATTER)
-        ICBMExplosives.REDMATTER = newEx(EnumTier.FOUR, "redmatter", todoBlast("redmatter", "S3.06"));
+        ICBMExplosives.REDMATTER = newEx(EnumTier.FOUR, "redmatter",
+                (w, x, y, z, s) -> new ActionSpawnRedmatter(w, new Vec3(x, y, z), s, ICBMExplosives.REDMATTER));
         ICBMClassicAPI.EX_BLOCK_REGISTRY.setFuseSupplier(ICBMExplosives.REDMATTER.getRegistryKey(), (world, x, y, z) -> ConfigBlast.FUSE_TIMES.EXPLOSIVES.REDMATTER);
         ICBMClassicAPI.EX_MINECART_REGISTRY.setFuseSupplier(ICBMExplosives.REDMATTER.getRegistryKey(), (entity) -> ConfigBlast.FUSE_TIMES.BOMB_CARTS.REDMATTER);
 

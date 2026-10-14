@@ -42,6 +42,14 @@ public abstract class BlastThreaded extends Blast
     /** True once the worker finished and the results are available on the server thread */
     protected boolean threadComplete = false;
 
+    /**
+     * Snapshot the worker reads, captured on the server thread when the work starts.
+     * <p>
+     * 1.12 subclasses read the live world inside their own {@code ThreadExplosion} subclass; 26.3 forbids
+     * that, so the snapshot is kept here and subclasses read blocks through it in {@link #doRun(int, Consumer)}.
+     */
+    protected LevelSnapshot snapshot;
+
     public BlastThreaded()
     {
     }
@@ -155,10 +163,10 @@ public abstract class BlastThreaded extends Blast
             hasThreadStarted = true;
             if (level() instanceof ServerLevel serverLevel)
             {
-                final LevelSnapshot snapshot = LevelSnapshot.capture(serverLevel,
+                this.snapshot = LevelSnapshot.capture(serverLevel,
                         BlockPos.containing(getPosition()), getThreadRadius());
                 workerTask = getWorkerTask();
-                WorkerThreadManager.INSTANCE.addWork(workerTask, snapshot);
+                WorkerThreadManager.INSTANCE.addWork(workerTask, this.snapshot);
             }
         }
         // the worker is running, the blast finishes when the edits are back in the world

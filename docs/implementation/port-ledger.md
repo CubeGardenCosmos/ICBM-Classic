@@ -232,7 +232,7 @@
 | PORTED | icbm/classic/content/blast/Blast.java | 26.3 的 Explosion 是接口 → 改为 implements（不再 extends 构造器）；删 Forge onExplosionStart 钩子与 doExplosionA/B；线程字段（thread/threadResults/ThreadExplosion）随 S3.06 重建一并删除；保留 1.12 缺陷 getBlastSource 自递归；S3.04 补回 1.12 从 Explosion 继承的 affectedBlockPositions/getAffectedBlockPositions | S3.02、S3.04 |
 | PORTED | icbm/classic/content/blast/BlastAntiGravitational.java | 去掉旧 ThreadSmallExplosion 字段，只用 doRun + getThreadResults()；飞行方块生成/实体抬升/RUNNING_TICKS 照抄 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastBeam.java | 两次 worker 遍历跑在 S1.09 框架（每次 capture 独立快照、结果回主线程）；光束/飞行方块/换块/计时顺序与 1.12 的 8 个 has* 标志一致；createExplosion → level.explode | S3.04 |
-| MERGED → icbm/classic/content/blast/threaded/BlastThreaded.java（新增：1.12 的 Blast 线程字段 + ThreadExplosion 外壳在 26.3 的归处） | icbm/classic/content/blast/threaded/BlastThreaded.java | 无 1.12 对应文件：把 Blast 里的 thread/threadResults/createAndStartThread/markThreadCompleted/isThreadCompleted 收敛到线程基类，跑在 S1.09 的 LevelSnapshot/BlockEditQueue 上 | S3.04 |
+| MERGED → icbm/classic/content/blast/threaded/BlastThreaded.java（新增：1.12 的 Blast 线程字段 + ThreadExplosion 外壳在 26.3 的归处） | icbm/classic/content/blast/threaded/BlastThreaded.java | 无 1.12 对应文件：把 Blast 里的 thread/threadResults/createAndStartThread/markThreadCompleted/isThreadCompleted 收敛到线程基类，跑在 S1.09 的 LevelSnapshot/BlockEditQueue 上；S3.06 加 protected snapshot 供子类在工作线程读取 | S3.04、S3.06 |
 | PORTED | icbm/classic/content/blast/BlastBreach.java | 继承 BlastTNT；朝向枚举改 Direction、getFrontOffset* → getStep*、getAdjustedHorizontalFacing → getDirection；HOST_DIRECTION 字段保留 | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastEndothermic.java | 制冷表照抄（水→冰、熔岩→黑曜石、流动熔岩→雪层、岩浆块→石头等）与药水效果；setWorldTime 改 clockManager | S3.04 |
 | PORTED | icbm/classic/content/blast/BlastExothermic.java | 换热表照抄（水/冰/植物/岩/沙/土 → 熔岩/岩浆块/下界岩/火）；改为经 mutateBlocks(worker 结果) 生效；setWorldTime 改 clockManager | S3.04 |
@@ -255,23 +255,23 @@
 | PORTED | icbm/classic/content/blast/gas/BlastGasBase.java | 气体云逐 tick 逻辑（扩云/路径/粒子/实体扫描）照抄；粒子改 ServerLevel#sendParticles 的 ColorParticleOption；防护门槛用 ProtectiveArmorHandler | S3.05 |
 | PORTED | icbm/classic/content/blast/helpers/BlastBlockHelpers.java | Forge IFluidBlock 删除 → LiquidBlock（原版+模组流体方块都继承它）；BlockLiquid→LiquidBlock、LEVEL 属性同名 | S3.02 |
 | PORTED | icbm/classic/content/blast/imp/BlastBase.java | 无 Explosion 父类；保留 1.12 缺陷 Math.min(blastSize,1) 与 locked/buildBlast 语义 | S3.02 |
-| TODO | icbm/classic/content/blast/redmatter/ActionSpawnRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/DamageSourceRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/EntityRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/caps/BlastRedmatterWrapper.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/caps/CapRedmatterPull.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/logic/RedmatterBlockCollector.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/logic/RedmatterLogic.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/render/RedmatterClientLogic.java | 各爆炸实现 | S3.02–S3.07 |
-| TODO | icbm/classic/content/blast/redmatter/render/RenderRedmatter.java | 各爆炸实现 | S3.02–S3.07 |
+| PORTED | icbm/classic/content/blast/redmatter/ActionSpawnRedmatter.java | 移植；生成 redmatter 实体动作，注册名与 1.12 一致（随 S3.06 的 ACTION_REGISTRY 接线） | S3.06 |
+| PORTED | icbm/classic/content/blast/redmatter/DamageSourceRedmatter.java | 1.12 的 DamageSource 子类（bypassesArmor/absolute）→ 数据包 redmatter 伤害类型 + 标签（S3.02 已建）；本类保留为薄包装，供调用点取传 | S3.06 |
+| PORTED | icbm/classic/content/blast/redmatter/EntityRedmatter.java | IEntityAdditionalSpawnData → SynchedEntityData（尺寸/最大尺寸）；存档键不变；capability 覆写删除；渲染字段 → S4.07 | S3.06 |
+| PORTED | icbm/classic/content/blast/redmatter/caps/BlastRedmatterWrapper.java | IBlast 包装器照抄（无 capability 系统，仍是普通类） | S3.06 |
+| PORTED | icbm/classic/content/blast/redmatter/caps/CapRedmatterPull.java | 拉拽逻辑照抄；由 RedmatterLogic 直接读字段，不再经 capability | S3.06 |
+| PORTED | icbm/classic/content/blast/redmatter/logic/RedmatterBlockCollector.java | 静态方块收集器照抄（纯整数数学 + Direction 顺序不变）；1.12 本就在主线程路径调用，未引入快照 | S3.06 |
+| PORTED | icbm/classic/content/blast/redmatter/logic/RedmatterLogic.java | 主逻辑照抄（移动/合并/方块销毁/实体伤害）；1.12 的合并-移动 TODO 原样保留；每 tick 预算常量不变 | S3.06 |
+| TODO | icbm/classic/content/blast/redmatter/render/RedmatterClientLogic.java | 客户端渲染/插值，按步骤卡排除，改写成 26.3 EntityRenderer 的工作在 S4.07 | S4.07 |
+| TODO | icbm/classic/content/blast/redmatter/render/RenderRedmatter.java | 客户端渲染/插值，按步骤卡排除，改写成 26.3 EntityRenderer 的工作在 S4.07 | S4.07 |
 | PORTED | icbm/classic/content/blast/thread/BasicResistanceCallBack.java | 默认抗性回调；1.12 的 Blast 字段与 IFluidBlock 检查删除（26.3 `Block#getExplosionResistance()` 无参），可安全用于工作线程 | S1.09 |
 | PORTED | icbm/classic/content/blast/thread/IThreadCallBack.java | World→Level、Block、BlockPos、IPos3D；工作线程调用时 level 为 null（不向工作线程暴露世界） | S1.09 |
 | MERGED → S3.06 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadExplosion.java | 1.12 的 thread-per-blast 设计（Thread 子类 + doRun(World, Location)）与 26.3 快照/预算队列架构不兼容；S3.02 已从 Blast 删除线程字段，改写落在 S3.06 | S3.06 |
 | MERGED → S3.06 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadLargeExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随线程化爆炸在 S3.06 重写 | S3.06 |
 | MERGED → S3.06 在 LevelSnapshot/BlockEditQueue 上重写（依赖 content.blast.Blast） | icbm/classic/content/blast/thread/ThreadSmallExplosion.java | 依赖 ThreadExplosion 与 content.blast.Blast，随线程化爆炸在 S3.06 重写 | S3.06 |
-| MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastAntimatter.java | 反物质爆炸（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
-| MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastNuclear.java | 核爆（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
-| MERGED → S3.06 | icbm/classic/content/blast/threaded/BlastThermobaric.java | 温压爆炸（线程化爆炸与红物质），依赖 BlastThreaded 与爆炸内容 | S3.06 |
+| PORTED | icbm/classic/content/blast/threaded/BlastAntimatter.java | 反物质爆炸：收集逻辑搬进 doRun（worker 读快照），damageUnbreakable 连基岩一起清、范围内红物质清理、伤害/粒子/音效照抄 | S3.06 |
+| PORTED | icbm/classic/content/blast/threaded/BlastNuclear.java | 核爆：射线步进/能量衰减照抄（读快照），阻力与可破坏判定同 1.12；tick 消费与收尾走 BlastThreaded | S3.06 |
+| PORTED | icbm/classic/content/blast/threaded/BlastThermobaric.java | 温压爆炸：同核爆的射线模型，能量/规模配置照抄 | S3.06 |
 | MERGED → S3.02 | icbm/classic/content/blast/threaded/BlastThreaded.java | 线程化爆炸基类，依赖 content.blast.Blast 与 S3.02 的爆炸框架重写 | S3.02 |
 | MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/blocks/BlockConcrete.java | 1.12 三种 meta 改为 concrete/compact_concrete/reinforced_concrete 三个原版 Block 实例 | S2.03 |
 | PORTED | icbm/classic/content/blocks/BlockGlassButton.java | BlockSetType.STONE + 20 tick，Properties 里设 glass 声音 | S2.03 |
@@ -443,7 +443,7 @@
 | TODO | icbm/classic/content/radioactive/BlockRadioactive.java | 平铺化方块 | S2.03、S3.08 |
 | TODO | icbm/classic/content/radioactive/RadioactiveHandler.java | 平铺化方块 | S2.03、S3.08 |
 | MERGED → icbm/classic/content/reg/ModBlocks.java | icbm/classic/content/reg/BlockReg.java | 注册事件改成 onInitialize 调用；方块与方块物品 | S2.01 |
-| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块 | S2.01、S3.02 |
+| MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块 | S2.01、S3.02、S3.03、S3.06 |
 | PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂为 S3 占位（throw） | S2.02 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07） | S2.01 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
