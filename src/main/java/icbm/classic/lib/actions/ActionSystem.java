@@ -11,6 +11,7 @@ import icbm.classic.api.actions.status.IActionStatus;
 import icbm.classic.api.reg.events.*;
 import icbm.classic.content.actions.causeby.CauseByTimer;
 import icbm.classic.content.actions.emp.ActionDataEmpArea;
+import icbm.classic.content.cluster.action.ActionDataCluster;
 import icbm.classic.content.actions.entity.ActionSpawnEntity;
 import icbm.classic.content.actions.conditionals.ConditionAnd;
 import icbm.classic.content.actions.conditionals.ConditionOR;
@@ -105,6 +106,7 @@ public final class ActionSystem {
         // Register defaults
         // 1.12: new ActionDataEmpArea().register()
         registry.register(ActionDataEmpArea.REG_NAME, ActionDataEmpArea::new);
+        registry.register(ActionDataCluster.REG_NAME, ActionDataCluster::new);
         // 1.12: ICBMClassicAPI.ACTION_REGISTRY.register(ACTION_ENTITY_SPAWN, () -> new ActionDataGeneric(...))
         registry.register(ACTION_ENTITY_SPAWN,
                 () -> new ActionDataGeneric(ACTION_ENTITY_SPAWN,

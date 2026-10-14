@@ -385,7 +385,7 @@ $ ./gradlew build
 | [R] | S4.03 | 区块外导弹追踪（SavedData） | S4.02 | P1 导弹 3 | [S4.03.md](evidence/S4.03.md) |
 | [R] | S4.04 | SAM 原样移植为 `anti_ballistic_missile` | S4.02、S1.06 | P1 导弹 4 | [S4.04.md](evidence/S4.04.md) |
 | [R] | S4.05 | 手雷与炸弹矿车 | S3.09 | P1 导弹 5 | [S4.05.md](evidence/S4.05.md) |
-| [ ] | S4.06 | 集束导弹、子弹药、货物投放、携带物品导弹、座椅 | S4.02、S4.05 | P1 导弹 6 | |
+| [R] | S4.06 | 集束导弹、子弹药、货物投放、携带物品导弹、座椅 | S4.02、S4.05 | P1 导弹 6 | [S4.06.md](evidence/S4.06.md) |
 | [~] | S4.07 | 实体渲染器与粒子（**拆分**：S3 已移植的 7 个实体类型渲染器已完成，导弹/手雷/座椅/降落伞渲染器与粒子仍待做） | S4.04、S4.06 | P1 导弹 7 | [S4.07-s3-entities.md](evidence/S4.07-s3-entities.md) |
 
 ### S5 机器、工具与 P1 验收 → [phase-s5-machines.md](phase-s5-machines.md)

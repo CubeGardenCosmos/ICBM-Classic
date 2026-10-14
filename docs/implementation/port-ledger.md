@@ -138,7 +138,7 @@
 | PORTED | icbm/classic/api/tile/IRotatable.java | EnumFacing→Direction | S1.10 |
 | PORTED | icbm/classic/api/tile/IRotation.java | EnumFacing→Direction | S1.10 |
 | TODO | icbm/classic/client/ClientProxy.java | 客户端类移入 client 源集；渲染注册部分已由 S4.07（拆分：S3 实体）在 IcbmEntityRenderers 落地，spawnSmoke/spawnAirParticle/spawnPadSmoke 的粒子生成仍待 S4.07 的粒子部分 | S2.06、S4.07、S5.07 |
-| MERGED → icbm/classic/client/render/IcbmEntityRenderers.java | icbm/classic/client/ClientReg.java | RenderingRegistry.registerEntityRenderingHandler 逐实体注册 → Fabric EntityRendererRegistry#register，由 ICBMClassicClient#onInitializeClient 调用；S4.07 拆分（S3 实体）已注册 7 个类型：RenderExBlock/RenderFragments/RenderEntityBlock/RenderLightBeam/RenderRedmatter 各自一个 EntityRenderer，RenderExplosion/RenderSmoke 映射为原版 NoopRenderer；另加 ClientLifecycleEvents.CLIENT_STARTED 自检（遍历 icbmclassic 实体类型，用 EntityRenderDispatcher#getRenderer(EntityRenderState) 探针报告缺失渲染器）。导弹/手雷/炸弹矿车/座椅/降落伞的渲染器待 S4.07 正式步骤 | S4.07（拆分：S3 实体） |
+| MERGED → icbm/classic/client/render/IcbmEntityRenderers.java | icbm/classic/client/ClientReg.java | RenderingRegistry.registerEntityRenderingHandler → Fabric EntityRendererRegistry#register（该 API 在 Fabric API 27 标记 deprecated，但仍是 mod 初始化期注册渲染器的可用入口），由 ICBMClassicClient#onInitializeClient 调用；S4.07 注册全部 16 个 icbmclassic 实体类型（RenderExBlock/RenderFragments/RenderEntityBlock/RenderLightBeam/RenderRedmatter/RenderMissile/RenderAsItem/RenderParachute/RenderBombDroplet，NoopRenderer 用于 EntityExplosion/EntitySmoke/EntityPlayerSeat，原版 TntMinecartRenderer 用于 bomb_cart），并注册太空鸡模型层与鸡渲染器（IcbmChickenRenderer）替换原版；ClientLifecycleEvents.CLIENT_STARTED 自检遍历 icbmclassic 实体类型报告缺失渲染器 | S4.07 |
 | MERGED → icbm/classic/content/reg/ModCreativeTabs.java | icbm/classic/client/ICBMCreativeTab.java | 1.12 客户端排序表改为 main 源集的 displayItems；内容按 ID 查表，未注册的跳过 | S2.05 |
 | MERGED → icbm/classic/content/reg/ModSounds.java | icbm/classic/client/ICBMSounds.java | 16 个 SoundEvent 注册 + assets/icbmclassic/sounds.json（字幕键 subtitles.icbmclassic.*）；1.12 SoundCategory 改由播放点传 SoundSource | S2.09 |
 | TODO | icbm/classic/client/SpikeMeshDefinition.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
@@ -344,38 +344,38 @@
 | TODO | icbm/classic/content/blocks/radarstation/gui/ContainerRadarStation.java | 雷达站 | S5 |
 | TODO | icbm/classic/content/blocks/radarstation/gui/GuiRadarStation.java | 雷达站 | S5 |
 | TODO | icbm/classic/content/blocks/radarstation/gui/RadarComponent.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/cargo/CargoHolderHandler.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/CargoProjectileData.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/ItemThrowableProjectile.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/ProjectileCargoMode.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/RecipeCargoData.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/RecipeCargoDataDecraft.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/balloon/BalloonProjectileData.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/balloon/EntityBalloon.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/parachute/EntityParachute.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/parachute/ParachuteProjectileData.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/parachute/RenderParachute.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/placer/BlockCargoHook.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/placer/TileEntityCargoHook.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cargo/placer/TileEntityCargoHookTicking.java | 货物投放（降落伞/气球） | S4 |
-| TODO | icbm/classic/content/cluster/action/ActionCluster.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/action/ActionDataCluster.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/bomblet/BombletProjectileData.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/bomblet/BombletProjectileStack.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/bomblet/EntityBombDroplet.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/bomblet/ItemBombDroplet.java | S2.05 注册 ExplosiveFormItem 占位（10 个平铺化子弹药）；S4.06 换成真实物品 | S2.05、S4.06 |
-| TODO | icbm/classic/content/cluster/bomblet/RenderBombDroplet.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/missile/CapabilityClusterMissileStack.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/missile/ClusterMissileHandler.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/missile/ItemClusterMissile.java | 集束导弹与子弹药 | S4 |
-| TODO | icbm/classic/content/cluster/missile/RecipeCluster.java | 集束导弹与子弹药 | S4 |
+| PORTED | icbm/classic/content/cargo/CargoHolderHandler.java | 允许物品判定（ConfigCargoItem） | S4.06 |
+| PORTED | icbm/classic/content/cargo/CargoProjectileData.java | 继承 BuildableObject，实现 IProjectileData/ISavable；乘客生成支持 PROJECTILE/ENTITY/BLOCK/ITEM 模式；SaveHandler 序列化 stack 与 mode | S4.06 |
+| PORTED | icbm/classic/content/cargo/ItemThrowableProjectile.java | 继承 Item，使用 BOW 动画与 3 秒使用时长，释放时调用 throwProjectile 生成降落伞/气球投射物 | S4.06 |
+| PORTED | icbm/classic/content/cargo/ProjectileCargoMode.java | 枚举保留 ITEM, BLOCK, ENTITY, PROJECTILE | S4.06 |
+| PORTED | icbm/classic/content/cargo/RecipeCargoData.java | 26.3 CustomRecipe 子类，装载货物到降落伞/气球物品组件 HELD_ITEM | S4.06 |
+| PORTED | icbm/classic/content/cargo/RecipeCargoDataDecraft.java | 26.3 CustomRecipe 子类，从降落伞/气球拆解取出货物，getRemainingItems 保留空降落伞/气球 | S4.06 |
+| PORTED | icbm/classic/content/cargo/balloon/BalloonProjectileData.java | 货物气球投射物数据，newEntity 生成 EntityBalloon | S4.06 |
+| PORTED | icbm/classic/content/cargo/balloon/EntityBalloon.java | 气球挂载实体，初期浮力上升（FLOATING_GRAVITY = -0.02），升力耗尽后慢降或 5% 概率破损落地卸载乘客 | S4.06 |
+| PORTED | icbm/classic/content/cargo/parachute/EntityParachute.java | 降落伞挂载实体，低重力（0.01）与高空气阻力（0.95）缓慢下落，落地释放乘客并掉落降落伞物品 | S4.06 |
+| PORTED | icbm/classic/content/cargo/parachute/ParachuteProjectileData.java | 降落伞投射物数据，newEntity 生成 EntityParachute | S4.06 |
+| PORTED | icbm/classic/content/cargo/parachute/RenderParachute.java | 客户端源集 client/render/entity/RenderParachute.java；始终 billboard（180-camera.yRot），scale 取 EntityParachute#getRenderScale（新增同步读写器） | S4.07 |
+| DROPPED（1.12 未注册的半成品） | icbm/classic/content/cargo/placer/BlockCargoHook.java | 1.12 未在 BlockReg 注册，无实际引用 | S4.06 |
+| DROPPED（1.12 未注册的半成品） | icbm/classic/content/cargo/placer/TileEntityCargoHook.java | 1.12 未在 BlockReg 注册，无实际引用 | S4.06 |
+| DROPPED（1.12 未注册的半成品） | icbm/classic/content/cargo/placer/TileEntityCargoHookTicking.java | 1.12 未在 BlockReg 注册，无实际引用 | S4.06 |
+| PORTED | icbm/classic/content/cluster/action/ActionCluster.java | 集束子弹药分层抛射算法，支持旋转矩阵、偏角与发射圆盘生成，逐个生成投射物或掉落物 | S4.06 |
+| PORTED | icbm/classic/content/cluster/action/ActionDataCluster.java | 实现 IActionData 与 ISavable，序列化 clusterSpawnEntries 物品列表，在 ActionSystem 注册 | S4.06 |
+| PORTED | icbm/classic/content/cluster/bomblet/BombletProjectileData.java | 子弹药投射物数据，newEntity 生成 EntityBombDroplet 并写入爆炸物物品栈 | S4.06 |
+| PORTED | icbm/classic/content/cluster/bomblet/BombletProjectileStack.java | 投射物栈包装器 | S4.06 |
+| PORTED | icbm/classic/content/cluster/bomblet/EntityBombDroplet.java | 继承 EntityProjectile，持 CapabilityExplosiveEntity，落地或受爆炸火焰伤害触发 ICBM 爆炸物 | S4.06 |
+| PORTED | icbm/classic/content/cluster/bomblet/ItemBombDroplet.java | 继承 ExplosiveFormItem，最大堆叠 16，显示爆炸物等阶 tooltip | S4.06 |
+| PORTED | icbm/classic/content/cluster/bomblet/RenderBombDroplet.java | 客户端源集 client/render/entity/RenderBombDroplet.java；直接提交 toStack() 的物品模型，translate(0,0.15,0)、yaw-180、pitch+90、旋转后 translate(0,0.2,0)；1.12 绑定的 fragment 贴图由物品模型自带贴图取代 | S4.07 |
+| PORTED | icbm/classic/content/cluster/missile/CapabilityClusterMissileStack.java | 实现 ICapabilityMissileStack，构造 EntityMissileActionable，读取 ExplosiveSettings 配置子弹药装载并在接近目标 3 格触发 ActionDataCluster | S4.06 |
+| PORTED | icbm/classic/content/cluster/missile/ClusterMissileHandler.java | 集束导弹子弹药容量与允许物品判定 | S4.06 |
+| PORTED | icbm/classic/content/cluster/missile/ItemClusterMissile.java | 集束导弹物品，显示子弹药配置数量与类型 | S4.06 |
+| PORTED | icbm/classic/content/cluster/missile/RecipeCluster.java | 26.3 CustomRecipe 子类，集束导弹与子弹药合成，结果写入 ExplosiveSettings 的 cluster 配置 | S4.06 |
 | PORTED | icbm/classic/content/entity/EntityBombCart.java | 继承原版 MinecartTNT（26.3 包 vehicle.minecart）；IEntityAdditionalSpawnData → SynchedEntityData（爆炸物物品栈）；explodeCart → explode(DamageSource,double)、killMinecart → destroy(ServerLevel,DamageSource)、ignite → primeFuse（引信经 Mixin Accessor 覆盖）、getDefaultDisplayTile → getDefaultDisplayBlockState（按爆炸 id 取平铺方块 + FACING=UP）；爆炸走 CapabilityExplosiveEntity → 爆炸物工厂；注册 bomb_cart（4 区块/2 tick，0.98x0.7） | S4.05 |
 | PORTED | icbm/classic/content/entity/EntityExplosion.java | IEntityAdditionalSpawnData 删除 → 爆炸 ID/偏移走 SynchedEntityData，blast 只在服务端构造；setDead→discard、readEntityFromNBT→readAdditionalSaveData(ValueInput)；注册为 explosion_holder（7 区块/5 tick） | S3.02 |
 | PORTED | icbm/classic/content/entity/EntityExplosive.java | IEntityAdditionalSpawnData → SynchedEntityData（爆炸 id/引信/朝向）；IRotatable 保留、IExplosive 改由实体自身实现（IEMPReceiver 转发 CapabilityEmpKill）；引信到时仍走 EXPLOSIVE_REGISTRY→IExplosiveData#create→doAction（工厂在 S3.04 前仍为占位） | S3.03 |
 | PORTED | icbm/classic/content/entity/EntityFragments.java | 三种模式（箭/铁砧/爆炸）保留；伤害源沿用 1.12 的原版 arrow 类型（1.12 TODO 不修）；mode/damage/critical 等改 SynchedEntityData，其余走 SaveHandler；已加 en_us 键 entity.icbmclassic.fragment | S3.03 |
 | PORTED | icbm/classic/content/entity/EntityGrenade.java | 继承 Entity；IEntityAdditionalSpawnData → SynchedEntityData（爆炸物物品栈，客户端渲染/解析爆炸 id）；motionX/Y/Z → getDeltaMovement/setDeltaMovement、rotationYaw/Pitch → setYRot/setXRot + yRotO/xRotO、setLocationAndAngles → snapTo、ticksExisted → tickCount、canBeCollidedWith/canBePushed → isPickable/isPushable；IExplosive 由实体自身实现（转发 CapabilityExplosiveEntity）；handleWaterMovement/canTriggerWalking 无 26.3 对应删除；引信走 EX_GRENADE_REGISTRY；注册 grenade（4 区块/5 tick，0.25x0.25） | S4.05 |
 | PORTED | icbm/classic/content/entity/EntityLightBeam.java | 光束颜色/尺寸/进度改 SynchedEntityData（updateDataBeforeSync + onSyncedDataUpdated 回填 1.12 公开字段）；1.12 存档方法本身为空，端口按字段表补 SaveHandler 并记录 | S3.03 |
-| TODO | icbm/classic/content/entity/EntityPlayerSeat.java | 爆炸相关实体（碎片、飞行方块等） | S3.01、S3.03 |
+| PORTED | icbm/classic/content/entity/EntityPlayerSeat.java | 玩家座椅实体，用于发射架/导弹骑乘，保留 1.12 骑乘偏移已知问题 | S4.06 |
 | PORTED | icbm/classic/content/entity/EntitySmoke.java | 颜色/寿命改 SynchedEntityData；粒子 world.spawnParticle → ServerLevel#sendParticles（ParticleTypes.SMOKE，数量/速度换算与 1.12 等效） | S3.03 |
 | PORTED | icbm/classic/content/entity/flyingblock/BlockCaptureData.java | INBTSerializable<NBTTagCompound> → ISavable(ValueInput/ValueOutput)；键名原样（block_state/source_stack/block_entity） | S3.03 |
 | PORTED | icbm/classic/content/entity/flyingblock/EntityFlyingBlock.java | 继承移植后的 EntityProjectile；方块状态走 EntityDataSerializers.BLOCK_STATE（S4.07 渲染用）；落地放回方块/掉落逻辑照抄；gravity 钩子改名 getProjectileGravity（26.3 getGravity 为 final） | S3.03 |
@@ -405,13 +405,13 @@
 | PORTED | icbm/classic/content/missile/entity/anti/item/ItemSurfaceToAirMissile.java | 26.3 普通 Item，stacksTo(1)；注册 IcbmLookups.MISSILE_STACK | S4.04 |
 | PORTED | icbm/classic/content/missile/entity/explosive/EntityExplosiveMissile.java | EntityMissile<EntityExplosiveMissile>，实现 IExplosive；持有 TargetRangeDet 与 CapabilityExplosiveEntity；根据 Tier 设置生命值；onDestroyedBy 爆炸/火焰时触发爆炸；tick 更新 TargetRangeDet；interact 触发 EX_MISSILE_REGISTRY 回调；actionOnImpact 调用 explosive.doExplosion；toStack 返回爆炸物 stack（空则回退平铺物品）；SaveHandler 存取 explosive | S4.02 |
 | PORTED | icbm/classic/content/missile/entity/explosive/EntityMissileActionable.java | EntityMissile<EntityMissileActionable>；PotentialAction + ActionFieldProvider（IMPACTED/HOST_ENTITY/HOST_POSITION/TARGET_POSITION）；onDestroyedBy 爆炸/火焰时触发 mainAction；tick 更新 mainAction；toStack 返回 originalStack；SaveHandler 存取 potential_action 与 original_stack | S4.02 |
-| TODO | icbm/classic/content/missile/entity/itemstack/EntityHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/itemstack/HeldActionMode.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/itemstack/item/CapabilityHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/itemstack/item/HeldItemMissileHandler.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/itemstack/item/ItemHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissile.java | 导弹实体与飞行逻辑 | S4 |
-| TODO | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissileDecraft.java | 导弹实体与飞行逻辑 | S4 |
+| PORTED | icbm/classic/content/missile/entity/itemstack/EntityHeldItemMissile.java | 继承 EntityMissile，命中后掉落装载物品或执行交互；toStack 返回携带 HELD_ITEM 组件的导弹 | S4.06 |
+| PORTED | icbm/classic/content/missile/entity/itemstack/HeldActionMode.java | PRIMARY, SECONDARY, PRIMARY_FIRST, SECONDARY_FIRST | S4.06 |
+| PORTED | icbm/classic/content/missile/entity/itemstack/item/CapabilityHeldItemMissile.java | 实现 ICapabilityMissileStack，生成携带物品导弹实体并传递 HELD_ITEM 组件 | S4.06 |
+| PORTED | icbm/classic/content/missile/entity/itemstack/item/HeldItemMissileHandler.java | 携带物品导弹允许装载物品判定 | S4.06 |
+| PORTED | icbm/classic/content/missile/entity/itemstack/item/ItemHeldItemMissile.java | 携带物品导弹物品，显示装载物品 tooltip | S4.06 |
+| PORTED | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissile.java | 26.3 CustomRecipe 子类，导弹装载货物到 HELD_ITEM 组件 | S4.06 |
+| PORTED | icbm/classic/content/missile/entity/itemstack/item/RecipeHeldItemMissileDecraft.java | 26.3 CustomRecipe 子类，从导弹拆解取出货物，getRemainingItems 保留空导弹 | S4.06 |
 | PORTED | icbm/classic/content/missile/logic/TargetRangeDet.java | 近炸触发器：world.isRemote→level().isClientSide()；读 BallisticTargetingData.impactHeightOffset 或 cluster 偏移；inRange 接近目标距离时触发 explosive.doExplosion 并 discard() | S4.02 |
 | PORTED | icbm/classic/content/missile/logic/flight/ArcFlightLogic.java | motionX/Y/Z→setDeltaMovement、rotation→setYRot/setXRot（同步 yRotO/xRotO）；弧线参数抽成静态纯函数 calculateArcParameters（JUnit 覆盖）；shouldSimulate 用 ServerLevel#hasChunk；S4.03 接通 MissileTrackerHandler.simulateMissile 模拟移交 | S4.01、S4.03 |
 | DROPPED（ADR 0002：不迁移 1.12 存档） | icbm/classic/content/missile/logic/flight/BallisticFlightLogicOld.java | 未在 26.3 注册（注册表也不注册其 ballistic 名）；1.12 只在注册、chunk unload 模拟、getMountedYOffset 与 EntityMissileDataFixer 里出现，后两处均为旧存档兼容路径 | S4.01 |
@@ -544,9 +544,9 @@
 | MERGED → src/main/java/icbm/classic/network/BlockExplosionFxPayload.java | icbm/classic/lib/network/packet/PacketSpawnBlockExplosion.java | 字段不变（维度改 Identifier）；粒子类型未移植，接收端先 debug 日志，S4.07 补完 | S1.04 |
 | PORTED | icbm/classic/lib/projectile/CachedProjectileData.java | 类型替换；apply 的 `instance != null` 条件按 1.12 原样保留（缓存不生效是 1.12 既有行为） | S3.01 |
 | DROPPED（26.3 无 Capability 系统，见 porting-guide §2.6；物品直接暴露投射物数据） | icbm/classic/lib/projectile/CapabilityProjectileStack.java | 物品/栈直接提供 IProjectileStack，S4.06 接入货柜与集束内容 | S3.01 |
-| PORTED | icbm/classic/lib/projectile/EntityProjectile.java | 直系继承 Entity（EntityICBM 属 S5.01，hasHealth/canBeDestroyed 暂内联）；onUpdate→tick、rayTraceBlocks→ClipContext、实体射线→ProjectileUtil、IEntityAdditionalSpawnData→SynchedEntityData(freezeMotion)；伤害源与 EntityPlayerSeat 排除留 S3.02/S4.06 | S3.01 |
+| PORTED | icbm/classic/lib/projectile/EntityProjectile.java | 直系继承 Entity（EntityICBM 属 S5.01，hasHealth/canBeDestroyed 暂内联）；onUpdate→tick、rayTraceBlocks→ClipContext、实体射线→ProjectileUtil、IEntityAdditionalSpawnData→SynchedEntityData(freezeMotion)；排除 EntityPlayerSeat 碰撞（S4.06 已完成） | S3.01、S4.06 |
 | PORTED | icbm/classic/lib/projectile/InGroundData.java | INBTSerializable→ISavable；getMaterial() 删除（26.3 无 Material，改判 state.isAir()） | S3.01 |
-| PORTED | icbm/classic/lib/projectile/ProjectileDataRegistry.java | ResourceLocation→Identifier、ForgeRegistries→BuiltInRegistries、ItemMonsterPlacer→SpawnEggItem（单一生成蛋物品拆成逐生怪蛋物品）；1.12 的 IProjectileStack capability 查询留 TODO S4.06；接线在 ICBMClassic#onInitialize | S3.01 |
+| PORTED | icbm/classic/lib/projectile/ProjectileDataRegistry.java | ResourceLocation→Identifier、ForgeRegistries→BuiltInRegistries、ItemMonsterPlacer→SpawnEggItem；1.12 的投射物数据/转换逻辑由 ProjectileDataRegistryEvent 在首次服务器启动时注册（S4.06 完成）；接线在 ICBMClassic#onInitialize | S3.01、S4.06 |
 | PORTED | icbm/classic/lib/projectile/ProjectileItemConversion.java | 类型替换，行为不变 | S3.01 |
 | PORTED | icbm/classic/lib/projectile/ProjectileStack.java | INBTSerializable→ISavable、nodeBuildableObject 保留；类型参数由 EntityParachute（S4.06）暂放为 Entity | S3.01 |
 | PORTED | icbm/classic/lib/projectile/vanilla/ArrowProjectileData.java | EntityTippedArrow→Arrow(EntityTypes.ARROW)、pickupStatus→AbstractArrow.pickup | S3.01 |

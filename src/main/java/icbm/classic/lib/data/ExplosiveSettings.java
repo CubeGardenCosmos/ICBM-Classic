@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 
 import java.util.Optional;
 
@@ -24,19 +25,44 @@ import java.util.Optional;
  *                    the explosive was never given a target (1.12 {@code EnderBlastCustomization} with a
  *                    null position, which made the ender blast search for a random target instead)
  */
-public record ExplosiveSettings(Optional<GlobalPos> enderTarget)
+public record ExplosiveSettings(Optional<GlobalPos> enderTarget, Optional<ClusterSettings> cluster)
 {
-    public static final ExplosiveSettings EMPTY = new ExplosiveSettings(Optional.empty());
+    public static final ExplosiveSettings EMPTY = new ExplosiveSettings(Optional.empty(), Optional.empty());
 
     public static final Codec<ExplosiveSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            GlobalPos.CODEC.optionalFieldOf("ender_target").forGetter(ExplosiveSettings::enderTarget)
+            GlobalPos.CODEC.optionalFieldOf("ender_target").forGetter(ExplosiveSettings::enderTarget),
+            ClusterSettings.CODEC.optionalFieldOf("cluster").forGetter(ExplosiveSettings::cluster)
     ).apply(instance, ExplosiveSettings::new));
 
     public static final StreamCodec<ByteBuf, ExplosiveSettings> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.optional(GlobalPos.STREAM_CODEC), ExplosiveSettings::enderTarget, ExplosiveSettings::new);
+            ByteBufCodecs.optional(GlobalPos.STREAM_CODEC), ExplosiveSettings::enderTarget,
+            ByteBufCodecs.optional(ClusterSettings.STREAM_CODEC), ExplosiveSettings::cluster,
+            ExplosiveSettings::new);
 
     public ExplosiveSettings(GlobalPos enderTarget)
     {
-        this(Optional.of(enderTarget));
+        this(Optional.of(enderTarget), Optional.empty());
+    }
+
+    public ExplosiveSettings(ClusterSettings cluster)
+    {
+        this(Optional.empty(), Optional.of(cluster));
+    }
+
+    public record ClusterSettings(Identifier bombletExplosive, int count)
+    {
+        public static final Identifier DEFAULT_EXPLOSIVE = Identifier.fromNamespaceAndPath("icbmclassic", "condensed");
+        public static final int DEFAULT_COUNT = 100;
+        public static final ClusterSettings DEFAULT = new ClusterSettings(DEFAULT_EXPLOSIVE, DEFAULT_COUNT);
+
+        public static final Codec<ClusterSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Identifier.CODEC.fieldOf("bomblet_explosive").forGetter(ClusterSettings::bombletExplosive),
+                Codec.INT.fieldOf("count").forGetter(ClusterSettings::count)
+        ).apply(instance, ClusterSettings::new));
+
+        public static final StreamCodec<ByteBuf, ClusterSettings> STREAM_CODEC = StreamCodec.composite(
+                Identifier.STREAM_CODEC, ClusterSettings::bombletExplosive,
+                ByteBufCodecs.VAR_INT, ClusterSettings::count,
+                ClusterSettings::new);
     }
 }

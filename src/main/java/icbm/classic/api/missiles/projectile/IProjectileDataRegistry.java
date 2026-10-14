@@ -45,6 +45,8 @@ public interface IProjectileDataRegistry extends IBuilderRegistry<IProjectileDat
      */
     void registerItemStackConversation(ItemStack itemStack, Function<ItemStack, IProjectileData> builder);
 
+    IProjectileData<?> find(ItemStack itemStack);
+
     /**
      * Spawns a projectile
      *

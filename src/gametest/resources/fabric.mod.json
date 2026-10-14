@@ -45,6 +45,7 @@
       "icbm.classic.test.missile.MissileFlightGameTest",
       "icbm.classic.test.missile.MissileTrackerGameTest",
       "icbm.classic.test.missile.SamInterceptorGameTest",
+      "icbm.classic.test.entity.ClusterCargoSeatGameTest"
     ]
   },
   "depends": {

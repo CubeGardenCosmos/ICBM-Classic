@@ -213,6 +213,10 @@ public class ICBMModelProvider implements DataProvider
         copiedModel(output, ModItems.EMPTY_BOMBLET, "item/bomblet");
         copiedModel(output, ModItems.MISSILE_MODULE, "item/missiles/missile");
         copiedModel(output, ModItems.ANTI_BALLISTIC_MISSILE, "item/missiles/surface_to_air");
+        copiedModel(output, ModItems.CLUSTER_MISSILE, "item/missiles/cluster");
+        copiedModel(output, ModItems.HELD_ITEM_MISSILE, "item/missiles/held_item");
+        copiedModel(output, ModItems.BALLOON, "item/balloon");
+        flatItem(output, ModItems.PARACHUTE, "item/parachute");
     }
 
     /**

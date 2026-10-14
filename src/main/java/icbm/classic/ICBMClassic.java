@@ -27,9 +27,15 @@ import icbm.classic.content.reg.ModDataComponents;
 import icbm.classic.content.radioactive.RadioactiveHandler;
 import icbm.classic.content.reg.ModEffects;
 import icbm.classic.content.reg.ModEntities;
+import icbm.classic.content.cargo.balloon.BalloonProjectileData;
+import icbm.classic.content.cargo.parachute.ParachuteProjectileData;
+import icbm.classic.content.cluster.bomblet.BombletProjectileData;
 import icbm.classic.content.reg.ModItems;
 import icbm.classic.content.reg.ModMenus;
+import icbm.classic.content.reg.ModRecipes;
 import icbm.classic.content.reg.ModSounds;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import icbm.classic.content.missile.tracker.MissileTrackerHandler;
 import icbm.classic.lib.actions.ActionSystem;
 import icbm.classic.lib.actions.WorkTickingActionHandler;
@@ -83,6 +89,7 @@ public final class ICBMClassic implements ModInitializer {
         ModEffects.register();
         ModBlocks.register();
         ModItems.register();
+        ModRecipes.register();
         ModBlockEntities.register();
         ModEntities.register();
         ModMenus.register();
@@ -103,6 +110,32 @@ public final class ICBMClassic implements ModInitializer {
         // content steps insert their registrations before the lock.
         final ProjectileDataRegistry projectileDataRegistry = new ProjectileDataRegistry();
         ICBMClassicAPI.PROJECTILE_DATA_REGISTRY = projectileDataRegistry;
+        ProjectileDataRegistryEvent.EVENT.register(registry -> {
+            registry.register(BombletProjectileData.NAME, BombletProjectileData::new);
+            registry.register(ParachuteProjectileData.NAME, ParachuteProjectileData::new);
+            registry.register(BalloonProjectileData.NAME, BalloonProjectileData::new);
+
+            for (Item bomblet : ModItems.EXPLOSIVE_BOMBLETS.values()) {
+                registry.registerItemStackConversation(new ItemStack(bomblet), stack ->
+                        new BombletProjectileData().setExplosiveStack(stack.copy()));
+            }
+            registry.registerItemStackConversation(new ItemStack(ModItems.EMPTY_BOMBLET), stack ->
+                    new BombletProjectileData().setExplosiveStack(stack.copy()));
+
+            registry.registerItemStackConversation(new ItemStack(ModItems.PARACHUTE), stack -> {
+                final ParachuteProjectileData data = new ParachuteProjectileData();
+                final ItemStack held = stack.getOrDefault(ModDataComponents.HELD_ITEM, ItemStack.EMPTY);
+                data.setHeldItem(held.copy());
+                return data;
+            });
+
+            registry.registerItemStackConversation(new ItemStack(ModItems.BALLOON), stack -> {
+                final BalloonProjectileData data = new BalloonProjectileData();
+                final ItemStack held = stack.getOrDefault(ModDataComponents.HELD_ITEM, ItemStack.EMPTY);
+                data.setHeldItem(held.copy());
+                return data;
+            });
+        });
         // 1.12 registered the vanilla defaults late (postInit, "needs to lock late as we need content to
         // register some types"). 26.3 has a second reason: ItemStack can not be created while the mod is
         // still initializing (porting-guide.md §9 note 5), so the vanilla conversions, the registry event

@@ -5,9 +5,15 @@ import icbm.classic.content.items.ExplosiveFormItem;
 import icbm.classic.content.items.ItemAntidote;
 import icbm.classic.content.items.ItemBombCart;
 import icbm.classic.content.items.ItemGrenade;
+import icbm.classic.content.cargo.ItemThrowableProjectile;
+import icbm.classic.content.cluster.bomblet.ItemBombDroplet;
+import icbm.classic.content.cluster.missile.CapabilityClusterMissileStack;
+import icbm.classic.content.cluster.missile.ItemClusterMissile;
 import icbm.classic.content.items.ItemMissile;
 import icbm.classic.content.missile.entity.anti.item.CapabilitySAMStack;
 import icbm.classic.content.missile.entity.anti.item.ItemSurfaceToAirMissile;
+import icbm.classic.content.missile.entity.itemstack.item.CapabilityHeldItemMissile;
+import icbm.classic.content.missile.entity.itemstack.item.ItemHeldItemMissile;
 import icbm.classic.content.reg.ExplosiveForms.ExplosiveForm;
 import icbm.classic.lib.capability.missile.CapabilityMissileStack;
 import icbm.classic.lib.lookup.IcbmLookups;
@@ -52,6 +58,10 @@ public final class ModItems
 
     /** Anti-ballistic missile (1.12 {@code surface_to_air_missile}, registry-ids.md §3, S4.04). */
     public static Item ANTI_BALLISTIC_MISSILE;
+    public static Item CLUSTER_MISSILE;
+    public static Item HELD_ITEM_MISSILE;
+    public static Item PARACHUTE;
+    public static Item BALLOON;
 
     //=================== S2.05 flat explosive items (registry-ids.md §1 forms M/G/C/D)
     /** Missiles by explosive id (form M). S4.02 replaces the placeholder item with the real missile item. */
@@ -121,6 +131,14 @@ public final class ModItems
         ANTI_BALLISTIC_MISSILE = RegHelper.item("anti_ballistic_missile", ItemSurfaceToAirMissile::new, new Item.Properties());
         IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilitySAMStack(), ANTI_BALLISTIC_MISSILE);
 
+        CLUSTER_MISSILE = RegHelper.item("cluster_missile", ItemClusterMissile::new, new Item.Properties());
+        HELD_ITEM_MISSILE = RegHelper.item("held_item_missile", ItemHeldItemMissile::new, new Item.Properties());
+        PARACHUTE = RegHelper.item("parachute", ItemThrowableProjectile::new, new Item.Properties());
+        BALLOON = RegHelper.item("balloon", ItemThrowableProjectile::new, new Item.Properties());
+
+        IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilityClusterMissileStack(stack), CLUSTER_MISSILE);
+        IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilityHeldItemMissile(stack), HELD_ITEM_MISSILE);
+
         // TODO(S5.08 / S6) tools, battery
     }
 
@@ -151,6 +169,7 @@ public final class ModItems
             case MISSILE -> new ItemMissile(ex, form, p.stacksTo(ItemMissile.MAX_STACK_SIZE));
             case GRENADE -> new ItemGrenade(ex, form, p.stacksTo(ItemGrenade.MAX_STACK_SIZE));
             case BOMB_CART -> new ItemBombCart(ex, form, p.stacksTo(ItemBombCart.MAX_STACK_SIZE));
+            case BOMBLET -> new ItemBombDroplet(ex, form, p.stacksTo(ItemBombDroplet.MAX_STACK_SIZE));
             default -> new ExplosiveFormItem(ex, form, p);
         };
     }

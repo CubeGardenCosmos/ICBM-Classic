@@ -6,6 +6,7 @@ import icbm.classic.api.data.D3Consumer;
 import icbm.classic.api.data.IWorldPosition;
 import icbm.classic.api.missiles.IMissileAiming;
 import icbm.classic.api.missiles.projectile.IProjectileThrowable;
+import icbm.classic.content.entity.EntityPlayerSeat;
 import icbm.classic.content.reg.ModDamageTypes;
 import icbm.classic.lib.saving.SaveHandler;
 import icbm.classic.lib.transform.vector.Pos;
@@ -390,9 +391,7 @@ public abstract class EntityProjectile<PROJECTILE extends EntityProjectile<PROJE
      */
     protected boolean shouldCollideWith(Entity entity) {
         //TODO add listener support
-        // TODO(S4.06): 1.12 additionally excluded icbm.classic.content.entity.EntityPlayerSeat here, that
-        //  class is ported together with the missiles.
-        return entity.isPickable();
+        return entity.isPickable() && !(entity instanceof EntityPlayerSeat);
     }
 
     protected void handleBlockCollision(BlockHitResult hit, double velocity) {

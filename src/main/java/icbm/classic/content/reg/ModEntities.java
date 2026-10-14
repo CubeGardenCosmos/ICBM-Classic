@@ -12,7 +12,12 @@ import icbm.classic.content.blast.redmatter.EntityRedmatter;
 import icbm.classic.content.entity.flyingblock.EntityFlyingBlock;
 import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
 import icbm.classic.content.missile.entity.explosive.EntityMissileActionable;
+import icbm.classic.content.cargo.balloon.EntityBalloon;
+import icbm.classic.content.cargo.parachute.EntityParachute;
+import icbm.classic.content.cluster.bomblet.EntityBombDroplet;
+import icbm.classic.content.entity.EntityPlayerSeat;
 import icbm.classic.content.missile.entity.anti.EntitySurfaceToAirMissile;
+import icbm.classic.content.missile.entity.itemstack.EntityHeldItemMissile;
 import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -71,6 +76,11 @@ public final class ModEntities
     /** Surface to air missile, 1.12 {@code missile.sam} (500 blocks / 1 → 32 chunks / 1, S4.04) */
     public static EntityType<EntitySurfaceToAirMissile> MISSILE_SAM;
 
+    public static EntityType<EntityHeldItemMissile> HELD_ITEM_MISSILE;
+    public static EntityType<EntityBombDroplet> BOMB_DROPLET;
+    public static EntityType<EntityPlayerSeat> MISSILE_SEAT;
+    public static EntityType<EntityParachute> PARACHUTE;
+    public static EntityType<EntityBalloon> BALLOON;
     private ModEntities() {}
 
     /** Registers every entity type. Called from {@code ICBMClassic#onInitialize}. */
@@ -110,8 +120,14 @@ public final class ModEntities
         // 1.12 EntityReg: buildEntityEntry(EntitySurfaceToAirMissile.class, ICBMEntities.MISSILE_SAM, 500, 1)
         MISSILE_SAM = registerEntity(ICBMEntities.MISSILE_SAM, 0.5F, 0.5F, 32, 1, EntitySurfaceToAirMissile::new);
 
-        IcbmLookups.EMP_RECEIVER_ENTITY.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE, MISSILE_SAM);
-        IcbmLookups.MISSILE.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE, MISSILE_SAM);
+        HELD_ITEM_MISSILE = registerEntity(ICBMEntities.MISSILE_HELD_ITEM, 0.5F, 0.5F, 32, 1, EntityHeldItemMissile::new);
+        BOMB_DROPLET = registerEntity(ICBMEntities.BOMB_DROPLET, 0.25F, 0.25F, 32, 1, EntityBombDroplet::new);
+        MISSILE_SEAT = registerEntity(ICBMEntities.MISSILE_SEAT, 0.5F, 0.5F, 4, 2, EntityPlayerSeat::new);
+        PARACHUTE = registerEntity(ICBMEntities.PARACHUTE, 0.5F, 0.5F, 32, 1, EntityParachute::new);
+        BALLOON = registerEntity(ICBMEntities.BALLOON, 0.5F, 0.5F, 32, 1, EntityBalloon::new);
+
+        IcbmLookups.EMP_RECEIVER_ENTITY.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE, MISSILE_SAM, HELD_ITEM_MISSILE);
+        IcbmLookups.MISSILE.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE, MISSILE_SAM, HELD_ITEM_MISSILE);
     }
 
     /**
