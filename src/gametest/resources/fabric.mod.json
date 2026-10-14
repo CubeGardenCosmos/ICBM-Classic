@@ -43,6 +43,7 @@
       "icbm.classic.test.missile.MissileSystemGameTest",
       "icbm.classic.test.missile.MissileFlightGameTest",
       "icbm.classic.test.missile.MissileTrackerGameTest",
+      "icbm.classic.test.missile.SamInterceptorGameTest",
     ]
   },
   "depends": {

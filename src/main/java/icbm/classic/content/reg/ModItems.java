@@ -4,6 +4,8 @@ import icbm.classic.config.ConfigItems;
 import icbm.classic.content.items.ExplosiveFormItem;
 import icbm.classic.content.items.ItemAntidote;
 import icbm.classic.content.items.ItemMissile;
+import icbm.classic.content.missile.entity.anti.item.CapabilitySAMStack;
+import icbm.classic.content.missile.entity.anti.item.ItemSurfaceToAirMissile;
 import icbm.classic.content.reg.ExplosiveForms.ExplosiveForm;
 import icbm.classic.lib.capability.missile.CapabilityMissileStack;
 import icbm.classic.lib.lookup.IcbmLookups;
@@ -45,6 +47,9 @@ public final class ModItems
     public static Item EMPTY_BOMBLET;
     /** Empty missile shell (1.12 {@code missile} explosive id 24, registry-ids.md §3). */
     public static Item MISSILE_MODULE;
+
+    /** Anti-ballistic missile (1.12 {@code surface_to_air_missile}, registry-ids.md §3, S4.04). */
+    public static Item ANTI_BALLISTIC_MISSILE;
 
     //=================== S2.05 flat explosive items (registry-ids.md §1 forms M/G/C/D)
     /** Missiles by explosive id (form M). S4.02 replaces the placeholder item with the real missile item. */
@@ -109,6 +114,10 @@ public final class ModItems
         // Register the missile stack capability lookup for all flat missile items (S4.02)
         IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilityMissileStack(stack),
                 EXPLOSIVE_MISSILES.values().toArray(new Item[0]));
+
+        // Surface-to-air missile / Anti-ballistic missile (S4.04)
+        ANTI_BALLISTIC_MISSILE = RegHelper.item("anti_ballistic_missile", ItemSurfaceToAirMissile::new, new Item.Properties());
+        IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilitySAMStack(), ANTI_BALLISTIC_MISSILE);
 
         // TODO(S5.08 / S6) tools, battery
     }

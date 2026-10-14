@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
  * <p>
  * 1.12 read the launched missile out of the {@code LaunchedWithMissile} status and pushed the target
  * into the SAM scan logic. 26.3 breaks the content dependency: the launch callback hands over an
- * {@link IRadioTargetAssignable} (implemented by the anti-missile missile in S4.04) and this message
+ * {@link IRadioTargetAssignable} (implemented by {@code EntitySurfaceToAirMissile}) and this message
  * assigns the incoming missile as its target.
  */
 @Data

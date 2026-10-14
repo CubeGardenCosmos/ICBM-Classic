@@ -212,6 +212,7 @@ public class ICBMModelProvider implements DataProvider
         ModItems.EXPLOSIVE_BOMBLETS.values().forEach(item -> copiedModel(output, item, "item/bomblet"));
         copiedModel(output, ModItems.EMPTY_BOMBLET, "item/bomblet");
         copiedModel(output, ModItems.MISSILE_MODULE, "item/missiles/missile");
+        copiedModel(output, ModItems.ANTI_BALLISTIC_MISSILE, "item/missiles/surface_to_air");
     }
 
     /**

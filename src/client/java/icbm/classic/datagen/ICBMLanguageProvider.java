@@ -112,6 +112,7 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         NAMES.put("antidote", "Antidote");
         NAMES.put("empty_bomblet", "Droplet");
         NAMES.put("missile_module", "Missile Module");
+        NAMES.put("anti_ballistic_missile", "Anti-Ballistic Missile");
 
         //Entity types. 1.12 registered no entity name in its lang file, so these are port side additions
         // built from the 1.12 registry ids and class purpose (registry-ids.md §4)
@@ -124,6 +125,7 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         ENTITY_NAMES.put("redmatter", "Red Matter");
         ENTITY_NAMES.put("explosive_missile", "Explosive Missile");
         ENTITY_NAMES.put("generic_missile", "Generic Missile");
+        ENTITY_NAMES.put("anti_ballistic_missile", "Anti-Ballistic Missile");
     }
 
     public ICBMLanguageProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries)

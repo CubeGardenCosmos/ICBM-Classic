@@ -75,7 +75,7 @@ public final class ModCreativeTabs
 
         //Explosives in the registry-ids.md §1 order (form missiles, then grenades, blocks, bomb carts, bomblets)
         acceptAll(output, ModItems.EXPLOSIVE_MISSILES);
-        acceptById(output, "anti_ballistic_missile");
+        accept(output, ModItems.ANTI_BALLISTIC_MISSILE);
         acceptById(output, "held_item_missile");
         acceptById(output, "cluster_missile");
         acceptAll(output, ModItems.EXPLOSIVE_GRENADES);

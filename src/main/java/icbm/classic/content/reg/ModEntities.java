@@ -10,6 +10,7 @@ import icbm.classic.content.blast.redmatter.EntityRedmatter;
 import icbm.classic.content.entity.flyingblock.EntityFlyingBlock;
 import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
 import icbm.classic.content.missile.entity.explosive.EntityMissileActionable;
+import icbm.classic.content.missile.entity.anti.EntitySurfaceToAirMissile;
 import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -59,6 +60,9 @@ public final class ModEntities
     /** Generic actionable missile, 1.12 {@code generic_missile} (500 blocks / 1 → 32 chunks / 1, S4.02) */
     public static EntityType<EntityMissileActionable> GENERIC_MISSILE;
 
+    /** Surface to air missile, 1.12 {@code missile.sam} (500 blocks / 1 → 32 chunks / 1, S4.04) */
+    public static EntityType<EntitySurfaceToAirMissile> MISSILE_SAM;
+
     private ModEntities() {}
 
     /** Registers every entity type. Called from {@code ICBMClassic#onInitialize}. */
@@ -91,8 +95,11 @@ public final class ModEntities
         // 1.12 EntityReg: buildEntityEntry(EntityMissileActionable.class, ICBMEntities.MISSILE_GENERIC, 500, 1)
         GENERIC_MISSILE = registerEntity(ICBMEntities.MISSILE_GENERIC, 0.5F, 0.5F, 32, 1, EntityMissileActionable::new);
 
-        IcbmLookups.EMP_RECEIVER_ENTITY.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE);
-        IcbmLookups.MISSILE.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE);
+        // 1.12 EntityReg: buildEntityEntry(EntitySurfaceToAirMissile.class, ICBMEntities.MISSILE_SAM, 500, 1)
+        MISSILE_SAM = registerEntity(ICBMEntities.MISSILE_SAM, 0.5F, 0.5F, 32, 1, EntitySurfaceToAirMissile::new);
+
+        IcbmLookups.EMP_RECEIVER_ENTITY.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE, MISSILE_SAM);
+        IcbmLookups.MISSILE.registerSelf(EXPLOSIVE_MISSILE, GENERIC_MISSILE, MISSILE_SAM);
     }
 
     /**

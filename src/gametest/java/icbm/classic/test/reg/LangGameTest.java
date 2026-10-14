@@ -49,9 +49,9 @@ public class LangGameTest
         }
 
         //32 S2.03/S2.05 blocks plus the two radioactive blocks of S3.08, and their two block items on top of
-        //the 115 items S2.03-S2.05 registered
+        //the 115 items S2.03-S2.05 registered, plus anti_ballistic_missile of S4.04
         helper.assertTrue(blocks == 34, "expected 34 icbmclassic blocks but checked " + blocks);
-        helper.assertTrue(items == 117, "expected 117 icbmclassic items but checked " + items);
+        helper.assertTrue(items == 118, "expected 118 icbmclassic items but checked " + items);
         helper.assertTrue(lang.has("itemGroup.icbmclassic.main"), "missing creative tab title");
         helper.assertTrue(lang.has("subtitles.icbmclassic.explosion"), "missing a S2.09 subtitle");
         helper.assertTrue(lang.has("icbmclassic.form.missile"), "missing a form template");

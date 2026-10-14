@@ -54,7 +54,7 @@
 - [ ] (1) 导弹实体与飞行逻辑。（部分：S4.01）
 - [ ] (2) 爆炸导弹、动作导弹、导弹物品。（部分：S4.02）
 - [ ] (3) 区块外导弹追踪模拟（SavedData）。（部分：S4.03）
-- [ ] (4) SAM 原样移植为 `anti_ballistic_missile`。
+- [x] (4) SAM 原样移植为 `anti_ballistic_missile`。（S4.04 已完成；证据：[S4.04.md](../implementation/evidence/S4.04.md)）
 - [ ] (5) 手雷、炸弹矿车。
 - [ ] (6) 集束导弹、子弹药、降落伞、气球、携带物品导弹、座椅、特殊配方。
 - [~] (7) 实体渲染器与粒子（部分完成：S3 已移植的 7 个实体类型渲染器已实现并注册，见 [S4.07-s3-entities.md](../implementation/evidence/S4.07-s3-entities.md)；导弹/手雷/炸弹矿车/座椅/降落伞渲染器与粒子仍待做）。
