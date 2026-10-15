@@ -33,7 +33,7 @@ public final class FireControl
     private void engage(ServerLevel level, TileRadarStation radar, String channel, long now, RadarTrack track)
     {
         if (now < track.nextEngageTick) return;
-        if (EngagementRegistry.activeCount(level, track.targetId) >= ConfigAbm.MAX_INTERCEPTORS_PER_TARGET) return;
+        if (!EngagementRegistry.canEngage(level, track.targetId)) return;
 
         InterceptQueryMessage query = new InterceptQueryMessage(channel, track.targetId,
                 Vectors.to(track.position), Vectors.to(track.velocity), Vectors.to(track.acceleration));

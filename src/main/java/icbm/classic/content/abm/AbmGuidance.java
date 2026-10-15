@@ -47,6 +47,8 @@ public final class AbmGuidance
         Entity target = abm.getTargetId() == null ? null : level.getEntity(abm.getTargetId());
         if (target == null || !target.isAlive())
         {
+            // Lock lost: stop counting as an interceptor for the abandoned target before hunting a new one
+            abm.retarget(null);
             abm.setAbmState(AbmState.REACQUIRE);
             return;
         }
@@ -71,11 +73,14 @@ public final class AbmGuidance
         if (abm.getTicksInState() % 10 == 0)
         {
             AABB search = abm.getBoundingBox().inflate(ConfigAbm.REACQUIRE_RANGE);
+            // Only targets below the in-flight limit may be picked: otherwise this ABM would be a second
+            // interceptor on a target the fire control already covered (perf-audit C2)
             Entity nearest = level.getEntities(abm, search, TileRadarStation::isThreat).stream()
+                    .filter(candidate -> EngagementRegistry.canEngage(level, candidate.getUUID()))
                     .min(Comparator.comparingDouble(abm::distanceToSqr)).orElse(null);
             if (nearest != null)
             {
-                abm.setTargetId(nearest.getUUID());
+                abm.retarget(nearest.getUUID());
                 abm.setAbmState(AbmState.GUIDE);
                 return;
             }

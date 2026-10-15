@@ -187,19 +187,23 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             if (tile.defenseMode == RadarDefenseMode.EMP_ONLY
                     || tile.defenseMode == RadarDefenseMode.ABM_THEN_EMP)
             {
-                final List<RadarTrack> empTargets = tile.empTargets();
-                if (!tile.radio.getChannel().equals(RadioRegistry.EMPTY_HZ) && !empTargets.isEmpty())
+                // Channel is checked first, then empTarget() picks the track in one pass; the cooldown only
+                // advances while a qualifying target exists, as before (perf-audit C5)
+                if (!tile.radio.getChannel().equals(RadioRegistry.EMPTY_HZ))
                 {
-                    if (tile.firingCooldown > 0) tile.firingCooldown--;
-                    if (tile.firingCooldown <= 0)
+                    final RadarTrack empTarget = tile.empTarget();
+                    if (empTarget != null)
                     {
-                        tile.firingCooldown = ConfigRadar.SAM_TICKS;
-                        final Level currentLevel = tile.getLevel();
-                        final RadarTrack track = empTargets.get(0);
-                        final Entity missile = currentLevel == null ? null : currentLevel.getEntity(track.targetId);
-                        if (missile instanceof IMissile)
-                            RadioRegistry.popMessage(level, tile.radio,
-                                    new IncomingMissileMessage(tile.radio.getChannel(), (IMissile) missile, true));
+                        if (tile.firingCooldown > 0) tile.firingCooldown--;
+                        if (tile.firingCooldown <= 0)
+                        {
+                            tile.firingCooldown = ConfigRadar.SAM_TICKS;
+                            final Level currentLevel = tile.getLevel();
+                            final Entity missile = currentLevel == null ? null : currentLevel.getEntity(empTarget.targetId);
+                            if (missile instanceof IMissile)
+                                RadioRegistry.popMessage(level, tile.radio,
+                                        new IncomingMissileMessage(tile.radio.getChannel(), (IMissile) missile, true));
+                        }
                     }
                 }
             }
@@ -293,7 +297,10 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
                 track.ticksToImpact = prediction == null ? Integer.MAX_VALUE : prediction.ticks();
             }
 
-            final TrackStatus nextStatus = track.status == TrackStatus.ENGAGED
+            // C1: ENGAGED is sticky only while an interceptor for this target is still in flight. Once the ABM is
+            // gone the track falls back to normal classification, so a failed interception can be engaged again
+            // (the reengage delay itself is still enforced by RadarTrack#nextEngageTick in FireControl).
+            final TrackStatus nextStatus = track.status == TrackStatus.ENGAGED && hasActiveInterceptors(level, targetId)
                     ? TrackStatus.ENGAGED
                     : track.predictedImpact != null && horizontalDistanceSqr(track.predictedImpact) <= (double) triggerRange * triggerRange
                     ? TrackStatus.THREAT
@@ -314,6 +321,17 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         }
         trackTable.purgeLost(now);
         if (!playersUsing.isEmpty()) radarRenderData.update();
+    }
+
+    /**
+     * True when at least one interceptor ordered at this target is still alive in the level, so the engagement
+     * is still running (perf-audit C1). {@link EngagementRegistry#activeCount} prunes interceptors whose entity
+     * is gone, so a destroyed/suicide ABM reports a count of zero.
+     */
+    private static boolean hasActiveInterceptors(Level level, UUID targetId)
+    {
+        return level instanceof ServerLevel serverLevel
+                && EngagementRegistry.activeCount(serverLevel, targetId) > 0;
     }
 
     /** Design §5 fallback when extrapolation finds no landing: horizontal distance over horizontal speed (min 0.1). */
@@ -338,14 +356,25 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
                 .sorted(Comparator.comparingInt(track -> track.ticksToImpact))
                 .toList();
     }
-    private List<RadarTrack> empTargets()
+    /**
+     * The incoming track an EMP shot would be fired at, or null when none qualifies.
+     *
+     * Only the first (smallest {@code ticksToImpact}) track is ever used, so this picks it in one pass instead of
+     * sorting a whole list (perf-audit C5). Ties keep the first track in table order, like the stable sort did.
+     */
+    private RadarTrack empTarget()
     {
+        // A qualifying track always has one of these two statuses, the status scan is cheaper than copying the table
+        if (!trackTable.hasThreat() && !trackTable.hasEngaged()) return null;
         final boolean fallbackOnly = defenseMode == RadarDefenseMode.ABM_THEN_EMP;
-        return trackTable.values().stream()
-                .filter(track -> track.status == TrackStatus.THREAT || track.status == TrackStatus.ENGAGED)
-                .filter(track -> !fallbackOnly || track.ticksToImpact <= ConfigAbm.EMP_FALLBACK_TICKS)
-                .sorted(Comparator.comparingInt(track -> track.ticksToImpact))
-                .toList();
+        RadarTrack best = null;
+        for (RadarTrack track : trackTable.values())
+        {
+            if (track.status != TrackStatus.THREAT && track.status != TrackStatus.ENGAGED) continue;
+            if (fallbackOnly && track.ticksToImpact > ConfigAbm.EMP_FALLBACK_TICKS) continue;
+            if (best == null || track.ticksToImpact < best.ticksToImpact) best = track;
+        }
+        return best;
     }
 
     private List<IMissile> incomingThreats()
@@ -387,7 +416,10 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     {
         if (isClient()) return radarVisualState;
         if (!energyStorage.has(getEnergyCost())) return EnumRadarState.OFF;
-        if (!getIncomingThreats().isEmpty()) return EnumRadarState.DANGER;
+        // No tracks means neither list below can be non-empty, skip both scans (perf-audit F3)
+        if (trackTable.isEmpty()) return EnumRadarState.ON;
+        // C6: an ENGAGED track is still a live danger, threats() only holds THREAT so it has to be checked here
+        if (trackTable.hasEngaged() || !getIncomingThreats().isEmpty()) return EnumRadarState.DANGER;
         if (!getDetectedThreats().isEmpty()) return EnumRadarState.WARNING;
         return EnumRadarState.ON;
     }
@@ -405,8 +437,9 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
     public boolean hasIncomingMissiles()
     {
-        return !getIncomingThreats().isEmpty()
-                || trackTable.values().stream().anyMatch(track -> track.status == TrackStatus.ENGAGED);
+        // hasEngaged() is a cheap scan and an empty table can not be incoming, both checks short circuit the threat list scan (perf-audit F3)
+        return !trackTable.isEmpty()
+                && (trackTable.hasEngaged() || !getIncomingThreats().isEmpty());
     }
     public int getDetectionRange() { return detectionRange; }
     public void setDetectionRange(int value) { detectionRange = value; }

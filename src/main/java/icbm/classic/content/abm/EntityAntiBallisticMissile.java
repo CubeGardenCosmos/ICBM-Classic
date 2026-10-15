@@ -6,6 +6,7 @@ import icbm.classic.content.missile.entity.EntityMissile;
 import icbm.classic.content.reg.ModEntities;
 import icbm.classic.content.reg.ModItems;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -35,7 +36,7 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     /** Detonates at the current position without block interaction and removes the ABM. */
     public void performSelfDestruct()
     {
-        if (level() instanceof net.minecraft.server.level.ServerLevel serverLevel)
+        if (level() instanceof ServerLevel serverLevel)
         {
             serverLevel.explode(this, getX(), getY(), getZ(), AbmGuidance.SELF_DESTRUCT_POWER, Level.ExplosionInteraction.NONE);
         }
@@ -50,7 +51,7 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
 
     public void killInterceptedTarget(Entity target)
     {
-        if (!(level() instanceof net.minecraft.server.level.ServerLevel serverLevel)) return;
+        if (!(level() instanceof ServerLevel serverLevel)) return;
         Vec3 point = position();
         if (!InterceptEvents.INTERCEPTED.invoker().onIntercept(serverLevel, this, target, point))
         {
@@ -81,11 +82,31 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     @Override
     public void assignTarget(Entity target) { setTargetId(target == null ? null : target.getUUID()); }
 
+    /**
+     * Stores the target chosen before the ABM exists in the world (launcher order). Does not touch the
+     * engagement registry: an ABM that was not spawned yet is not in flight and must not be counted.
+     */
     public void setTargetId(UUID targetId)
     {
         this.targetId = targetId;
         this.abmState = AbmGuidance.AbmState.BOOST;
         this.ticksInState = 0;
+    }
+
+    /**
+     * Moves an in-flight ABM to a new target, carrying its engagement registration along: the previous target
+     * is released and {@code targetId} is registered. {@code null} only releases, because the ABM is no longer
+     * engaging anything. Registration lifecycle lives here so the registry never has to rely on a target id
+     * that was captured earlier by someone else.
+     */
+    public void retarget(UUID targetId)
+    {
+        if (level() instanceof ServerLevel serverLevel)
+        {
+            if (targetId == null) EngagementRegistry.unregister(serverLevel, getUUID());
+            else EngagementRegistry.register(serverLevel, targetId, getUUID());
+        }
+        setTargetId(targetId);
     }
 
     public UUID getTargetId() { return targetId; }
@@ -102,8 +123,9 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     @Override
     public void remove(Entity.RemovalReason reason)
     {
-        if (level() instanceof net.minecraft.server.level.ServerLevel serverLevel && targetId != null)
-            EngagementRegistry.unregister(serverLevel, targetId, getUUID());
+        // Keyed by ABM, never by the target it happens to hold at removal (perf-audit C2)
+        if (level() instanceof ServerLevel serverLevel)
+            EngagementRegistry.unregister(serverLevel, getUUID());
         super.remove(reason);
     }
     @Override

@@ -33,7 +33,8 @@ icbm.classic.content.abm
 │   ├── InterceptQueryMessage.java
 │   ├── InterceptOffer.java
 │   └── InterceptOrderMessage.java
-├── EngagementRegistry.java         # 每世界：目标 UUID → 在飞 ABM UUID 集合
+├── EngagementRegistry.java         # 每世界：目标 UUID → 在飞 ABM UUID 集合（登记由 ABM 拥有，可跨目标迁移）
+│                                   #           + 目标 UUID → 拦截时刻（保留 INTERCEPT_HISTORY_TICKS）
 ├── EntityAntiBallisticMissile.java # 由 EntitySurfaceToAirMissile 改名改造
 ├── AbmGuidance.java                # 助推→制导→自毁 状态机
 ├── ProximityFuse.java              # 近炸判定（调用 InterceptMath）
@@ -174,7 +175,7 @@ JUnit：①迎头穿越（两点在 tick 中点相遇）→ 0；②平行同速 
 threats = 航迹表中 status ∈ {THREAT} 的航迹，按 ticksToImpact 升序
 for track in threats:
     if now < track.nextEngageTick: continue
-    if EngagementRegistry.activeCount(level, track.targetId) >= max_interceptors_per_target: continue
+    if not EngagementRegistry.canEngage(level, track.targetId): continue
     query = new InterceptQueryMessage(channel, track.targetId, track.position, track.velocity, track.acceleration)
     RadioRegistry.popMessage(level, radio, query)        // 同步：返回时报价已收集完
     if query.offers().isEmpty(): continue                // 无可用发射台，下一个目标
@@ -209,7 +210,7 @@ for track in threats:
 | --- | --- | --- | --- |
 | `BOOST` | 生成时 | 速度 = (0, `boost_speed`, 0) | 已过 `boost_ticks` → `GUIDE` |
 | `GUIDE` | BOOST 结束 | 找目标实体（`ServerLevel#getEntity(UUID)`）；存在则 `InterceptMath.solve` 得瞄准点（无解时瞄准目标当前位置）；把当前速度方向向瞄准方向旋转，最多 `max_turn_degrees`；速度大小 = `flight_speed`；更新朝向 | 目标不存在/死亡 → `REACQUIRE`；近炸命中 → 销毁；`fuel_ticks` 用尽 → `SELF_DESTRUCT` |
-| `REACQUIRE` | 目标丢失 | 保持直线；每 10 tick 在 `reacquire_range` 内找最近的威胁实体（`TileRadarStation.isThreat`），且该目标在 `EngagementRegistry` 中在飞 ABM 数 < 上限 | 找到 → 注册后回 `GUIDE`；超过 `reacquire_timeout_ticks` → `SELF_DESTRUCT` |
+| `REACQUIRE` | 目标丢失 | 进入时先释放旧目标的登记（`EngagementRegistry.unregister(level, abmId)`，登记按 ABM 归属，不依赖当时持有的目标 id）；保持直线；每 10 tick 在 `reacquire_range` 内找最近的威胁实体（`TileRadarStation.isThreat`），且该目标满足 `EngagementRegistry.canEngage(level, targetId)`（在飞 ABM 数 < `max_interceptors_per_target`） | 找到 → `abm.retarget(...)` 把登记迁到新目标并回 `GUIDE`；超过 `reacquire_timeout_ticks` → `SELF_DESTRUCT` |
 | `SELF_DESTRUCT` | 燃料耗尽或超时 | 在当前位置 `level.explode(this, x, y, z, kill_effect_power, Level.ExplosionInteraction.NONE)`，`discard()` | — |
 
 转向限制实现（`AbmGuidance.rotateTowards(Vec3 current, Vec3 desired, double maxRadians)`）：两向量归一化，夹角 θ = acos(clamp(dot, -1, 1))；θ ≤ max → 返回 desired；否则用球面线性插值 `slerp(current, desired, max/θ)`。θ≈π（反向）时，绕任一垂直轴旋转 max。JUnit 覆盖这三种情况。
@@ -234,7 +235,7 @@ if (d <= ConfigAbm.PROXIMITY_RADIUS) {
 2. `target_warhead_on_kill = true`：调用目标的爆炸物/动作触发（复用 1.12 `CapabilityEmpMissile` 中“Trigger firing circuits”分支的代码路径，抽成 `MissileKillHelper.detonate(missile, source)`）。否则：`target.discard()`。
 3. 在拦截点 `level.explode(abm, x, y, z, kill_effect_power, Level.ExplosionInteraction.NONE)`。
 4. 播放声音（复用 1.12 已有的导弹爆炸声）。
-5. `EngagementRegistry.markIntercepted(level, targetId)`；雷达下一次扫描把航迹标为 `INTERCEPTED`。
+5. `EngagementRegistry.markIntercepted(level, targetId)` 记录拦截时刻；雷达下一次扫描把航迹标为 `INTERCEPTED`。该记录只在 `INTERCEPT_HISTORY_TICKS`（200 tick，> 航迹表保留 `INTERCEPTED` 的 40 tick）内有效，过期即失效并在下一次记录拦截时整体清理（避免历史无界增长）；窗口内可被多座雷达重复读取，读取不消费。
 6. `abm.discard()`。
 
 ### 8.4 其他

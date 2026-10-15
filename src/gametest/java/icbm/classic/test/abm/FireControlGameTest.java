@@ -34,6 +34,7 @@ public class FireControlGameTest
     private static final String SELECTS_NEAREST_CHANNEL = "fire-control-selects-nearest";
     private static final String LAUNCHED_ORDER_CHANNEL = "fire-control-launched-order";
     private static final String NO_OFFER_CHANNEL = "fire-control-no-offer";
+    private static final String RECOVERY_CHANNEL = "fire-control-engaged-recovery";
 
     private static final class TestMissile extends EntityExplosiveMissile
     {
@@ -49,6 +50,20 @@ public class FireControlGameTest
         public void tick()
         {
             // Keep the test trajectory stationary; radar reads the configured velocity.
+        }
+    }
+
+    private static final class FrozenAbm extends EntityAntiBallisticMissile
+    {
+        private FrozenAbm(Level level)
+        {
+            super(level);
+        }
+
+        @Override
+        public void tick()
+        {
+            // Keep the interceptor in place so the test decides exactly when the engagement ends.
         }
     }
 
@@ -213,6 +228,63 @@ public class FireControlGameTest
                     "radar must create the expected threat track and query the receiver");
             helper.assertTrue(receiver.orderCount == 0, "no offer must not produce an order");
             RadioRegistry.remove(receiver);
+            helper.succeed();
+        });
+    }
+
+    /**
+     * C1: an ENGAGED track must not stay engaged forever once its interceptor is gone. The scan has to drop it back
+     * to THREAT and the fire control must be able to order a replacement interceptor while the threat keeps flying.
+     * Before the fix the track stayed ENGAGED, {@code TrackTable#threats()} stayed empty and no second order was
+     * ever sent, which made {@code ConfigAbm.REENGAGE_DELAY_TICKS} meaningless after a failed interception.
+     */
+    @GameTest(maxTicks = 200, padding = 128)
+    public void engagedTrackRecoversWhenInterceptorIsLost(GameTestHelper helper)
+    {
+        Fixture fixture = setup(helper, RECOVERY_CHANNEL);
+        final ServerLevel level = (ServerLevel) helper.getLevel();
+        FrozenAbm firstAbm = new FrozenAbm(level);
+        firstAbm.setTargetId(fixture.missile().getUUID());
+        helper.assertTrue(level.addFreshEntity(firstAbm), "test interceptor must spawn");
+        BlockPos launcherPos = fixture.pos().offset(0, 0, 2);
+        TestReceiver receiver = receiver(helper, fixture.pos(), launcherPos, firstAbm.getUUID(), RECOVERY_CHANNEL);
+        RadioRegistry.add(receiver);
+        final int[] phase = { 0 };
+        final int[] ordersWhenLost = { 0 };
+        helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
+            RadarTrack track = refreshTrack(helper, fixture);
+            helper.assertTrue(track != null, "radar must track the incoming missile");
+
+            if (phase[0] == 0)
+            {
+                helper.assertTrue(track.status == TrackStatus.ENGAGED && receiver.orderCount > 0,
+                        "radar must engage the track while the interceptor is in flight");
+                helper.assertTrue(EngagementRegistry.activeCount(level, fixture.missile().getUUID()) == 1,
+                        "the interceptor must count as active while its entity exists");
+                ordersWhenLost[0] = receiver.orderCount;
+                firstAbm.discard(); // interception fails: the interceptor is gone, the threat keeps flying
+                phase[0] = 1;
+                helper.assertTrue(false, "waiting for the scan to notice the lost interceptor");
+            }
+
+            if (phase[0] == 1)
+            {
+                helper.assertTrue(EngagementRegistry.activeCount(level, fixture.missile().getUUID()) == 0,
+                        "a discarded interceptor must no longer count as active");
+                helper.assertTrue(track.status == TrackStatus.THREAT,
+                        "a track whose interceptor is gone must fall back to THREAT, was " + track.status);
+                phase[0] = 2;
+                helper.assertTrue(false, "waiting for the replacement interceptor order");
+            }
+
+            helper.assertTrue(receiver.orderCount >= ordersWhenLost[0] + 1,
+                    "a failed interception must allow a replacement order, ordered " + receiver.orderCount
+                            + " of " + ordersWhenLost[0]);
+            helper.assertTrue(EngagementRegistry.activeCount(level, fixture.missile().getUUID()) == 0,
+                    "the replacement order must have been possible because no interceptor was left");
+            RadioRegistry.remove(receiver);
+            firstAbm.discard();
             helper.succeed();
         });
     }
