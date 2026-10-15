@@ -11,6 +11,7 @@ import icbm.classic.content.reg.ModMenus;
 import icbm.classic.lib.actions.PotentialActionKnown;
 import icbm.classic.lib.actions.fields.ActionFieldProvider;
 import icbm.classic.lib.data.IMachineInfo;
+import icbm.classic.lib.energy.EmpEnergyDrain;
 import icbm.classic.lib.energy.EnergyRules;
 import icbm.classic.lib.energy.IcbmEnergyBuffer;
 import icbm.classic.lib.energy.ExposedEnergyStorage;
@@ -192,6 +193,8 @@ public class TileEMPTower extends TileMachine implements IGuiTile, IMachineInfo,
         final var response = empAction.doAction(level, getBlockPos(), cause);
         if (!response.isType(ActionStatusTypes.GREEN)) return false;
         EnergyRules.consumeOrFree(energyStorage, getFiringCost());
+        if (level instanceof ServerLevel serverLevel)
+            EmpEnergyDrain.drainAround(serverLevel, getBlockPos(), getRange(), ConfigMain.EMP_DRAIN);
         cooldownTicks = ConfigEmpTower.COOLDOWN;
         setChanged();
         return true;

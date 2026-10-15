@@ -15,6 +15,10 @@ public class ConfigMain
     @ConfigEntry(name = "use_energy", comment = "Range of tier 1 launcher")
     public static boolean REQUIRES_POWER = true;
 
+    /** Maximum FE pulled from each block when an EMP tower activates. */
+    @ConfigEntry(name = "emp_drain", comment = "Maximum energy units EMP may pull per block")
+    public static long EMP_DRAIN = 10_000L;
+
 
 
     @ConfigEntry(name = "protectiveArmor", comment = "Settings for setting protection support on armor items")

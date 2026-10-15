@@ -57,10 +57,21 @@ public final class IcbmEnergyBuffer {
         return false;
     }
 
+    /** Removes up to {@code max} stored FE for EMP effects and returns the amount removed. */
+    public long drain(long max) {
+        if (max <= 0) return 0;
+        final long removed = Math.min(stored, max);
+        if (removed > 0) {
+            stored -= removed;
+            onChange.run();
+        }
+        return removed;
+    }
     /** 只检查不扣除。 */
     public boolean has(long amount) {
         return EnergyRules.ignoresPower() || stored >= amount;
     }
+
 
     /** 直接设置（存档加载、EMP 清零用），夹到 [0, capacity]。 */
     public void setStored(long value) {
