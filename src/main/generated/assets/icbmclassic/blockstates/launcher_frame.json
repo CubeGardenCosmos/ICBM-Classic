@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "icbmclassic:block/frame_bottom"
+    },
+    "type=middle": {
+      "model": "icbmclassic:block/frame_middle"
+    },
+    "type=top": {
+      "model": "icbmclassic:block/frame_top"
+    }
+  }
+}
