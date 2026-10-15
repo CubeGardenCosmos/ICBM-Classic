@@ -246,9 +246,55 @@ if (d <= ConfigAbm.PROXIMITY_RADIUS) {
 
 ## 9. 已知限制（必须写进发布说明）
 
-- **区块外模拟飞行的导弹不可见**：1.12 的 `MissileTrackerHandler` 会在导弹离开已加载区块时把它转为数据模拟，接近目标时重新生成实体。雷达与 ABM 只能处理实体。若导弹在保护区上空才重新生成，可能来不及拦截。S7.08 用 GameTest 记录“重新生成点到目标的距离”，并在 `ConfigMissile.SIMULATION_ENTER_*` 现有配置项的说明中提示玩家。
+- **区块外模拟飞行的导弹不可见**：1.12 的 `MissileTrackerHandler` 会在导弹离开已加载区块时把它转为数据模拟，接近目标时重新生成实体。雷达与 ABM 只能处理实体。若导弹在保护区上空才重新生成，可能来不及拦截 —— 实测见 §9.1。
 - 不做敌我识别：同频道雷达会拦截任何预测落在保护区内的导弹，包括玩家自己误射的。
 - 不拦截非 ICBM 导弹的投射物（箭、火球等）。
+
+### 9.1 S7.08 实测：重新生成点的几何与可拦截性
+
+测量方法：GameTest `icbmclassic/test/abm/SimulatedMissileGameTest`。导弹经 S4.03 生产路径
+`MissileTrackerHandler.simulateMissile()` 进入模拟，再由 `MissileTrackerWorld#runSimulationTick()`
+推进到 `spawnMissileOnDestination()` 重新生成；位置/速度直接取自重新生成的实体，到落地的 tick 由
+`TrajectoryPredictor.predictImpact()` 以「重新生成位置 + 速度 + 零加速度、`floorY` = 雷达 y、
+`prediction_max_ticks` = 600」计算（即雷达自己用的那套外推）。雷达/ABM 场景为：雷达（探测
+`ConfigRadar.MAX_RANGE`、保护 20、`ABM_ONLY`、逐 tick 补电）+ 一座同频道、装 ABM 的巡航发射器；
+「是否拦截成功」取 `EngagementRegistry.wasIntercepted()`，发射/命中 tick、高度与距离取自逐 tick 采样；
+「ABM 每 tick 步长」也逐 tick 采样并被断言 ≤ `abm.flight_speed`（该断言即 §9.1 第 2 条缺陷的集成级守卫）。
+
+重新生成点由 `spawnMissileOnDestination` 固定为 `(target.x, simulation_enter_height, target.z)`、速度
+`(0, -simulation_enter_speed, 0)` —— **目标正上方**重新进入世界，水平距离恒为 0：
+
+| 场景 | 重新生成点水平距离 | 重新生成高度（y） | 到落地 tick（`TrajectoryPredictor`） | 是否拦截成功（修复前） | 是否拦截成功（修复后） |
+| --- | --- | --- | --- | --- | --- |
+| 1.12 默认（`simulation_enter_height=450`、`simulation_enter_speed=1`） | 0.0 格 | 450（雷达 y=38，垂直距离 412 格） | 412 | 是（靠 ABM 单 tick 位移 273.8~335.9 格的越界线段恰好穿过目标 2.5 格内） | **是**（ABM 以 `flight_speed` 4 格/tick 正常接敌：发射 tick 157~166 → 结束 tick 189~193，结束点 y=128.9~142.5、距发射点 89.0~102.5 格，实测单 tick 最大位移恒为 4.0000000000 格） |
+| `simulation_enter_height` ×2 = 900 | 0.0 格 | 900（垂直距离 862 格） | 862 > `prediction_max_ticks`(600) → 外推返回 null（雷达先按 `DETECTED` 跟踪，落至可外推后才转 `THREAT`） | 否（ABM 越界步长擦过目标 ~0.5 格，未命中；目标第 325~329 tick 落到雷达上） | **是**（发射 tick 278~287 → 结束 tick 305~309，结束点 y=107.0~125.0、距发射点 67.1~85.1 格，实测单 tick 最大位移恒为 4.0000000000 格） |
+
+结论：
+
+1. **重新生成高度不是限制**：即使 900 格重新生成高度，只要雷达探测得到，`engagement_range`(200) 就会在
+   目标进入 200 格时下令发射（实测下令时目标距发射点 174.97 / 169.34 格），此后 ABM 以 4 格/tick 迎头，
+   约 18~28 tick 完成交战，远早于目标落地（`fuel_ticks` 200 也远未用尽）。
+   交战的「击毁归属」有两种，取决于同一 tick 内两个实体的 tick 顺序：ABM 近炸（写 `EngagementRegistry`）或
+   来袭导弹自己的实体命中判定先打到 ABM（导弹空中爆炸、不写 registry）；两者都表示导弹在高空（y≈107~143）被拦下。
+2. **曾经的「拦截结果由缺陷支配」已修复**（历史记录，见 §9.1 补充）：`Rotation.rotateTowards` 在
+   「转向在 `max_turn_degrees` 内」的分支曾返回**未归一化**的 `desired`，而 `AbmGuidance.guide()` 直接把它
+   `.scale(ConfigAbm.FLIGHT_SPEED)`，使 ABM 单 tick 位移 = `flight_speed × |aim − position|`（实测
+   273.8~335.9 格）。当时的「默认行命中 / ×2 行未命中」只是「越界线段是否恰好穿过目标 2.5 格内」的偶然结果。
+   修复方式：该分支改为返回归一化后的 `desired`（`Rotation.java`，函数契约即「返回方向」，θ>max 分支本就返回
+   单位向量）；同时 `AbmMathTest` 增加「非单位 `desired` 输入 → 输出长度为 1」的回归用例，
+   `SimulatedMissileGameTest` 增加「ABM 单 tick 位移 ≤ `flight_speed`」的集成断言。
+3. **`simulation_enter_height`/`simulation_enter_speed` 的配置注释提示文案**：设计原意是让玩家知道
+   「导弹会在目标正上方 `simulation_enter_height` 处重新出现」。文案尚未添加（改动会让已入库的
+   `run/datagen/config/icbmclassic/missile.json` 快照失效），留给维护者与 S7.09 一起决定。
+4. 雷达的 `prediction_max_ticks`(600) 对 900 格的重新生成高度不足以给出外推落点（返回 null）；
+   若 `use_missile_target_data=true` 且导弹自带目标坐标，航迹仍会因「预测落点在保护半径内」成为 `THREAT`
+   （落点取自目标坐标，`ticksToImpact` 退化为水平距离/水平速度），因此这一点不影响交战。
+
+> §11 重测范围（S7.10 执行）：制导修复改变了 ABM 的飞行时间（不再瞬移），凡是依赖「发射后极短时间命中」的
+> 场景都要重测，重点是 `单目标拦截`（80 格水平 + 60 格高，400 tick 预算是否仍够）、`不越权齐射`、
+> `燃料耗尽自毁`（自毁时序）与 `跨雷达去重`；`落点在外不交战`/`EMP 兜底` 与制导无关，只需顺带确认。
+
+详见 `docs/implementation/evidence/S7.08.md`。
 
 ## 10. 网络与 GUI
 
