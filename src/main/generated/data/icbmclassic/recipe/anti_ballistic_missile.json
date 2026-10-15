@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "c": "icbmclassic:basic_circuit",
+    "e": "icbmclassic:condensed_explosive",
+    "m": "icbmclassic:missile_module"
+  },
+  "pattern": [
+    "c",
+    "e",
+    "m"
+  ],
+  "result": {
+    "id": "icbmclassic:anti_ballistic_missile"
+  }
+}
