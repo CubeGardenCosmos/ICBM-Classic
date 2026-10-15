@@ -34,7 +34,7 @@ import java.util.function.Predicate;
  *     <li>incendiary → fire appears,</li>
  *     <li>shrapnel / anvil / fragmentation → fragments are spawned,</li>
  *     <li>repulsive / attractive → a zombie is pushed away from / pulled towards the blast,</li>
- *     <li>exothermic / endothermic → blocks are mutated (water → lava/ice),</li>
+ *     <li>exothermic / endothermic → blocks are mutated (exothermic removes water and ice, endothermic freezes water),</li>
  *     <li>antigravitational → flying blocks are spawned,</li>
  *     <li>mutation → a villager is converted,</li>
  *     <li>primed_explosive → the primed block entity runs its explosive (carried over from S3.03).</li>
@@ -46,8 +46,16 @@ public class BasicBlastsGameTest
 {
     /** Center of the blast, relative to the test structure */
     private static final BlockPos CENTER = new BlockPos(4, 3, 4);
-    /** Size every blast is forced to, keeps the affected area inside the test structure */
+    /** Size most blasts are forced to, keeps the affected area inside the test structure */
     private static final int TEST_SIZE = 3;
+
+    /**
+     * Size the sonic blast needs. Its rays start with {@code 2 * size} energy ({@code BlastSonic}), pay 0.3 *
+     * 0.75 * 5 = 1.125 per step and 6.0 + 0.3 for every stone block (vanilla explosion resistance, see
+     * {@code BasicResistanceCallBack}), so size 8 is the smallest one that still breaks the cube. The configured
+     * scale of the explosive is 15, size 3 could never remove a single stone block.
+     */
+    private static final int SONIC_TEST_SIZE = 8;
 
     private static final Predicate<BlockState> IS_AIR = BlockState::isAir;
 
@@ -60,10 +68,27 @@ public class BasicBlastsGameTest
      */
     private static IAction triggerBlast(GameTestHelper helper, String explosiveId)
     {
-        return triggerBlast(helper, explosiveId, Direction.UP);
+        return triggerBlast(helper, explosiveId, TEST_SIZE, Direction.UP);
+    }
+
+    private static IAction triggerBlast(GameTestHelper helper, String explosiveId, int size)
+    {
+        return triggerBlast(helper, explosiveId, size, Direction.UP);
     }
 
     private static IAction triggerBlast(GameTestHelper helper, String explosiveId, Direction direction)
+    {
+        return triggerBlast(helper, explosiveId, TEST_SIZE, direction);
+    }
+
+    /**
+     * @param helper      test helper
+     * @param explosiveId explosive id inside the mod namespace
+     * @param size        blast size to force
+     * @param direction   host direction of the blast
+     * @return the action that was started
+     */
+    private static IAction triggerBlast(GameTestHelper helper, String explosiveId, int size, Direction direction)
     {
         final IExplosiveData data = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(ICBMConstants.id(explosiveId), false);
         final BlockPos pos = helper.absolutePos(CENTER);
@@ -73,7 +98,7 @@ public class BasicBlastsGameTest
         final IAction action = data.create(helper.getLevel(), center.x, center.y, center.z, source, null);
         if (action instanceof IBlastInit init)
         {
-            init.setBlastSize(TEST_SIZE);
+            init.setBlastSize(size);
         }
         if (action instanceof IActionFieldReceiver receiver)
         {
@@ -132,11 +157,11 @@ public class BasicBlastsGameTest
         return count;
     }
 
-    /** Waits until at least one block around the center matches the predicate */
-    private static void succeedWhenBlock(GameTestHelper helper, Predicate<BlockState> test, String message)
+    /** Waits until at least one block within the radius around the center matches the predicate */
+    private static void succeedWhenBlock(GameTestHelper helper, int radius, Predicate<BlockState> test, String message)
     {
         helper.startSequence()
-                .thenWaitUntil(() -> helper.assertTrue(countBlocks(helper, TEST_SIZE + 1, test) > 0, message))
+                .thenWaitUntil(() -> helper.assertTrue(countBlocks(helper, radius, test) > 0, message))
                 .thenSucceed();
     }
 
@@ -165,15 +190,21 @@ public class BasicBlastsGameTest
         helper.succeed();
     }
 
-    @GameTest(maxTicks = 200)
+    /**
+     * The sonic wave reaches 2 * size blocks and pushes every entity inside it, so the structure is padded to
+     * keep the neighbouring tests of the same batch out of the blast (the grid leaves 5/6 blocks between the
+     * structures).
+     */
+    @GameTest(maxTicks = 200, padding = 8)
     public void sonicBlastDestroysBlocks(GameTestHelper helper)
     {
         buildStoneCube(helper);
+        helper.assertTrue(countBlocks(helper, 1, IS_AIR) == 0, "test cube should start solid");
 
-        triggerBlast(helper, "sonic");
+        triggerBlast(helper, "sonic", SONIC_TEST_SIZE);
 
         // sonic is threaded, the blocks go away over several ticks
-        succeedWhenBlock(helper, IS_AIR, "sonic blast did not destroy any of the stone blocks");
+        succeedWhenBlock(helper, 1, IS_AIR, "sonic blast did not destroy any of the stone blocks");
     }
 
     @GameTest(maxTicks = 60)
@@ -284,11 +315,31 @@ public class BasicBlastsGameTest
             }
         }
 
+        // The beam opens with a 4F vanilla explosion, which blows the stone floor apart and lets the water drain
+        // into the crater the same tick. That is fine for this assertion: the nine blocks of the layer are water
+        // sources, so only a block edit can empty them, and the drained water sits below the layer where it can
+        // not flow back up. The mutation pass of the beam clears every water block it collected, which is the
+        // nine of the layer plus whatever is left in the crater inside its radius.
+        final List<BlockPos> waterLayer = new ArrayList<>();
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int z = -1; z <= 1; z++)
+            {
+                waterLayer.add(CENTER.offset(x, 0, z));
+            }
+        }
+        helper.assertTrue(waterLayer.stream().allMatch(pos -> helper.getBlockState(pos).is(Blocks.WATER)),
+                "test water layer should start full");
+
         triggerBlast(helper, "exothermic");
 
-        // beam style blast: the mutation runs after the two worker passes, so the water is not gone right away
-        succeedWhenBlock(helper, state -> !state.is(Blocks.WATER),
-                "exothermic blast did not mutate any of the water blocks");
+        // beam style blast: the removal runs after the two worker passes, so the water is not gone right away
+        helper.startSequence()
+                .thenWaitUntil(() -> {
+                    final long remaining = waterLayer.stream().filter(pos -> helper.getBlockState(pos).is(Blocks.WATER)).count();
+                    helper.assertTrue(remaining == 0, "exothermic blast left " + remaining + " of the 9 water blocks in the layer");
+                })
+                .thenSucceed();
     }
 
     @GameTest(maxTicks = 400)
@@ -306,7 +357,7 @@ public class BasicBlastsGameTest
         triggerBlast(helper, "endothermic");
 
         // beam style blast: the freeze runs after the two worker passes
-        succeedWhenBlock(helper, state -> state.is(Blocks.ICE),
+        succeedWhenBlock(helper, TEST_SIZE + 1, state -> state.is(Blocks.ICE),
                 "endothermic blast did not freeze any of the water blocks");
     }
 
@@ -343,6 +394,7 @@ public class BasicBlastsGameTest
     public void primedExplosiveRunsItsBlast(GameTestHelper helper)
     {
         buildStoneCube(helper);
+        helper.assertTrue(countBlocks(helper, 1, IS_AIR) == 0, "test cube should start solid");
 
         final BlockPos pos = helper.absolutePos(CENTER);
         final EntityExplosive explosive = new EntityExplosive(helper.getLevel(),
@@ -352,6 +404,6 @@ public class BasicBlastsGameTest
         helper.getLevel().addFreshEntity(explosive);
 
         // S3.03 could not assert the explosion because the factories still threw, S3.04 wired them
-        succeedWhenBlock(helper, IS_AIR, "the primed explosive did not run its blast");
+        succeedWhenBlock(helper, 1, IS_AIR, "the primed explosive did not run its blast");
     }
 }

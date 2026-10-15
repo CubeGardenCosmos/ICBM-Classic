@@ -10,7 +10,6 @@ import icbm.classic.api.actions.cause.IActionSource;
 import icbm.classic.api.explosion.IBlastInit;
 import icbm.classic.api.refs.ICBMExplosives;
 import icbm.classic.api.reg.IExplosiveData;
-import icbm.classic.config.ConfigMain;
 import icbm.classic.config.blast.ConfigBlast;
 import icbm.classic.content.blast.gas.BlastColor;
 import icbm.classic.content.blast.redmatter.EntityRedmatter;
@@ -44,7 +43,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.io.InputStream;
@@ -209,6 +207,17 @@ public final class P1RegressionGameTests
     @GameTest(maxTicks = 500, padding = 16)
     public void launchRadarEmpScenario(GameTestHelper helper)
     {
+        // Geometry constraints of the scenario (all of them are fixture only, none is production):
+        // - the launcher refuses targets closer than 10 blocks on both x and z (LauncherCapability#isTargetTooClose),
+        // - the radar only turns a track into THREAT (hasIncomingMissiles) when the extrapolated impact lands
+        //   within its trigger range of 16 blocks,
+        // - the launched missile and its whole flight path have to stay inside the chunks the batch loaded for entity
+        //   ticking, which are the chunks the test structures sit in (see docs/implementation/evidence/S7.07.md and
+        //   the probe in this test's history). Only positive local offsets are covered by that: the grid puts the
+        //   next structure of the row at +13 and the next row at +14, nothing is loaded below the origin.
+        // The layout is therefore the original one and only the target moved from 30 blocks down range to 11: a
+        // flight of 11 blocks clears the launcher minimum, keeps every entity at local +1 or higher and lands the
+        // impact ~5 blocks from the radar, well inside its trigger range.
         final BlockPos localBase = new BlockPos(1, 1, 1);
         helper.setBlock(localBase, ModBlocks.LAUNCHER_BASE.defaultBlockState().setValue(BlockICBM.ROTATION_PROP, Direction.UP));
         helper.setBlock(localBase.above(), ModBlocks.LAUNCHER_FRAME);
@@ -221,7 +230,7 @@ public final class P1RegressionGameTests
         final BlockPos basePos = helper.absolutePos(localBase);
         final BlockPos radarPos = helper.absolutePos(localRadar);
         final BlockPos towerPos = helper.absolutePos(localTower);
-        final BlockPos targetPos = basePos.relative(Direction.EAST, 30);
+        final BlockPos targetPos = basePos.relative(Direction.EAST, 11);
         helper.getLevel().setBlock(targetPos.below(), Blocks.STONE.defaultBlockState(), 3);
         helper.getLevel().setBlock(targetPos, Blocks.STONE.defaultBlockState(), 3);
         final TileLauncherBase base = (TileLauncherBase) helper.getLevel().getBlockEntity(basePos);
@@ -229,51 +238,75 @@ public final class P1RegressionGameTests
         final TileEMPTower tower = (TileEMPTower) helper.getLevel().getBlockEntity(towerPos);
         helper.assertTrue(base != null && radar != null && tower != null, "launch/radar/EMP block entity missing");
         base.inventory.setItem(0, new ItemStack(ModItems.EXPLOSIVE_MISSILES.get(ICBMExplosives.CONDENSED.getRegistryKey())));
+        // The launcher refuses to fire while its firing cost is missing from the buffer (LauncherCapability#getStatus).
+        // The buffer is charged instead of flipping ConfigMain.REQUIRES_POWER, which is global state shared with every
+        // test of the batch.
+        base.energyStorage.setStored(base.energyStorage.getCapacity());
+        helper.onEachTick(() -> base.energyStorage.setStored(base.energyStorage.getCapacity()));
         radar.setDetectionRange(32);
         radar.setTriggerRange(16);
+        // The station turns its redstone output on as soon as it has a threat, and that signal reaches the EMP tower
+        // of the fixture (TileEMPTower#tick fires on hasNeighborSignal), which kills the missile with the configured
+        // chance before this test can observe it. The scenario under test is the radio path, so the redstone output
+        // of the station is turned off and the tower is driven by the IncomingMissileMessage of this test only.
+        radar.setOutputRedstone(false);
+        // Both machines drain their buffer while the scenario runs (radar 1000 FE/tick against a 20000 buffer,
+        // EMP tower 320 FE/tick against the charge its firing cost leaves) and stop working when it runs empty, so
+        // the same recharge the other machine GameTests use keeps them running for the whole flight.
+        radar.energyStorage.setStored(radar.energyStorage.getCapacity());
+        helper.onEachTick(() -> radar.energyStorage.setStored(radar.energyStorage.getCapacity()));
         radar.getRadio().setChannel("s5.10-regression");
         tower.getRadio().setChannel("s5.10-regression");
         tower.getRadio().setDisabled(true);
         tower.setRange(32);
         tower.energyStorage.setStored(tower.energyStorage.getCapacity());
+        helper.onEachTick(() -> {
+            if (tower.getCooldown() <= 0) tower.energyStorage.setStored(tower.energyStorage.getCapacity());
+        });
 
-        final boolean previousRequiresPower = ConfigMain.REQUIRES_POWER;
-        final icbm.classic.api.actions.status.IActionStatus status;
-        try
-        {
-            ConfigMain.REQUIRES_POWER = false;
-            final Vec3 target = Vec3.atCenterOf(targetPos);
-            status = base.missileLauncher.launch(new LauncherSolution(new BasicTargetData(target)), null, false);
-        }
-        finally
-        {
-            ConfigMain.REQUIRES_POWER = previousRequiresPower;
-        }
+        // No global config is touched: the launcher gets its charge from the fixture above, so ConfigMain stays as
+        // the other tests of the batch expect it.
+        final Vec3 target = Vec3.atCenterOf(targetPos);
+        final icbm.classic.api.actions.status.IActionStatus status =
+                base.missileLauncher.launch(new LauncherSolution(new BasicTargetData(target)), null, false);
         helper.assertTrue(status != null && !status.isBlocking(), "launcher rejected the loaded missile/target");
+        // Every gate below throws until the radar has classified the missile and it is inside the tower range, so the
+        // sequence cannot pass on the first tick. Firing is one-shot (config change and popMessage are not idempotent);
+        // later attempts only wait for the detected missile to be removed.
+        final boolean[] fired = {false};
+        final Entity[] detected = {null};
         helper.succeedWhen(() -> {
-            if (!radar.hasIncomingMissiles() || radar.getIncomingThreats().isEmpty()) return;
-            final var missile = radar.getIncomingThreats().get(0);
-            final Entity missileEntity = missile.getMissileEntity();
-            helper.assertTrue(missileEntity != null, "radar detected a missile without a live entity");
-            if (!new AABB(towerPos).inflate(32).intersects(missileEntity.getBoundingBox())) return;
-            helper.assertTrue(tower.isReady(), "EMP tower did not remain charged and ready");
-            final float previousMissileKillChance = ConfigBlast.emp.missiles.missileKillChance;
-            final float previousFuelExplosionChance = ConfigBlast.emp.missiles.engineFullBlowChance;
-            try
+            if (!fired[0])
             {
-                ConfigBlast.emp.missiles.missileKillChance = 1f;
-                ConfigBlast.emp.missiles.engineFullBlowChance = 0f;
-                tower.getRadio().setDisabled(false);
-                RadioRegistry.popMessage(helper.getLevel(), radar.getRadio(),
-                        new IncomingMissileMessage(radar.getRadio().getChannel(), missile, true));
-                helper.assertTrue(missileEntity.isRemoved(),
-                        "same-channel EMP tower did not process the detected missile");
+                helper.assertTrue(radar.hasIncomingMissiles() && !radar.getIncomingThreats().isEmpty(),
+                        "radar has not classified the launched missile as incoming yet");
+                final var missile = radar.getIncomingThreats().get(0);
+                final Entity missileEntity = missile.getMissileEntity();
+                helper.assertTrue(missileEntity != null, "radar detected a missile without a live entity");
+                // Same test as RadioEmpTower#onMessage: distance from the tower block centre to the missile < range
+                helper.assertTrue(missile.getVec3().distanceTo(Vec3.atCenterOf(towerPos)) < tower.getRange(),
+                        "missile has not entered the EMP tower range yet");
+                helper.assertTrue(tower.isReady(), "EMP tower did not remain charged and ready");
+                fired[0] = true;
+                detected[0] = missileEntity;
+                final float previousMissileKillChance = ConfigBlast.emp.missiles.missileKillChance;
+                final float previousFuelExplosionChance = ConfigBlast.emp.missiles.engineFullBlowChance;
+                try
+                {
+                    ConfigBlast.emp.missiles.missileKillChance = 1f;
+                    ConfigBlast.emp.missiles.engineFullBlowChance = 0f;
+                    tower.getRadio().setDisabled(false);
+                    RadioRegistry.popMessage(helper.getLevel(), radar.getRadio(),
+                            new IncomingMissileMessage(radar.getRadio().getChannel(), missile, true));
+                }
+                finally
+                {
+                    ConfigBlast.emp.missiles.missileKillChance = previousMissileKillChance;
+                    ConfigBlast.emp.missiles.engineFullBlowChance = previousFuelExplosionChance;
+                }
             }
-            finally
-            {
-                ConfigBlast.emp.missiles.missileKillChance = previousMissileKillChance;
-                ConfigBlast.emp.missiles.engineFullBlowChance = previousFuelExplosionChance;
-            }
+            helper.assertTrue(detected[0].isRemoved(),
+                    "same-channel EMP tower did not process the detected missile");
         });
     }
 
