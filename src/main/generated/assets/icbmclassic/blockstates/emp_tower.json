@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "type=base": {
+      "model": "icbmclassic:block/emp_tower_base"
+    },
+    "type=coil": {
+      "model": "icbmclassic:block/emp_tower_coil"
+    },
+    "type=electric": {
+      "model": "icbmclassic:block/emp_tower_electric"
+    },
+    "type=spin": {
+      "model": "icbmclassic:block/emp_tower_spin"
+    }
+  }
+}
