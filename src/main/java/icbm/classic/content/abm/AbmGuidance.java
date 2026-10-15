@@ -18,7 +18,6 @@ public final class AbmGuidance
 
     public static final int BOOST_TICKS = 10;
     public static final double BOOST_SPEED = 1.5;
-    public static final int FUEL_TICKS = 200;
     private static final double MAX_TURN_RADIANS = Math.toRadians(15.0);
     private static final double REACQUIRE_RANGE = 30;
     private static final int REACQUIRE_TIMEOUT_TICKS = 40;

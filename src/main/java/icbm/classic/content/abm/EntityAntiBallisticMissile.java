@@ -22,7 +22,7 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     private UUID targetId;
     private AbmGuidance.AbmState abmState = AbmGuidance.AbmState.BOOST;
     private int ticksInState;
-    private int fuelLeft = AbmGuidance.FUEL_TICKS;
+    private int fuelLeft = ConfigAbm.FUEL_TICKS;
     private Vec3 targetVelocityLastTick = Vec3.ZERO;
     private Vec3 previousPositionThisTick = Vec3.ZERO;
     public Vec3 getPreviousPositionThisTick() { return previousPositionThisTick; }
@@ -100,6 +100,13 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     public void setTargetVelocityLastTick(Vec3 velocity) { targetVelocityLastTick = velocity; hasTargetVelocity = true; }
 
     @Override
+    public void remove(Entity.RemovalReason reason)
+    {
+        if (level() instanceof net.minecraft.server.level.ServerLevel serverLevel && targetId != null)
+            EngagementRegistry.unregister(serverLevel, targetId, getUUID());
+        super.remove(reason);
+    }
+    @Override
     public void tick()
     {
         if (!level().isClientSide())
@@ -168,7 +175,7 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
             catch (IllegalArgumentException ignored) { abmState = AbmGuidance.AbmState.BOOST; }
         });
         ticksInState = in.getIntOr("ticks_in_state", 0);
-        fuelLeft = in.getIntOr("fuel_left", AbmGuidance.FUEL_TICKS);
+        fuelLeft = in.getIntOr("fuel_left", ConfigAbm.FUEL_TICKS);
         targetId = in.read("target_id", UUIDUtil.CODEC).orElse(null);
         if (targetId == null && abmState == AbmGuidance.AbmState.GUIDE) abmState = AbmGuidance.AbmState.REACQUIRE;
     }

@@ -1,5 +1,7 @@
 package icbm.classic.content.blocks.radarstation;
 
+import icbm.classic.content.abm.radar.FireControl;
+import icbm.classic.content.abm.EngagementRegistry;
 import icbm.classic.content.abm.ConfigAbm;
 import icbm.classic.content.abm.math.Prediction;
 import icbm.classic.content.abm.math.TrajectoryPredictor;
@@ -74,6 +76,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     private int triggerRange = 50;
     private boolean outputRedstone = true;
     private final TrackTable trackTable = new TrackTable();
+    private final FireControl fireControl = new FireControl();
     private final RadarRenderData radarRenderData = new RadarRenderData(this);
     public final IcbmEnergyBuffer energyStorage = new IcbmEnergyBuffer(
             () -> ConfigRadar.POWER_CAPACITY, () -> ConfigRadar.POWER_CAPACITY).onChange(this::setChanged);
@@ -167,6 +170,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         if (hasPower)
         {
             if (tile.ticks % ConfigRadar.SCAN_TICKS == 0) tile.doScan();
+            if (level instanceof ServerLevel serverLevel) tile.fireControl.tick(serverLevel, tile);
             if (!tile.radio.getChannel().equals(RadioRegistry.EMPTY_HZ) && !tile.getIncomingThreats().isEmpty())
             {
                 if (tile.firingCooldown > 0) tile.firingCooldown--;
@@ -266,7 +270,13 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
         for (RadarTrack track : trackTable.values())
         {
-            if (!seen.contains(track.targetId)) trackTable.markLost(track.targetId, now);
+            if (!seen.contains(track.targetId))
+            {
+                if (level instanceof ServerLevel serverLevel && EngagementRegistry.wasIntercepted(serverLevel, track.targetId))
+                    track.setStatus(TrackStatus.INTERCEPTED, now);
+                else
+                    trackTable.markLost(track.targetId, now);
+            }
         }
         trackTable.purgeLost(now);
         if (!playersUsing.isEmpty()) radarRenderData.update();

@@ -1,5 +1,6 @@
 package icbm.classic;
 
+import icbm.classic.content.abm.EngagementRegistry;
 import icbm.classic.api.ICBMClassicAPI;
 import icbm.classic.api.missiles.parts.IMissileFlightLogic;
 import icbm.classic.api.missiles.parts.IMissileTarget;
@@ -188,6 +189,7 @@ public final class ICBMClassic implements ModInitializer {
         ServerTickEvents.END_LEVEL_TICK.register(RadarRegistry::onLevelTick);
         ServerChunkEvents.CHUNK_UNLOAD.register(RadarRegistry::onChunkUnload);
         ServerLevelEvents.UNLOAD.register((server, level) -> RadarRegistry.clear(level.dimension()));
+        ServerLevelEvents.UNLOAD.register((server, level) -> EngagementRegistry.clear(level.dimension()));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> RadarRegistry.clearAll());
 
         // Threaded blast framework (S1.09, docs/architecture/overview.md §6): worker threads read a

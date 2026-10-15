@@ -6,6 +6,16 @@ import icbm.classic.config.core.IcbmConfig;
 @IcbmConfig(file = "abm")
 public class ConfigAbm
 {
+    @ConfigEntry(name = "fuel_ticks", comment = "Maximum ABM flight time before self-destruct")
+    public static int FUEL_TICKS = 200;
+    @ConfigEntry(name = "engagement_range", comment = "Maximum distance from an ABM launch point to a target for an offer")
+    public static int ENGAGEMENT_RANGE = 200;
+    @ConfigEntry(name = "max_interceptors_per_target", comment = "Maximum active ABMs assigned to one target")
+    public static int MAX_INTERCEPTORS_PER_TARGET = 1;
+    @ConfigEntry(name = "fire_control_interval_ticks", comment = "Ticks between radar fire-control decisions")
+    public static int FIRE_CONTROL_INTERVAL_TICKS = 10;
+    @ConfigEntry(name = "reengage_delay_ticks", comment = "Minimum ticks between orders for one target")
+    public static int REENGAGE_DELAY_TICKS = 40;
     public static final float FLIGHT_SPEED = 4.0F;
     @ConfigEntry(name = "proximity_radius", comment = "Distance at which an ABM proximity fuse resolves")
     public static double PROXIMITY_RADIUS = 2.5;
