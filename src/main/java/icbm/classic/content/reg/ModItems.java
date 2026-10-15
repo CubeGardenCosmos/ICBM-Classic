@@ -17,7 +17,7 @@ import icbm.classic.content.cluster.missile.CapabilityClusterMissileStack;
 import icbm.classic.content.cluster.missile.ItemClusterMissile;
 import icbm.classic.content.items.ItemMissile;
 import icbm.classic.content.missile.entity.anti.item.CapabilitySAMStack;
-import icbm.classic.content.missile.entity.anti.item.ItemSurfaceToAirMissile;
+import icbm.classic.content.abm.ItemAntiBallisticMissile;
 import icbm.classic.content.missile.entity.itemstack.item.CapabilityHeldItemMissile;
 import icbm.classic.content.missile.entity.itemstack.item.ItemHeldItemMissile;
 import icbm.classic.content.reg.ExplosiveForms.ExplosiveForm;
@@ -149,7 +149,7 @@ public final class ModItems
                 EXPLOSIVE_MISSILES.values().toArray(new Item[0]));
 
         // Surface-to-air missile / Anti-ballistic missile (S4.04)
-        ANTI_BALLISTIC_MISSILE = RegHelper.item("anti_ballistic_missile", ItemSurfaceToAirMissile::new, new Item.Properties());
+        ANTI_BALLISTIC_MISSILE = RegHelper.item("anti_ballistic_missile", ItemAntiBallisticMissile::new, new Item.Properties());
         IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilitySAMStack(), ANTI_BALLISTIC_MISSILE);
 
         CLUSTER_MISSILE = RegHelper.item("cluster_missile", ItemClusterMissile::new, new Item.Properties());

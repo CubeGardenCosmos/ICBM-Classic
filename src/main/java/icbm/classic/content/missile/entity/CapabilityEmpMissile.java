@@ -57,8 +57,7 @@ public class CapabilityEmpMissile implements IEMPReceiver
                     }
                     else
                     if(missileEntity instanceof IRadioTargetAssignable) {
-                        // 1.12 checked EntitySurfaceToAirMissile (ported in S4.04); the SAM now implements
-                        // IRadioTargetAssignable instead of being referenced by content type (S1.05/S4.04)
+                        // EMP may destroy an assigned-target missile; ABM implements IRadioTargetAssignable.
                         world.explode(missileEntity, x, y, z, ConfigBlast.emp.missiles.engineFullBlowStrength, Level.ExplosionInteraction.NONE);
                     }
                 }

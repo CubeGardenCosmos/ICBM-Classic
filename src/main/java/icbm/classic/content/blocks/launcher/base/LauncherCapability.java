@@ -262,6 +262,6 @@ public class LauncherCapability extends LauncherBaseCapability
     public float getPayloadVelocity()
     {
         return host.missileHolder.getMissileStack().getItem() == ModItems.ANTI_BALLISTIC_MISSILE
-                ? ConfigMissile.SAM_MISSILE.FLIGHT_SPEED : ConfigMissile.DIRECT_FLIGHT_SPEED;
+                ? icbm.classic.content.abm.ConfigAbm.FLIGHT_SPEED : ConfigMissile.DIRECT_FLIGHT_SPEED;
     }
 }

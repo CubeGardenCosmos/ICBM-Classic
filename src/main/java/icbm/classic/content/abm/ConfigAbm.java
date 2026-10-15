@@ -6,6 +6,7 @@ import icbm.classic.config.core.IcbmConfig;
 @IcbmConfig(file = "abm")
 public class ConfigAbm
 {
+    public static final float FLIGHT_SPEED = 4.0F;
     @ConfigEntry(name = "use_missile_target_data", comment = "Use missile target data when predicting impact")
     public static boolean USE_MISSILE_TARGET_DATA = true;
 

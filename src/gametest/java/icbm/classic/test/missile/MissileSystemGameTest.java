@@ -84,7 +84,7 @@ public class MissileSystemGameTest
                 "basic target data is missing from the registry");
         helper.assertTrue(targetRegistry.getOrBuild(BallisticTargetingData.REG_NAME) instanceof BallisticTargetingData,
                 "ballistic target data is missing from the registry");
-        // 1.12 reserved the SAM name with a builder answering null, SAMTargetData is ported in S4.04
+        // The legacy anti-missile target-data identifier remains reserved, but ABM stores its target UUID directly.
         helper.assertTrue(targetRegistry.getOrBuild(ICBMConstants.id("anti.missile")) == null,
                 "the reserved anti.missile target data name returned an instance");
 

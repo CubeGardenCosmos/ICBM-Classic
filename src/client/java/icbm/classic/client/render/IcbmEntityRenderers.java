@@ -62,7 +62,7 @@ public final class IcbmEntityRenderers
         //1.12 registered RenderMissile for the EntityMissile base class, 26.3 needs one registration per type
         EntityRendererRegistry.register(ModEntities.EXPLOSIVE_MISSILE, RenderMissile::new);
         EntityRendererRegistry.register(ModEntities.GENERIC_MISSILE, RenderMissile::new);
-        EntityRendererRegistry.register(ModEntities.MISSILE_SAM, RenderMissile::new); //1.12 EntitySurfaceToAirMissile
+        EntityRendererRegistry.register(ModEntities.MISSILE_SAM, RenderMissile::new); // Anti-ballistic missile
         EntityRendererRegistry.register(ModEntities.HELD_ITEM_MISSILE, RenderMissile::new);
         //1.12: new RenderAsItem<>(rm, EntityGrenade::renderItemStack).setBillboard(true)
         EntityRendererRegistry.register(ModEntities.GRENADE,

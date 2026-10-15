@@ -69,8 +69,6 @@ public class ConfigMissile
     @ConfigRange(min = 0, max = Double.MAX_VALUE)
     public static float DAMAGE_SCALE = 20f;
 
-    @ConfigEntry(name = "SAM_MISSILE")
-    public static ConfigSAMMissile SAM_MISSILE = new ConfigSAMMissile();
 
     @ConfigEntry(name = "bomblet")
     public static ConfigBomblet bomblet = new ConfigBomblet();

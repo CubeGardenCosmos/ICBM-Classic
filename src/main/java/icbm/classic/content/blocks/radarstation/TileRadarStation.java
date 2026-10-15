@@ -15,7 +15,7 @@ import icbm.classic.config.ConfigMain;
 import icbm.classic.config.machines.ConfigRadar;
 import icbm.classic.content.blocks.radarstation.data.RadarRenderData;
 import icbm.classic.content.blocks.radarstation.gui.ContainerRadarStation;
-import icbm.classic.content.missile.entity.anti.EntitySurfaceToAirMissile;
+import icbm.classic.content.abm.EntityAntiBallisticMissile;
 import icbm.classic.content.reg.ModBlockEntities;
 import icbm.classic.content.reg.ModMenus;
 import icbm.classic.lib.data.IMachineInfo;
@@ -316,7 +316,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
     public static boolean isThreat(Entity entity)
     {
-        return entity instanceof IMissile && !(entity instanceof EntitySurfaceToAirMissile)
+        return entity instanceof IMissile && !(entity instanceof EntityAntiBallisticMissile)
                 && ICBMClassicHelpers.getExplosive(entity) != null;
     }
 

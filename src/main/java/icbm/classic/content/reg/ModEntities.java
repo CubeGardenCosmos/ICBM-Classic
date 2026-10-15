@@ -16,7 +16,7 @@ import icbm.classic.content.cargo.balloon.EntityBalloon;
 import icbm.classic.content.cargo.parachute.EntityParachute;
 import icbm.classic.content.cluster.bomblet.EntityBombDroplet;
 import icbm.classic.content.entity.EntityPlayerSeat;
-import icbm.classic.content.missile.entity.anti.EntitySurfaceToAirMissile;
+import icbm.classic.content.abm.EntityAntiBallisticMissile;
 import icbm.classic.content.missile.entity.itemstack.EntityHeldItemMissile;
 import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.core.Registry;
@@ -74,7 +74,7 @@ public final class ModEntities
     public static EntityType<EntityMissileActionable> GENERIC_MISSILE;
 
     /** Surface to air missile, 1.12 {@code missile.sam} (500 blocks / 1 → 32 chunks / 1, S4.04) */
-    public static EntityType<EntitySurfaceToAirMissile> MISSILE_SAM;
+    public static EntityType<EntityAntiBallisticMissile> MISSILE_SAM;
 
     public static EntityType<EntityHeldItemMissile> HELD_ITEM_MISSILE;
     public static EntityType<EntityBombDroplet> BOMB_DROPLET;
@@ -117,8 +117,8 @@ public final class ModEntities
         // 1.12 EntityReg: buildEntityEntry(EntityMissileActionable.class, ICBMEntities.MISSILE_GENERIC, 500, 1)
         GENERIC_MISSILE = registerEntity(ICBMEntities.MISSILE_GENERIC, 0.5F, 0.5F, 32, 1, EntityMissileActionable::new);
 
-        // 1.12 EntityReg: buildEntityEntry(EntitySurfaceToAirMissile.class, ICBMEntities.MISSILE_SAM, 500, 1)
-        MISSILE_SAM = registerEntity(ICBMEntities.MISSILE_SAM, 0.5F, 0.5F, 32, 1, EntitySurfaceToAirMissile::new);
+        // Registry ID remains anti_ballistic_missile; only the Java implementation is renamed.
+        MISSILE_SAM = registerEntity(ICBMEntities.MISSILE_SAM, 0.5F, 0.5F, 32, 1, EntityAntiBallisticMissile::new);
 
         HELD_ITEM_MISSILE = registerEntity(ICBMEntities.MISSILE_HELD_ITEM, 0.5F, 0.5F, 32, 1, EntityHeldItemMissile::new);
         BOMB_DROPLET = registerEntity(ICBMEntities.BOMB_DROPLET, 0.25F, 0.25F, 32, 1, EntityBombDroplet::new);

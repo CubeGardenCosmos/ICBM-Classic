@@ -233,7 +233,7 @@ public final class ICBMClassic implements ModInitializer {
         // Default types
         targetRegistry.register(BasicTargetData.REG_NAME, BasicTargetData::new);
         targetRegistry.register(BallisticTargetingData.REG_NAME, BallisticTargetingData::new);
-        // 1.12 reserved the SAM target name with a builder answering null; SAMTargetData is ported in S4.04
+        // 1.12 reserved this anti-missile target name; missile guidance now stores its target UUID directly.
         targetRegistry.register(ICBMConstants.id("anti.missile"), () -> null); //Can't be restored from save but reserving name
 
         //Fire registry event

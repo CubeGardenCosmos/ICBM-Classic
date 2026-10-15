@@ -56,7 +56,7 @@ public class FollowTargetLogic extends DeadFlightLogic
             motionZ /= velocity;
 
             //Set motion
-            entity.setDeltaMovement(motionX * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED, motionY * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED, motionZ * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED);
+            entity.setDeltaMovement(motionX * icbm.classic.content.abm.ConfigAbm.FLIGHT_SPEED, motionY * icbm.classic.content.abm.ConfigAbm.FLIGHT_SPEED, motionZ * icbm.classic.content.abm.ConfigAbm.FLIGHT_SPEED);
 
             //Update rotation
             float f3 = Mth.sqrt((float)(motionX * motionX + motionZ * motionZ));

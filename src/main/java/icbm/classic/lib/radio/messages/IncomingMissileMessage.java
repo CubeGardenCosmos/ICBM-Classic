@@ -11,9 +11,8 @@ import net.minecraft.world.phys.Vec3;
  * Radio message reporting an incoming missile to the launcher network.
  * <p>
  * 1.12 read the launched missile out of the {@code LaunchedWithMissile} status and pushed the target
- * into the SAM scan logic. 26.3 breaks the content dependency: the launch callback hands over an
- * {@link IRadioTargetAssignable} (implemented by {@code EntitySurfaceToAirMissile}) and this message
- * assigns the incoming missile as its target.
+ * into the assigned-target missile. 26.3 keeps the message independent of the missile's concrete class
+ * through {@link IRadioTargetAssignable}.
  */
 @Data
 public class IncomingMissileMessage implements IIncomingMissileMessage {
