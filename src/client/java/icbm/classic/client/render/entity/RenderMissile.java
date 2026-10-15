@@ -84,10 +84,18 @@ public class RenderMissile<T extends EntityMissile<T>> extends RenderItemImp<T, 
     @Override
     protected void rotate(PoseStack poseStack, IcbmItemRenderState state, CameraRenderState camera, int index)
     {
-        poseStack.rotateDegrees(Axis.YP, state.entityYaw);
-        poseStack.rotateDegrees(Axis.XP, state.entityPitch + (index == 1 ? 10.0F : 0.0F));
+        applyMissileRotation(poseStack, state.entityYaw, state.entityPitch + (index == 1 ? 10.0F : 0.0F), index);
+    }
 
-        //1.12: translate to rotation point of model
+    /**
+     * Shared 1.12 missile item transform used by entity and block-entity renderers.
+     * The initial 0.2 vertical offset is applied by the caller, matching {@link #translate}.
+     */
+    public static void applyMissileRotation(PoseStack poseStack, float yaw, float pitch, int index)
+    {
+        poseStack.rotateDegrees(Axis.YP, yaw);
+        poseStack.rotateDegrees(Axis.XP, pitch);
+
         if (index == 0)
         {
             poseStack.translate(0.0F, -0.8F, 0.0F);

@@ -114,8 +114,29 @@ public abstract class RenderItemImp<T extends Entity, S extends IcbmItemRenderSt
         {
             stack = getBackupRenderStack();
         }
+        extractItemModel(itemModelResolver, target, stack, getTransformType(index), entity.level(), entity, entity.getId());
+    }
+
+    /** Shared item-model extraction primitive for entities and block entities. */
+    public static void extractItemModel(ItemModelResolver resolver, ItemStackRenderState target, ItemStack stack,
+                                        ItemDisplayContext context, net.minecraft.world.level.Level level,
+                                        net.minecraft.world.entity.ItemOwner owner, int seed)
+    {
         target.clear();
-        itemModelResolver.updateForNonLiving(target, stack, getTransformType(index), entity);
+        if (stack != null && !stack.isEmpty())
+        {
+            resolver.updateForTopItem(target, stack, context, level, owner, seed);
+        }
+    }
+
+    /** Shared item-model submission primitive for entities and block entities. */
+    public static void submitItemModel(ItemStackRenderState item, PoseStack poseStack, SubmitNodeCollector collector,
+                                       int lightCoords, int outlineColor)
+    {
+        if (!item.isEmpty())
+        {
+            item.submit(poseStack, collector, lightCoords, OverlayTexture.NO_OVERLAY, outlineColor);
+        }
     }
 
     /** Lazily built fallback of {@link #extractItem}, see the field javadoc. */
@@ -154,7 +175,7 @@ public abstract class RenderItemImp<T extends Entity, S extends IcbmItemRenderSt
         translate(poseStack, state, index);
         rotate(poseStack, state, camera, index);
         scale(poseStack, state, index);
-        item.submit(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
+        submitItemModel(item, poseStack, submitNodeCollector, state.lightCoords, state.outlineColor);
         poseStack.popPose();
     }
 
