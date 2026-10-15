@@ -38,6 +38,8 @@ EN_US = "en_us.json"
 REQUIRED_LANGUAGES = ("zh_cn", "fr_fr", "de_de", "ja_jp", "ar_sa")
 PLACEHOLDER = re.compile(r"%(\d+\$)?[sdf]")
 TRANSLATABLE = re.compile(r'Component\.translatable\(\s*"([^"]+)"')
+# Keys that Minecraft itself always provides; the mod does not need to ship them (S5.11)
+EXTERNAL_TRANSLATION_KEYS = {"container.inventory"}
 
 errors = []
 warnings = []
@@ -159,7 +161,7 @@ def check_code_keys(english):
                 with io.open(path, encoding="utf-8") as stream:
                     for number, line in enumerate(stream, start=1):
                         for key in TRANSLATABLE.findall(line):
-                            if key in english:
+                            if key in english or key in EXTERNAL_TRANSLATION_KEYS:
                                 continue
                             if key.endswith(".") and any(k.startswith(key) for k in english):
                                 continue

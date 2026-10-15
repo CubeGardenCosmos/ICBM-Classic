@@ -65,11 +65,11 @@ public class TileRadarStation extends TileMachine /* S5.01 的新基类，继承
 2. `LauncherNetwork`/`LauncherNode`：网络发现在方块放置/破坏时重建（1.12 逻辑照抄）；`NetworkInventory`、`NetworkEnergyStorage`：本步把 `NetworkEnergyStorage` 改为对 `IcbmEnergyBuffer` 的简单分配器（内部），S6.03 再改为对外存储。
 3. `LauncherCapability`（基座发射逻辑）：
    - `getItem() == ItemReg.itemSAM` → `== ModItems.ANTI_BALLISTIC_MISSILE`。
-   - 发射：创建导弹实体（`ItemMissile` 对应的实体类型）、设置目标数据/飞行逻辑/来源，`level.addFreshEntity`，播放声音。
+   - 发射：创建导弹实体（`ItemMissile` 对应的实体类型）、设置目标数据/飞行逻辑/来源，通过 `ServerLevel.addFreshEntity` 加入世界，播放声音。
    - 不精确度计算（`applyInaccuracy`）用 `level.getRandom()`。
 4. `FiringPackage`、`status/**`（`FiringWithDelay`、`LaunchedWithMissile`、`LauncherStatus`）照抄。
 5. 方块交互：空手右击打开菜单（S5.03 前先什么都不做）；手持导弹右击基座装填（照 1.12）。
-6. 漏斗/自动化：基座库存通过 `ItemStorage.SIDED.registerForBlockEntity((be, dir) -> InventoryStorage.of(be.getInventory(), dir), ModBlockEntities.LAUNCHER_BASE)`（Fabric Transfer API，javap 核对）暴露。
+6. 漏斗/自动化：基座库存通过 `ItemStorage.SIDED.registerForBlockEntity((be, dir) -> ContainerStorage.of(be.getInventory(), dir), ModBlockEntities.LAUNCHER_BASE)`（Fabric Transfer API，javap 核对）暴露；26.3 当前 Fabric Transfer API 使用 `ContainerStorage`，无 `InventoryStorage`。
 7. 发射架高度、连接器：照抄。
 8. GameTest `LauncherGameTest`：放基座 + 2 节发射架 → 断言网络包含 3 个节点；向基座库存放入 `condensed_missile` → 设置目标（东 30 格）→ 调用发射 → 断言导弹实体生成，`succeedWhen` 目标附近方块被破坏（`REQUIRES_POWER=false`）。
 

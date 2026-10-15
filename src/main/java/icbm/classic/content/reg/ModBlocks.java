@@ -7,6 +7,13 @@ import icbm.classic.content.blocks.BlockSpikes;
 import icbm.classic.content.blocks.explosive.ExplosiveBlock;
 import icbm.classic.content.radioactive.BlockRadioactive;
 import icbm.classic.content.reg.ExplosiveForms.ExplosiveForm;
+import icbm.classic.content.blocks.launcher.base.BlockLauncherBase;
+import icbm.classic.content.blocks.launcher.connector.BlockLaunchConnector;
+import icbm.classic.content.blocks.launcher.frame.BlockLaunchFrame;
+import icbm.classic.content.blocks.launcher.screen.BlockLaunchScreen;
+import icbm.classic.content.blocks.launcher.cruise.BlockCruiseLauncher;
+import icbm.classic.content.blocks.radarstation.BlockRadarStation;
+import icbm.classic.content.blocks.emptower.BlockEmpTower;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -55,6 +62,15 @@ public final class ModBlocks
     public static Block RADIOACTIVE_DIRT;
     /** 1.12 {@code radioactive} meta 1 (stone), random ticks spread the decay. */
     public static Block RADIOACTIVE_STONE;
+
+    //=================== S5.02 launcher network blocks
+    public static BlockLauncherBase LAUNCHER_BASE;
+    public static BlockLaunchFrame LAUNCHER_FRAME;
+    public static BlockLaunchConnector LAUNCHER_CONNECTOR;
+    public static BlockLaunchScreen LAUNCHER_SCREEN;
+    public static BlockCruiseLauncher CRUISE_LAUNCHER;
+    public static BlockRadarStation RADAR_STATION;
+    public static BlockEmpTower EMP_TOWER;
 
     /**
      * Flat explosive blocks by explosive id (registry-ids.md §1, form B). S3.09 turns these into working
@@ -119,7 +135,17 @@ public final class ModBlocks
         RADIOACTIVE_STONE = RegHelper.block("radioactive_stone",
                 p -> new BlockRadioactive(BlockRadioactive.Kind.STONE, p), BlockRadioactive.properties(BlockRadioactive.Kind.STONE));
 
-        // TODO(S5) launcher network, radar station, EMP tower
+        // Launcher network blocks (registry-ids.md §2)
+        final BlockBehaviour.Properties machine = BlockBehaviour.Properties.of().strength(10f, 10f);
+        LAUNCHER_BASE = RegHelper.block("launcher_base", BlockLauncherBase::new, machine);
+        LAUNCHER_FRAME = RegHelper.block("launcher_frame", BlockLaunchFrame::new, machine);
+        LAUNCHER_CONNECTOR = RegHelper.block("launcher_connector", BlockLaunchConnector::new, machine);
+        LAUNCHER_SCREEN = RegHelper.block("launcher_screen", BlockLaunchScreen::new, machine);
+        CRUISE_LAUNCHER = RegHelper.block("cruise_launcher", BlockCruiseLauncher::new, machine);
+        RADAR_STATION = RegHelper.block("radar_station", BlockRadarStation::new,
+                BlockBehaviour.Properties.of().strength(10f, 10f));
+        EMP_TOWER = RegHelper.block("emp_tower", BlockEmpTower::new,
+                BlockBehaviour.Properties.of().strength(10f, 10f).noOcclusion());
     }
 
     /** 1.12 {@code BlockConcrete} used Material.ROCK (hardness 10) and a per type explosion resistance. */

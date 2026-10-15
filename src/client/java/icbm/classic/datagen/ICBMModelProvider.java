@@ -1,6 +1,12 @@
 package icbm.classic.datagen;
 
 import icbm.classic.ICBMConstants;
+import icbm.classic.content.blocks.launcher.cruise.BlockCruiseLauncher;
+import icbm.classic.content.blocks.launcher.frame.BlockLaunchFrame;
+import icbm.classic.content.blocks.launcher.frame.EnumFrameState;
+import icbm.classic.content.blocks.radarstation.BlockRadarStation;
+import icbm.classic.content.blocks.emptower.BlockEmpTower;
+import icbm.classic.prefab.tile.BlockICBM;
 import icbm.classic.content.reg.ModBlocks;
 import icbm.classic.content.reg.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
@@ -22,6 +28,7 @@ import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
+import com.mojang.math.Quadrant;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
@@ -29,6 +36,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.random.WeightedList;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -131,6 +139,53 @@ public class ICBMModelProvider implements DataProvider
         trivialCube(output, ModBlocks.RADIOACTIVE_DIRT, texture("block/radioactive/dirt/side"));
         trivialCube(output, ModBlocks.RADIOACTIVE_STONE, texture("block/radioactive/stone/side"));
 
+        // Launcher network blocks use the 1.12 machine models; block state properties drive facing/frame shape.
+        final Identifier launcherBaseModel = id("block/silo_pad");
+        output.facingVariants(ModBlocks.LAUNCHER_BASE, launcherBaseModel, BlockModelGenerators.ROTATIONS_COLUMN_WITH_FACING);
+        output.blockItemModel(ModBlocks.LAUNCHER_BASE, launcherBaseModel);
+
+        final Identifier frameMiddle = id("block/frame_middle");
+        output.blockState(MultiVariantGenerator.dispatch(ModBlocks.LAUNCHER_FRAME)
+                .with(PropertyDispatch.initial(BlockLaunchFrame.FRAME_STATE).generate(frameState -> {
+                    final Identifier model = switch (frameState) {
+                        case TOP -> id("block/frame_top");
+                        case MIDDLE -> frameMiddle;
+                        case BOTTOM -> id("block/frame_bottom");
+                    };
+                    return new MultiVariant(WeightedList.of(new Variant(model)));
+                })));
+        output.blockItemModel(ModBlocks.LAUNCHER_FRAME, frameMiddle);
+
+        final Identifier connectorModel = id("block/launcher_connector");
+        output.singleVariant(ModBlocks.LAUNCHER_CONNECTOR, connectorModel);
+        output.blockItemModel(ModBlocks.LAUNCHER_CONNECTOR, connectorModel);
+        final Identifier launcherScreenModel = id("block/silo_screen");
+        output.facingVariants(ModBlocks.LAUNCHER_SCREEN, launcherScreenModel, BlockModelGenerators.ROTATIONS_COLUMN_WITH_FACING);
+        output.blockItemModel(ModBlocks.LAUNCHER_SCREEN, launcherScreenModel);
+        final Identifier cruiseLauncherModel = id("block/cruise_launcher");
+        output.singleVariant(ModBlocks.CRUISE_LAUNCHER, cruiseLauncherModel);
+        final Identifier radarModel = id("block/radar_screen");
+        output.blockState(MultiVariantGenerator.dispatch(ModBlocks.RADAR_STATION)
+                .with(PropertyDispatch.initial(BlockICBM.ROTATION_PROP, BlockRadarStation.REDSTONE_PROPERTY,
+                        BlockRadarStation.RADAR_STATE).generate((direction, redstone, radarState) -> {
+                    final Variant variant = switch (direction)
+                    {
+                        case DOWN -> new Variant(radarModel).withXRot(Quadrant.R180);
+                        case UP -> new Variant(radarModel);
+                        case NORTH -> new Variant(radarModel).withXRot(Quadrant.R90);
+                        case SOUTH -> new Variant(radarModel).withXRot(Quadrant.R270);
+                        case EAST -> new Variant(radarModel).withXRot(Quadrant.R90).withYRot(Quadrant.R90);
+                        case WEST -> new Variant(radarModel).withXRot(Quadrant.R90).withYRot(Quadrant.R270);
+                    };
+                    return new MultiVariant(WeightedList.of(variant));
+                })));
+        output.blockItemModel(ModBlocks.RADAR_STATION, radarModel);
+        output.blockState(MultiVariantGenerator.dispatch(ModBlocks.EMP_TOWER)
+                .with(PropertyDispatch.initial(BlockEmpTower.TOWER_MODELS).generate(type ->
+                        new MultiVariant(WeightedList.of(new Variant(id("block/emp_tower_" + type.getSerializedName())))))));
+        output.blockItemModel(ModBlocks.EMP_TOWER, id("block/emp_tower_base"));
+        output.blockItemModel(ModBlocks.CRUISE_LAUNCHER, cruiseLauncherModel);
+
         // Flat explosive blocks (registry-ids.md §1 form B)
         ModBlocks.EXPLOSIVE_BLOCKS.forEach((explosive, block) -> explosiveBlock(output, block, explosive));
     }
@@ -217,6 +272,13 @@ public class ICBMModelProvider implements DataProvider
         copiedModel(output, ModItems.HELD_ITEM_MISSILE, "item/missiles/held_item");
         copiedModel(output, ModItems.BALLOON, "item/balloon");
         flatItem(output, ModItems.PARACHUTE, "item/parachute");
+        flatItem(output, ModItems.REMOTE_DETONATOR, "item/remote_detonator");
+        flatItem(output, ModItems.LASER_DETONATOR, "item/laser_designator");
+        flatItem(output, ModItems.RADAR_GUN, "item/radar_gun");
+        flatItem(output, ModItems.ROCKET_LAUNCHER, "item/rpg");
+        flatItem(output, ModItems.BALLISTIC_LAUNCHER, "item/rpg");
+        flatItem(output, ModItems.DEFUSER, "item/defuser");
+        flatItem(output, ModItems.BATTERY, "item/battery");
     }
 
     /**

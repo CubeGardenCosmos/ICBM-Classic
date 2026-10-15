@@ -40,6 +40,13 @@ public class ICBMBlockLootProvider extends FabricBlockLootSubProvider
         // 1.12 damageDropped returned the metadata value, so both types dropped themselves (S3.08)
         dropSelf(ModBlocks.RADIOACTIVE_DIRT);
         dropSelf(ModBlocks.RADIOACTIVE_STONE);
+        dropSelf(ModBlocks.LAUNCHER_BASE);
+        dropSelf(ModBlocks.LAUNCHER_FRAME);
+        dropSelf(ModBlocks.LAUNCHER_CONNECTOR);
+        dropSelf(ModBlocks.LAUNCHER_SCREEN);
+        dropSelf(ModBlocks.CRUISE_LAUNCHER);
+        dropSelf(ModBlocks.RADAR_STATION);
+        dropSelf(ModBlocks.EMP_TOWER);
         ModBlocks.EXPLOSIVE_BLOCKS.values().forEach(this::dropSelf);
     }
 }

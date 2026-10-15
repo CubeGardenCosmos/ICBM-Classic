@@ -93,6 +93,14 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         //Radioactive blocks (S3.08), the 1.12 "icbmclassic.block.radioactive.<meta>.name" values
         NAMES.put("radioactive_dirt", "Radioactive Dirt");
         NAMES.put("radioactive_stone", "Radioactive Stone");
+        // Launcher network blocks (S5.02)
+        NAMES.put("launcher_base", "Launcher Base");
+        NAMES.put("launcher_frame", "Launcher Frame");
+        NAMES.put("launcher_connector", "Launcher Connector");
+        NAMES.put("launcher_screen", "Launcher Screen");
+        NAMES.put("cruise_launcher", "Cruise Launcher");
+        NAMES.put("radar_station", "Radar Station");
+        NAMES.put("emp_tower", "EMP Tower");
 
         //Materials and simple items (S2.04)
         NAMES.put("steel_ingot", "Steel Ingot");
@@ -117,6 +125,13 @@ public class ICBMLanguageProvider extends FabricLanguageProvider
         NAMES.put("held_item_missile", "Held Item Missile");
         NAMES.put("parachute", "Parachute");
         NAMES.put("balloon", "Balloon");
+        NAMES.put("remote_detonator", "Remote Detonator");
+        NAMES.put("laser_detonator", "Laser Detonator");
+        NAMES.put("radar_gun", "Radar Gun");
+        NAMES.put("rocket_launcher", "Rocket Launcher");
+        NAMES.put("ballistic_launcher", "Ballistic Launcher");
+        NAMES.put("defuser", "Defuser");
+        NAMES.put("battery", "Battery");
 
         //Entity types. 1.12 registered no entity name in its lang file, so these are port side additions
         // built from the 1.12 registry ids and class purpose (registry-ids.md §4)

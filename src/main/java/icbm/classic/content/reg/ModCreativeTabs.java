@@ -39,7 +39,7 @@ public final class ModCreativeTabs
     /** Tool items, registered by S5.08. */
     private static final List<String> TOOL_IDS = List.of(
             "rocket_launcher", "ballistic_launcher", "radar_gun",
-            "remote_detonator", "laser_detonator", "defuser");
+            "remote_detonator", "laser_detonator", "defuser", "battery");
 
     public static CreativeModeTab MAIN;
 
@@ -112,9 +112,7 @@ public final class ModCreativeTabs
         accept(output, ModItems.COPPER_WIRE);
         accept(output, ModItems.GOLD_WIRE);
 
-        // TODO(S4.06) cluster missile, held item missile, parachute, balloon
-        // TODO(S5.08) tools
-        // TODO(S6) battery
+        // Energy storage/display for the battery arrives in S6.04; the S5.08 item is listed here already.
     }
 
     private static void accept(CreativeModeTab.Output output, Block block)

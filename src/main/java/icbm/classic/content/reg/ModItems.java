@@ -2,9 +2,15 @@ package icbm.classic.content.reg;
 
 import icbm.classic.config.ConfigItems;
 import icbm.classic.content.items.ExplosiveFormItem;
-import icbm.classic.content.items.ItemAntidote;
 import icbm.classic.content.items.ItemBombCart;
 import icbm.classic.content.items.ItemGrenade;
+import icbm.classic.content.items.ItemAntidote;
+import icbm.classic.content.items.ItemBattery;
+import icbm.classic.content.items.ItemDefuser;
+import icbm.classic.content.items.ItemLaserDetonator;
+import icbm.classic.content.items.ItemRadarGun;
+import icbm.classic.content.items.ItemRemoteDetonator;
+import icbm.classic.content.items.ItemRocketLauncher;
 import icbm.classic.content.cargo.ItemThrowableProjectile;
 import icbm.classic.content.cluster.bomblet.ItemBombDroplet;
 import icbm.classic.content.cluster.missile.CapabilityClusterMissileStack;
@@ -19,6 +25,7 @@ import icbm.classic.lib.capability.missile.CapabilityMissileStack;
 import icbm.classic.lib.lookup.IcbmLookups;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
+import icbm.classic.content.blocks.emptower.ItemBlockEmpTower;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -73,14 +80,28 @@ public final class ModItems
     /** Bomblets by explosive id (form D, follows the grenade content). S4.06 replaces the placeholder item. */
     public static final Map<Identifier, Item> EXPLOSIVE_BOMBLETS = new LinkedHashMap<>();
 
+    public static Item EMP_TOWER;
+    public static Item REMOTE_DETONATOR;
+    public static Item LASER_DETONATOR;
+    public static Item RADAR_GUN;
+    public static Item ROCKET_LAUNCHER;
+    public static Item BALLISTIC_LAUNCHER;
+    public static Item DEFUSER;
+    public static Item BATTERY;
     private ModItems() {}
 
     /** Registers every item that is not a block. Called from {@code ICBMClassic#onInitialize}. */
     public static void register()
     {
-        //Block items for the blocks registered by ModBlocks (1.12 ItemBlock / ItemBlockSubTypes)
-        // TODO(S2.05) RegHelper.blockItem(<flat explosive blocks>)
-        // TODO(S5) RegHelper.blockItem(<machines>)
+        // S5.02/S5.03 machine block items (1.12 ItemReg registered ordinary ItemBlock instances).
+        RegHelper.blockItem(ModBlocks.LAUNCHER_BASE);
+        RegHelper.blockItem(ModBlocks.LAUNCHER_FRAME);
+        RegHelper.blockItem(ModBlocks.LAUNCHER_CONNECTOR);
+        RegHelper.blockItem(ModBlocks.LAUNCHER_SCREEN);
+        RegHelper.blockItem(ModBlocks.CRUISE_LAUNCHER);
+        RegHelper.blockItem(ModBlocks.RADAR_STATION);
+        EMP_TOWER = RegHelper.item("emp_tower", properties -> new ItemBlockEmpTower(ModBlocks.EMP_TOWER,
+                properties.useBlockDescriptionPrefix()), new Item.Properties());
         RegHelper.blockItem(ModBlocks.CONCRETE);
         RegHelper.blockItem(ModBlocks.COMPACT_CONCRETE);
         RegHelper.blockItem(ModBlocks.REINFORCED_CONCRETE);
@@ -139,7 +160,17 @@ public final class ModItems
         IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilityClusterMissileStack(stack), CLUSTER_MISSILE);
         IcbmLookups.MISSILE_STACK.registerForItems((stack, ctx) -> new CapabilityHeldItemMissile(stack), HELD_ITEM_MISSILE);
 
-        // TODO(S5.08 / S6) tools, battery
+        REMOTE_DETONATOR = RegHelper.item("remote_detonator", ItemRemoteDetonator::new, new Item.Properties().stacksTo(1));
+        LASER_DETONATOR = RegHelper.item("laser_detonator", ItemLaserDetonator::new, new Item.Properties().stacksTo(1));
+        RADAR_GUN = RegHelper.item("radar_gun", ItemRadarGun::new, new Item.Properties().stacksTo(1));
+        ROCKET_LAUNCHER = RegHelper.item("rocket_launcher", p -> new ItemRocketLauncher(false, p), new Item.Properties().stacksTo(1));
+        BALLISTIC_LAUNCHER = RegHelper.item("ballistic_launcher", p -> new ItemRocketLauncher(true, p), new Item.Properties().stacksTo(1));
+        DEFUSER = RegHelper.item("defuser", ItemDefuser::new, new Item.Properties().stacksTo(1));
+        BATTERY = RegHelper.item("battery", ItemBattery::new, new Item.Properties().stacksTo(1));
+
+        ItemRemoteDetonator.registerUseCallback();
+        ItemLaserDetonator.registerUseCallback();
+        ItemDefuser.registerAttackCallback();
     }
 
     /** Registers one placeholder item per explosive enabled for the form, plus the matching block item for {@link ExplosiveForm#BLOCK}. */

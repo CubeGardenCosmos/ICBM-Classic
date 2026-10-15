@@ -242,6 +242,7 @@ public final class ConfigRadar {
 | `GuiButton` / `actionPerformed` | `Button.builder(Component, btn -> {...}).bounds(x, y, w, h).build()`，在 `init()` 中 `addRenderableWidget` |
 | `GuiTextField` | `EditBox`。**26.3 改用 SDL 输入：自定义文本控件必须在获得/失去焦点时调用 `Minecraft.getInstance().onTextInputFocusChange(this, focused)`，否则无法输入字符**（Fabric 26.3 公告）。使用原版 `EditBox` 则无需处理 |
 | `IGuiHandler#getServerGuiElement` + `player.openGui` | 方块实体实现 `ExtendedMenuProvider<BlockPos>`（`getScreenOpeningData(ServerPlayer)` 返回 `getBlockPos()`），`player.openMenu(be)`；`MenuType` 用 `new ExtendedMenuType<>(FooMenu::new, BlockPos.STREAM_CODEC)` 注册到 `BuiltInRegistries.MENU` |
+| 客户端注册菜单界面 | `MenuScreens.register(MenuType, ScreenConstructor)`。MC 26.3 原版 jar 中 `register` 显示为 private；项目解析的 `fabric-menu-api-v1` 声明了 access widener，Loom 会将其应用到编译类路径。使用 `MenuScreens.register(ModMenus.X, XScreen::new)`；屏幕必须是 `AbstractContainerScreen`（实现 `MenuAccess`），不要用 mixin 或反射。 |
 | 同步数值（能量、进度） | `ContainerData`（int 值，`addDataSlots`）；字符串/列表等用 `PacketCodex` 的 `fromServer()` codex（雷达点阵沿用 1.12 做法） |
 | `Minecraft.getMinecraft().displayGuiScreen(x)` | `Minecraft.getInstance().gui.setScreen(x)`（26.2 起 setScreen 移到 `Gui`；用 javap 核对） |
 
@@ -268,4 +269,5 @@ public final class ConfigRadar {
 5. **`ItemStack` 不能在世界加载前创建**（26.1 起）：静态字段里不要 `new ItemStack(...)`；创造标签、配方、默认值改为延迟创建。
 6. **教程过时**：Fabric 文档页面标注的版本可能是 26.2；以 javap 结果为准。
 7. **不要用 `Component.literal` 写英文**：S8 会逐个清理，现在就用 `Component.translatable`，并把键加入 `en_us.json`。
-8. **随机数**：`world.rand` → `level.getRandom()`（`RandomSource`），`nextFloat()` 用法相同。
+8. **菜单屏幕注册**：MC 26.3 原始 jar 的 `MenuScreens.register` 为 private；Fabric `fabric-menu-api-v1` 的 `fabric-menu-api-v1.classtweaker` 将它与 `MenuScreens$ScreenConstructor` 声明为 accessible，Loom 应用后可直接用 `MenuScreens.register(ModMenus.X, XScreen::new)`。核对实际 resolved jar；不要因 raw `javap` 的 private 修饰符误报 BLOCKED，也不要自行使用 mixin/反射。
+9. **随机数**：`world.rand` → `level.getRandom()`（`RandomSource`），`nextFloat()` 用法相同。

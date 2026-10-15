@@ -48,11 +48,12 @@ public class LangGameTest
             items++;
         }
 
-        //32 S2.03/S2.05 blocks plus the two radioactive blocks of S3.08, and their two block items on top of
-        //the 115 items S2.03-S2.05 registered, plus anti_ballistic_missile of S4.04, plus cluster_missile,
-        //held_item_missile, parachute, balloon of S4.06
-        helper.assertTrue(blocks == 34, "expected 34 icbmclassic blocks but checked " + blocks);
-        helper.assertTrue(items == 122, "expected 122 icbmclassic items but checked " + items);
+        //32 base blocks plus radioactive blocks (S3.08), launcher blocks/screens (S5.02/S5.03),
+        //cruise launcher (S5.04), radar station (S5.05), and EMP tower (S5.06).
+        //Items include the prior flat forms and machine items (S2-S5.06), plus the seven S5.08 tool/battery IDs.
+        //Legacy evidence: registry-ids.md §3 and the S5.08 card define these additional item identifiers.
+        helper.assertTrue(blocks == 41, "expected 41 icbmclassic blocks but checked " + blocks);
+        helper.assertTrue(items == 136, "expected 136 icbmclassic items but checked " + items);
         helper.assertTrue(lang.has("itemGroup.icbmclassic.main"), "missing creative tab title");
         helper.assertTrue(lang.has("subtitles.icbmclassic.explosion"), "missing a S2.09 subtitle");
         helper.assertTrue(lang.has("icbmclassic.form.missile"), "missing a form template");

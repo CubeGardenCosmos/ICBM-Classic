@@ -20,6 +20,11 @@ import icbm.classic.content.missile.logic.flight.move.MoveForTicksLogic;
 import icbm.classic.content.missile.logic.targeting.BallisticTargetingData;
 import icbm.classic.content.missile.logic.targeting.BasicTargetData;
 import icbm.classic.content.reg.ExplosiveInit;
+import icbm.classic.content.blocks.launcher.base.TileLauncherBase;
+import icbm.classic.content.blocks.launcher.screen.TileLauncherScreen;
+import icbm.classic.content.blocks.radarstation.TileRadarStation;
+import icbm.classic.content.blocks.emptower.TileEMPTower;
+import icbm.classic.content.blocks.launcher.cruise.TileCruiseLauncher;
 import icbm.classic.content.reg.ModBlockEntities;
 import icbm.classic.content.reg.ModBlocks;
 import icbm.classic.content.reg.ModCreativeTabs;
@@ -30,11 +35,14 @@ import icbm.classic.content.reg.ModEntities;
 import icbm.classic.content.cargo.balloon.BalloonProjectileData;
 import icbm.classic.content.cargo.parachute.ParachuteProjectileData;
 import icbm.classic.content.cluster.bomblet.BombletProjectileData;
+import icbm.classic.content.items.behavior.BombCartDispenseBehavior;
+import icbm.classic.content.items.behavior.GrenadeDispenseBehavior;
 import icbm.classic.content.reg.ModItems;
 import icbm.classic.content.reg.ModMenus;
 import icbm.classic.content.reg.ModParticles;
 import icbm.classic.content.reg.ModRecipes;
 import icbm.classic.content.reg.ModSounds;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import icbm.classic.content.missile.tracker.MissileTrackerHandler;
@@ -95,7 +103,17 @@ public final class ICBMClassic implements ModInitializer {
         ModRecipes.register();
         ModBlockEntities.register();
         ModEntities.register();
+        // S5.09: register identical dispenser behavior for every flat variant of each legacy metadata item.
+        ModItems.EXPLOSIVE_GRENADES.values().forEach(item ->
+                DispenserBlock.registerBehavior(item, new GrenadeDispenseBehavior()));
+        ModItems.EXPLOSIVE_BOMB_CARTS.values().forEach(item ->
+                DispenserBlock.registerBehavior(item, new BombCartDispenseBehavior()));
         ModMenus.register();
+        TileLauncherBase.registerCodexes();
+        TileLauncherScreen.registerCodexes();
+        TileCruiseLauncher.registerCodexes();
+        TileEMPTower.registerCodexes();
+        TileRadarStation.registerCodexes();
         ModCreativeTabs.register();
         IcbmNetwork.registerPayloads();
 

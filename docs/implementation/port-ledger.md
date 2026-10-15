@@ -18,11 +18,11 @@
 | PORTED | com/builtbroken/jlib/lang/StringHelpers.java | jlib 纯 Java，原样移植（data/network 保留 io.netty.buffer.ByteBuf） | S1.01 |
 | DROPPED（无 proxy） | icbm/classic/CommonProxy.java | Fabric 无 proxy，逻辑并入入口类 | — |
 | PORTED | icbm/classic/ICBMClassic.java | Forge 入口 → Fabric ModInitializer；每次阶段性追加注册调用（S3.02 加 WorkTickingActionHandler 事件接线、S3.05 加 ModEffects.register、S4.01 加 setupMissileRegistries()：TARGET_DATA/FLIGHT_LOGIC 建表+注册事件+lock） | S0.03、S3.02、S3.05、S4.01 |
-| TODO | icbm/classic/ICBMConstants.java |  | — |
+| PORTED | icbm/classic/ICBMConstants.java | Existing Fabric-side constants retain the legacy fields and add `id(String)` for 26.3 Identifiers | S0.03 |
 | DROPPED（1.12 的开发工具，把爆炸物注册表写成 JSON 配方） | icbm/classic/RecipeGeneration.java | 配方改由 datagen ICBMRecipeProvider 生成 | S2.08 |
 | PORTED | icbm/classic/api/EnumTier.java | StringRepresentable + ChatFormatting；getLocalizedName 改 Component.translatable（LanguageUtility 未移植，getName→getSerializedName）；S2.10 键改 icbmclassic.tier.* | S1.10、S2.10 |
 | PORTED | icbm/classic/api/ICBMClassicAPI.java | 动作字段（S1.08）+ 本步补齐 MISSILE_TARGET_DATA/FLIGHT_LOGIC/PROJECTILE_DATA/EXPLOSIVE/EX_*/EXPLOSIVE_CUSTOMIZATION 注册表与 EX_* Identifier 常量；删全部 @CapabilityInject，改指向 IcbmLookups | S1.08、S1.10 |
-| PORTED | icbm/classic/api/ICBMClassicHelpers.java | 删 hasCapability/getCapability：getMissile 走 instanceof+IcbmLookups.MISSILE；isExplosive/getExplosive(Entity) 走 instanceof；getLauncher 走 IcbmLookups；S3.09 关闭 getExplosive(ItemStack) 的 TODO(S2.05)（改走 CapabilityExplosiveStack.fromStack），getGPSData 仍待 S2.04/S5.08 | S1.10、S3.09 |
+| PORTED | icbm/classic/api/ICBMClassicHelpers.java | 删 hasCapability/getCapability：getMissile 走 instanceof+IcbmLookups.MISSILE；isExplosive/getExplosive(Entity) 走 instanceof；getLauncher 走 IcbmLookups；S3.09 关闭 getExplosive(ItemStack) 的 TODO(S2.05)（改走 CapabilityExplosiveStack.fromStack）；S5.08 的 getGPSData 以 GpsData/GlobalPos 兼容视图读取、写入 gps_data 组件 | S1.10、S3.09、S5.08 |
 | PORTED | icbm/classic/api/actions/IAction.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/IActionData.java | 动作系统 | S1.08 |
 | PORTED | icbm/classic/api/actions/IActionProvider.java | 动作系统 | S1.08 |
@@ -139,9 +139,9 @@
 | PORTED | icbm/classic/api/tile/IRotation.java | EnumFacing→Direction | S1.10 |
 | MERGED → icbm/classic/client/particle/ModParticlesClient.java | icbm/classic/client/ClientProxy.java | spawnSmoke/spawnAirParticle/spawnExplosionParticles 落地为 ParticleIcbmSmoke + 原版 POOF/SMOKE；spawnMissileSmoke/spawnPadSmoke（1.12 客户端实体更新驱动）改为 ClientTickEvents.END_CLIENT_TICK 遍历导弹实体，按是否在移动选择引擎/发射台烟雾（ConfigClient 开关保留）；隧道/渲染注册部分见 IcbmEntityRenderers | S4.07 |
 | MERGED → icbm/classic/client/render/IcbmEntityRenderers.java | icbm/classic/client/ClientReg.java | RenderingRegistry.registerEntityRenderingHandler → Fabric EntityRendererRegistry#register（该 API 在 Fabric API 27 标记 deprecated，但仍是 mod 初始化期注册渲染器的可用入口），由 ICBMClassicClient#onInitializeClient 调用；S4.07 注册全部 16 个 icbmclassic 实体类型（RenderExBlock/RenderFragments/RenderEntityBlock/RenderLightBeam/RenderRedmatter/RenderMissile/RenderAsItem/RenderParachute/RenderBombDroplet，NoopRenderer 用于 EntityExplosion/EntitySmoke/EntityPlayerSeat，原版 TntMinecartRenderer 用于 bomb_cart），并注册太空鸡模型层与鸡渲染器（IcbmChickenRenderer）替换原版；ClientLifecycleEvents.CLIENT_STARTED 自检遍历 icbmclassic 实体类型报告缺失渲染器 | S4.07 |
-| MERGED → icbm/classic/content/reg/ModCreativeTabs.java | icbm/classic/client/ICBMCreativeTab.java | 1.12 客户端排序表改为 main 源集的 displayItems；内容按 ID 查表，未注册的跳过 | S2.05 |
+| MERGED → icbm/classic/content/reg/ModCreativeTabs.java | icbm/classic/client/ICBMCreativeTab.java | 1.12 客户端排序表改为 main 源集 displayItems；内容按 ID 查表，未注册的跳过；S5.08 注册后工具与 battery ID 自动出现在工具顺序 | S2.05、S5.08 |
 | MERGED → icbm/classic/content/reg/ModSounds.java | icbm/classic/client/ICBMSounds.java | 16 个 SoundEvent 注册 + assets/icbmclassic/sounds.json（字幕键 subtitles.icbmclassic.*）；1.12 SoundCategory 改由播放点传 SoundSource | S2.09 |
-| TODO | icbm/classic/client/SpikeMeshDefinition.java | 客户端类移入 client 源集 | S2.06、S4.07、S5.07 |
+| DROPPED（平铺化的 normal/poison/fire spikes 各有独立注册物品模型；客户端 item mesh 与 metadata 选择已由 datagen 生成的 item/block models 取代，ported code 无引用） | icbm/classic/client/SpikeMeshDefinition.java | 1.12 metadata-based client mesh selector is obsolete under flattened spike IDs and datagen models | S2.03、S2.06 |
 | DROPPED（1.12 无调用者） | icbm/classic/client/fx/FXAntimatterParticle.java | grep 全 1.12 源码仅本文件自身出现，无任何 spawn 调用；26.3 不移植（delete dead weight） | S4.07 |
 | MERGED → icbm/classic/client/particle/ParticleIcbmSmoke.java | icbm/classic/client/fx/ParticleAirICBM.java | ParticleAirICBM 与 ParticleSmokeICBM 的唯一差异是 1.12 原版烟的自升力，26.3 原版 SmokeParticle（BaseAshSmokeParticle#tick 只做 sprite 动画）没有自升力，故两者合并为一个类；setAge/setColor（随机色变体）照抄 | S4.07 |
 | DROPPED（只服务于合并掉的 ParticleLauncherSmoke） | icbm/classic/client/fx/ParticleCollisionLogic.java | 仅被 ParticleLauncherSmoke#move 使用，该豁免只针对 S5 才引入的发射台方块，26.3 由原版 Particle#move 碰撞处理 | S4.07 |
@@ -149,9 +149,9 @@
 | MERGED → icbm/classic/client/particle/ParticleIcbmSmoke.java | icbm/classic/client/fx/ParticleSmokeICBM.java | 1.12 无调用者（ClientProxy#spawnSmoke 无人调用），行为并入同一粒子类，供数据包/指令/后续内容使用 | S4.07 |
 | DROPPED（平铺化后由 datagen 模型取代） | icbm/classic/client/mapper/BlockModelMapperExplosive.java | 1.12 运行时拼装爆炸物方块模型；26.3 每个爆炸物方块有独立 json（ICBMModelProvider 生成），无需映射器 | S4.07 |
 | DROPPED（平铺化后由 datagen 模型取代） | icbm/classic/client/mapper/ItemModelMapperExplosive.java | 同上，物品模型由 ICBMModelProvider/datagen 生成 | S4.07 |
-| TODO | icbm/classic/client/models/CruiseLauncherTopModel.java | 方块实体渲染器（巡航发射器顶部） | S5.07 |
+| PORTED → icbm/classic/client/model/CruiseLauncherTopModel.java | icbm/classic/client/models/CruiseLauncherTopModel.java | Blockbench yaw/pitch hierarchy converted to a LayerDefinition/ModelPart model; texture and cube geometry retained | S5.07 |
 | PORTED | icbm/classic/client/models/ModelChickenHelmet.java | ModelBase + ModelRenderer → Model<ChickenRenderState> + LayerDefinition（CubeListBuilder.texOffs(40,12).addBox(-3,-6.5,-4.5,6,7,6)，PartPose.offset(0,15,-4)，64x32）；rotateAngleX/Y 改在 setupAnim 里由 ChickenRenderState.xRot/yRot 设置；isChild 的 translate(0,5*scale,2*scale) 改为 bone 的 5/2 模型单位偏移 | S4.07 |
-| TODO | icbm/classic/client/models/ModelICBM.java | 只被 CruiseLauncherTopModel 使用，与方块实体渲染器一起移植 | S5.07 |
+| PORTED → icbm/classic/client/model/ModelICBM.java | icbm/classic/client/models/ModelICBM.java | Legacy ModelBase model base converted to the client Model base; used only by CruiseLauncherTopModel | S5.07 |
 | MERGED → icbm/classic/client/render/entity/item/RenderItemImp.java | icbm/classic/client/render/entity/RenderEntityItem2.java | 1.12 已标 @Deprecated，只被 RenderBombDroplet 用来画一个假 EntityItem；26.3 直接提交物品模型 | S4.07 |
 | PORTED → icbm/classic/client/render/entity/RenderExBlock.java + state/ExBlockRenderState.java | icbm/classic/client/render/entity/RenderExBlock.java | 方块外观：1.12 blockExplosive + ROTATION_PROP=UP + EX_PROP=爆炸物数据 → 26.3 按 id 查 ModBlocks.EXPLOSIVE_BLOCKS 取平铺方块 + FACING=UP（硬编码，1.12 的 TODO get direction from rotation 原样保留）；renderBlockBrightness → BlockModelResolver#update + BlockModelRenderState#submit；引信膨胀与白闪照 TntRenderer 范式（膨胀保留 1.12 的 f^3，不用原版 f^4；白闪用 overlay 而非第二遍几何）；rot/mutation 无平铺方块形态时不渲染并告警 | S3.09、S4.07（拆分：S3 实体） |
 | MERGED → 原版 NoopRenderer | icbm/classic/client/render/entity/RenderExplosion.java | 1.12 的 doRender 是空实现（getEntityTexture 返回 models/grey.png 但从不使用）→ 26.3 直接注册原版 NoopRenderer，语义等价；注意 1.12 未注册渲染器只是隐形，26.3 会让渲染线程 NPE，所以这个映射是必需的 | S4.07（拆分：S3 实体） |
@@ -278,72 +278,72 @@
 | PORTED | icbm/classic/content/blocks/BlockGlassPressurePlate.java | BlockSetType.OAK（= 1.12 Sensitivity.EVERYTHING）+ 玻璃声音 | S2.03 |
 | PORTED | icbm/classic/content/blocks/BlockReinforcedGlass.java | TransparentBlock + noOcclusion | S2.03 |
 | PORTED | icbm/classic/content/blocks/BlockSpikes.java | 三种 meta 改为 SpikeType 字段 + 三个实例；伤害源改用原版 cactus（§7 无 spikes 伤害类型） | S2.03 |
-| TODO | icbm/classic/content/blocks/emptower/BlockEmpTower.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/ItemBlockEmpTower.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/PropertyTowerStates.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/RadioEmpTower.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/TESREmpTower.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/TileEMPTower.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/TileEmpTowerFake.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/gui/ContainerEMPTower.java | EMP 塔 | S5 |
-| TODO | icbm/classic/content/blocks/emptower/gui/GuiEMPTower.java | EMP 塔 | S5 |
+| PORTED → icbm/classic/content/blocks/emptower/BlockEmpTower.java | icbm/classic/content/blocks/emptower/BlockEmpTower.java | EMP 塔方块；EnumTowerTypes → EnumProperty，SPIN 对应 TileEmpTowerFake；空手/持物右击打开菜单 | S5.06 |
+| PORTED → icbm/classic/content/blocks/emptower/ItemBlockEmpTower.java | icbm/classic/content/blocks/emptower/ItemBlockEmpTower.java | BlockItem 子类；默认/扩展状态使用旧 tooltip 翻译键与 BONUS_RADIUS | S5.06 |
+| PORTED → icbm/classic/content/blocks/emptower/PropertyTowerStates.java | icbm/classic/content/blocks/emptower/PropertyTowerStates.java | EnumTowerTypes implements StringRepresentable 并映射 EnumProperty | S5.06 |
+| PORTED → icbm/classic/content/blocks/emptower/RadioEmpTower.java | icbm/classic/content/blocks/emptower/RadioEmpTower.java | 响应来袭导弹与遥控触发；保留成功回执 | S5.06 |
+| PORTED → icbm/classic/client/render/tile/emptower/EmpTowerRenderer.java + EmpTowerRenderState.java | icbm/classic/content/blocks/emptower/TESREmpTower.java | Rotating coil/electric block models, interpolated rotation and fake multiblock host lookup | S5.07 |
+| PORTED → icbm/classic/content/blocks/emptower/TileEMPTower.java | icbm/classic/content/blocks/emptower/TileEMPTower.java | 塔结构、充能/冷却、EMP 动作、Radio、GUI Codex 与存档 | S5.06 |
+| PORTED → icbm/classic/content/blocks/emptower/TileEmpTowerFake.java | icbm/classic/content/blocks/emptower/TileEmpTowerFake.java | 假方块实体持有主塔 BlockPos；未合并独立的 TileMulti（无 1.12 调用者） | S5.06 |
+| PORTED → icbm/classic/content/blocks/emptower/gui/ContainerEMPTower.java | icbm/classic/content/blocks/emptower/gui/ContainerEMPTower.java | 电池槽过滤保留 icbmclassic:battery 预留 ID | S5.06 |
+| PORTED → icbm/classic/client/content/blocks/emptower/gui/GuiEMPTower.java | icbm/classic/content/blocks/emptower/gui/GuiEMPTower.java | EMP 塔客户端 GUI；源集移动 | S5.06 |
 | MERGED → icbm/classic/content/blocks/explosive/ExplosiveBlock.java | icbm/classic/content/blocks/explosive/BlockExplosive.java | ROTATION_PROP（PropertyDirection，6 向，默认 NORTH）→ FACING=BlockStateProperties.FACING，放置取 getClickedFace；setPlacedBy 保留红石通电检查 + 水平四向的火焰/熔岩扫描（FLOWING_LAVA 并入 LAVA）与 1.12 的 TODO 日志；neighborChanged → hasNeighborSignal；onBlockExploded → BlockBehaviour#onExplosionHit（在移除方块前调用，时机同 1.12；wasExploded 在 26.3 无调用方且在移除后）；onBlockActivated → useItemOn（hurtAndBreak/consume 保 1.12 创造豁免）+ useWithoutItem（调用注册的激活监听器，新增）；onEntityCollidedWithBlock(EntityArrow) → onProjectileHit + isOnFire；createNewTileEntity → newBlockEntity；静态 triggerExplosive 与 !isRemote 守卫照抄；rotate/mirror 与 onBlockAdded 按 1.12 未覆写保持不变 | S3.09 |
 | DROPPED（平铺化） | icbm/classic/content/blocks/explosive/ItemBlockExplosive.java | 平铺方块物品由 ModItems（RegHelper.blockItem）注册，无元数据/子类型（ADR 0002）；1.12 getSubItems 的循环 → ModCreativeTabs（23 项）；getDetailedInfo/嘲讽文本属工具提示管线（ExplosiveSettings，S4.06） | S3.09 |
 | DROPPED（平铺化） | icbm/classic/content/blocks/explosive/PropertyExplosive.java | 元数据驱动的爆炸物属性被「每个爆炸物一个平铺方块」取代（23 个，ADR 0002，registry-ids.md §1/§2），属性类及其 parse/getName 映射不再存在 | S3.09 |
 | MERGED → icbm/classic/content/blocks/explosive/ExplosiveBlockEntity.java | icbm/classic/content/blocks/explosive/TileEntityExplosive.java | capabilityExplosive → icbmclassic:explosive_settings 组件（applyImplicitComponents/collectImplicitComponents），并按 1.12 键名 explosive_stack 显式存档（值改为设置复合；1.12 的 toStack 带 TODO 会丢自定义数据，本步按步骤卡要求修好）；trigger(boolean) 1:1 照抄含 breaching 特例（HOST_DIRECTION=getDirection().getOpposite()）与两处 1.12 TODO；setFire(100) → igniteForSeconds(100)、spawnEntity → addFreshEntity、setBlockToAir → removeBlock(pos,false)；IRotatable 走方块状态，setDirection 用 Block.UPDATE_CLIENTS；hasBeenTriggered 保持公开、不复位、不存档（同 1.12）；删 getUpdatePacket/getUpdateTag/onDataPacket（26.3 无客户端可见状态）；无 getTicker（1.12 该 tile 不 tick） | S3.09 |
-| TODO | icbm/classic/content/blocks/launcher/FiringPackage.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/LauncherBaseCapability.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/LauncherLangs.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/LauncherSolution.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/base/BlockLauncherBase.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/base/LauncherCapability.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/base/TESRLauncherBase.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/base/TileLauncherBase.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/base/gui/ContainerLaunchBase.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/base/gui/GuiLauncherBase.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/connector/BlockLaunchConnector.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/connector/TileLauncherConnector.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/BlockCruiseLauncher.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/CLauncherCapability.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/RadioCruise.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/TESRCruiseLauncher.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/TileCruiseLauncher.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/gui/ContainerCruiseLauncher.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/gui/GuiCruiseLauncher.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/cruise/gui/LaunchButton.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/frame/BlockLaunchFrame.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/frame/EnumFrameState.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/frame/PropertyFrameState.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/frame/TileLauncherFrame.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/network/ILauncherComponent.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/network/LauncherEntry.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/network/LauncherNetwork.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/network/LauncherNode.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/network/NetworkEnergyStorage.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/network/NetworkInventory.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/screen/BlockLaunchScreen.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/screen/BlockScreenCause.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/screen/LauncherPair.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/screen/RadioScreen.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/screen/TileLauncherScreen.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/screen/gui/ContainerLaunchScreen.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/screen/gui/GuiLauncherScreen.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/status/FiringWithDelay.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/status/LaunchedWithMissile.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/launcher/status/LauncherStatus.java | 发射台网络与巡航发射器 | S5 |
-| TODO | icbm/classic/content/blocks/multiblock/TileMulti.java |  | — |
-| TODO | icbm/classic/content/blocks/radarstation/BlockRadarStation.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/EnumRadarState.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/PropertyRadarState.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/RadarObjectType.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/RadioRadar.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/TileRadarStation.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/data/RadarDotType.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/data/RadarRenderData.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/data/RadarRenderDot.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/gui/ContainerRadarStation.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/gui/GuiRadarStation.java | 雷达站 | S5 |
-| TODO | icbm/classic/content/blocks/radarstation/gui/RadarComponent.java | 雷达站 | S5 |
+| PORTED | icbm/classic/content/blocks/launcher/FiringPackage.java | Firing countdown and save/load state; adapted to ValueInput/ValueOutput | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/LauncherBaseCapability.java | Saves launcher UUID through SaveHandler | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/LauncherLangs.java | Launcher language keys | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/LauncherSolution.java | Target and firing-group selection | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/base/BlockLauncherBase.java | Base registration, placement networking, inventory interaction and ticker | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/base/LauncherCapability.java | Missile validation, launch and flight setup using 26.3 APIs | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/base/TileLauncherBase.java | Base inventory, energy, save/load, seat and network lifecycle | S5.02 |
+| PORTED → icbm/classic/client/render/tile/launcher/LauncherBaseRenderer.java + LauncherBaseRenderState.java | icbm/classic/content/blocks/launcher/base/TESRLauncherBase.java | Loaded missile item model offset along launch direction with the 1.12 yaw/pitch | S5.07 |
+| PORTED | icbm/classic/content/blocks/launcher/base/gui/ContainerLaunchBase.java | Launcher base menu with missile/energy slots and player inventory | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/base/gui/GuiLauncherBase.java | Client launcher base screen with status, direction, and energy display | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/connector/BlockLaunchConnector.java | Connector registration, network interaction and debug text | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/connector/TileLauncherConnector.java | Connector network node and save/load | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/cruise/BlockCruiseLauncher.java | Cruise launcher block, GUI interaction, ticker and drops | S5.04 |
+| PORTED | icbm/classic/content/blocks/launcher/cruise/CLauncherCapability.java | Direct flight launch, aiming status and anti-ballistic missile velocity selection | S5.04 |
+| PORTED | icbm/classic/content/blocks/launcher/cruise/RadioCruise.java | Cruise radio target and trigger message behavior (no legacy incoming-missile handler) | S5.04 |
+| PORTED → icbm/classic/client/render/tile/cruise/CruiseLauncherRenderer.java + CruiseLauncherRenderState.java | icbm/classic/content/blocks/launcher/cruise/TESRCruiseLauncher.java | Layered yaw/pitch turret model and held missile item model; debug-only GL sphere grid omitted | S5.07 |
+| PORTED | icbm/classic/content/blocks/launcher/cruise/TileCruiseLauncher.java | Aiming, inventory/energy, redstone, radio, persistence, menu and codexes | S5.04 |
+| PORTED | icbm/classic/content/blocks/launcher/cruise/gui/ContainerCruiseLauncher.java | Cruise launcher menu with missile/battery slots | S5.04 |
+| PORTED | icbm/classic/content/blocks/launcher/cruise/gui/GuiCruiseLauncher.java | Client target/channel/firing screen | S5.04 |
+| PORTED | icbm/classic/content/blocks/launcher/cruise/gui/LaunchButton.java | Pre-check enabled cruise launch button | S5.04 |
+| PORTED | icbm/classic/content/blocks/launcher/frame/BlockLaunchFrame.java | Frame block state, registration and network interaction | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/frame/EnumFrameState.java | Frame state enum implements StringRepresentable | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/frame/PropertyFrameState.java | EnumProperty<EnumFrameState> | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/frame/TileLauncherFrame.java | Frame network node and save/load | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/network/ILauncherComponent.java | Launcher component interface | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/network/LauncherEntry.java | Launcher network entry state | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/network/LauncherNetwork.java | Network membership, inventory and firing dispatch | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/network/LauncherNode.java | Network discovery and invalidation | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/network/NetworkEnergyStorage.java | Internal IcbmEnergyBuffer allocator; no external energy API | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/network/NetworkInventory.java | Flattened inventory view for launcher network | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/screen/BlockLaunchScreen.java | Launcher screen block and menu interaction | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/screen/BlockScreenCause.java | Action cause for launch-screen initiated launches | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/screen/LauncherPair.java | Launcher/screen pairing value | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/screen/RadioScreen.java | Radio target/trigger endpoint for launcher screen | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/screen/TileLauncherScreen.java | Launcher screen block entity, network, state, persistence and codexes | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/screen/gui/ContainerLaunchScreen.java | Launcher screen menu and inventory | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/screen/gui/GuiLauncherScreen.java | Client launcher screen with target, radio, launch and status controls | S5.03 |
+| PORTED | icbm/classic/content/blocks/launcher/status/FiringWithDelay.java | Delayed launch status and translatable message | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/status/LaunchedWithMissile.java | Launched status retaining missile reference | S5.02 |
+| PORTED | icbm/classic/content/blocks/launcher/status/LauncherStatus.java | Launcher action statuses | S5.02 |
+| PORTED | icbm/classic/content/blocks/multiblock/TileMulti.java | BlockEntity + ValueInput/ValueOutput；主方块位置存 NBTConstants.HOST_POS（int[3]→BlockPos），onLoad 的 TODO 无常驻对象；hostPosition 加 getter/setter 供假方块使用 | S5.01 |
+| PORTED → icbm/classic/content/blocks/radarstation/BlockRadarStation.java | icbm/classic/content/blocks/radarstation/BlockRadarStation.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/EnumRadarState.java | icbm/classic/content/blocks/radarstation/EnumRadarState.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/PropertyRadarState.java | icbm/classic/content/blocks/radarstation/PropertyRadarState.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/RadarObjectType.java | icbm/classic/content/blocks/radarstation/RadarObjectType.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/RadioRadar.java | icbm/classic/content/blocks/radarstation/RadioRadar.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/TileRadarStation.java | icbm/classic/content/blocks/radarstation/TileRadarStation.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/data/RadarDotType.java | icbm/classic/content/blocks/radarstation/data/RadarDotType.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/data/RadarRenderData.java | icbm/classic/content/blocks/radarstation/data/RadarRenderData.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/data/RadarRenderDot.java | icbm/classic/content/blocks/radarstation/data/RadarRenderDot.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/content/blocks/radarstation/gui/ContainerRadarStation.java | icbm/classic/content/blocks/radarstation/gui/ContainerRadarStation.java | 雷达站 | S5.05 |
+| PORTED → icbm/classic/client/content/blocks/radarstation/gui/GuiRadarStation.java | icbm/classic/content/blocks/radarstation/gui/GuiRadarStation.java | 雷达站；GUI 移至客户端源集 | S5.05 |
+| PORTED → icbm/classic/client/content/blocks/radarstation/gui/RadarComponent.java | icbm/classic/content/blocks/radarstation/gui/RadarComponent.java | 雷达站；GUI 组件移至客户端源集 | S5.05 |
 | PORTED | icbm/classic/content/cargo/CargoHolderHandler.java | 允许物品判定（ConfigCargoItem） | S4.06 |
 | PORTED | icbm/classic/content/cargo/CargoProjectileData.java | 继承 BuildableObject，实现 IProjectileData/ISavable；乘客生成支持 PROJECTILE/ENTITY/BLOCK/ITEM 模式；SaveHandler 序列化 stack 与 mode | S4.06 |
 | PORTED | icbm/classic/content/cargo/ItemThrowableProjectile.java | 继承 Item，使用 BOW 动画与 3 秒使用时长，释放时调用 throwProjectile 生成降落伞/气球投射物 | S4.06 |
@@ -383,18 +383,18 @@
 | PORTED → icbm/classic/client/render/entity/RenderEntityBlock.java（沿用原版 FallingBlockRenderState） | icbm/classic/content/entity/flyingblock/RenderEntityBlock.java | 渲染被掀起的方块：26.3 用 FallingBlockRenderState + MovingBlockRenderState + submitMovingBlock（原版落地管线），变换等价于 1.12 的 translate(y+0.5) + rotate(-90,Y) + translate(-0.5,-0.5,0.5)（推导见证据）；shadowRadius 0.5；1.12 本来就不应用实体旋转，保持一致；1.12 的 failedBlocks + try/catch 回退无等价触发点（26.3 提交是延迟的，缺模型时由原版给占位模型），已记录为差异 | S4.07（拆分：S3 实体） |
 | PORTED | icbm/classic/content/gas/ProtectiveArmorHandler.java | 配置项改 ConfigMain.protectiveArmor（item_ratings 字符串列表，ItemStackConfigList.FloatOut 已在 S1.02 移植）；护甲槽用 EquipmentSlotGroup.ARMOR 的人类槽位 | S3.05 |
 | PORTED | icbm/classic/content/items/ItemAntidote.java | 食用改 food/consumable 组件；效果清除改 finishUsingItem，清单在 S3.05 补齐（4 个 ICBM 效果 + gas 用到的原版效果） | S2.04、S3.05 |
-| TODO | icbm/classic/content/items/ItemBattery.java |  | — |
+| PORTED → icbm/classic/content/items/ItemBattery.java | 本步仅注册为普通单件 Item（零/无能量条，避免伪造存量）；机器槽的 icbmclassic:battery 临时过滤器现匹配真实物品；S6.04 接入 SimpleEnergyItem 并将类移至 lib/energy/item | S5.08 |
 | PORTED | icbm/classic/content/items/ItemBombCart.java | 继承 ExplosiveFormItem；onItemUse → useOn(UseOnContext)，在铁轨上放 EntityBombCart（BlockRailBase.isRailBlock → BlockTags.RAILS，isAscending → RailShape#isSlope）；stack size 3、initCapabilities（Forge）删除（爆炸 id 由扁平物品自带），元数据/getSubItems 删除；显示名沿用物品的 CUSTOM_NAME 组件 | S2.05、S4.05 |
 | MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/items/ItemCrafting.java | 元数据子类型改为 10 个平铺化普通 Item；OreDictionary → c: 标签（S2.07） | S2.04 |
-| TODO | icbm/classic/content/items/ItemDefuser.java |  | — |
+| PORTED → icbm/classic/content/items/ItemDefuser.java | 作为普通 Item（ItemICBMElectrical 在 S5.01 已 DROPPED）；AttackEntityCallback 对 IExplosive 调 onDefuse、TNT 掉落 Items.TNT、炸弹矿车 destroy，移除实体；无伪电量/能量成本，电池接口留 S6 | S5.08 |
 | PORTED | icbm/classic/content/items/ItemGrenade.java | 继承 ExplosiveFormItem；蓄力投掷照抄：getItemUseAction → getUseAnimation(BOW)、getMaxItemUseDuration → getUseDuration(ItemStack,LivingEntity)、onItemRightClick → use（startUsingItem + CONSUME）、onPlayerStoppedUsing → releaseUsing（生成 EntityGrenade，按蓄力算投掷能量，音效 ENTITY_TNT_PRIMED → TNT_PRIMED）；stack size 16；initCapabilities（Forge）删除（爆炸 id 由扁平物品自带），元数据/getSubItems 删除；tier 提示沿用翻译键 | S2.05、S4.05 |
-| TODO | icbm/classic/content/items/ItemLaserDetonator.java |  | — |
+| PORTED → icbm/classic/content/items/ItemLaserDetonator.java | 继承 ItemRadio；Entity#pick(200,1,false) 取目标，gps_data/radio_channel 组件、LaserRemoteTriggerEvent 与 TriggerActionTargetMessage；Fabric UseItemCallback 代替 Forge 包；消息改 translatable | S5.08 |
 | PORTED | icbm/classic/content/items/ItemMissile.java | 继承 ExplosiveFormItem；appendHoverText 显示等级（appendExplosiveTier）与 collectInformation；ModItems 注册 23 个平铺物品并注册 IcbmLookups.MISSILE_STACK | S2.05、S4.02 |
-| TODO | icbm/classic/content/items/ItemRadarGun.java |  | — |
-| TODO | icbm/classic/content/items/ItemRemoteDetonator.java |  | — |
-| TODO | icbm/classic/content/items/ItemRocketLauncher.java |  | — |
-| TODO | icbm/classic/content/items/behavior/BombCartDispenseBehavior.java |  | — |
-| TODO | icbm/classic/content/items/behavior/GrenadeDispenseBehavior.java |  | — |
+| PORTED → icbm/classic/content/items/ItemRadarGun.java | use/useOn 取射线或点击方块坐标；GpsData(Optional<GlobalPos>) 写入 gps_data，Shift 清除；RadarGunTraceEvent 保留 | S5.08 |
+| PORTED → icbm/classic/content/items/ItemRemoteDetonator.java | 继承 ItemRadio；UseItemCallback 发 RemoteTriggerEvent 与 TriggerActionMessage，FakeRadioSender 使用 ServerPlayer，频道来自 radio_channel 组件 | S5.08 |
+| PORTED → icbm/classic/content/items/ItemRocketLauncher.java | ItemRocketLauncher(false/true) 共用于 rocket_launcher/ballistic_launcher；use/releaseUsing 蓄力、库存导弹 IcbmLookups.MISSILE_STACK、创建/发射 missile entity，直接火箭设置 DeadFlightLogic(HANDHELD_FUEL)；Energy 成本因 ItemICBMElectrical 已 DROPPED 而留待 S6 | S5.08 |
+| PORTED | icbm/classic/content/items/behavior/BombCartDispenseBehavior.java | 继承 DefaultDispenseItemBehavior；用 BlockSource/BlockTags.RAILS/RailShape 复现 1.12 前方或下方铁路判定、坡道高度、1.125 方块生成偏移与自定义名称；无铁路时使用父类普通物品喷出行为 | S5.09 |
+| PORTED | icbm/classic/content/items/behavior/GrenadeDispenseBehavior.java | 继承 DefaultDispenseItemBehavior；从 BlockSource.center() 生成 EntityGrenade，设置物品栈并使用 1.12 朝向、0.1 垂直分量、0.5 速度与 1.0 不精确度参数；默认方块音效/动画由父类执行 | S5.09 |
 | DROPPED（Forge 事件在 26.3 无对应） | icbm/classic/content/missile/MissileEventHandler.java | 两条订阅事件均已并入内容类：EntityMountEvent 的下马判定改为 `EntityMissile#removePassenger` 触发 `MissileRideEvent.Stop`；ChunkEvent.Unload 里的 BallisticFlightLogicOld 模拟随该类删除（S4.03 用 SavedData 追踪取代） | S4.01 |
 | PORTED | icbm/classic/content/missile/entity/CapabilityEmpMissile.java | 实现 IEMPReceiver（Level 版签名）；setDead→discard、createExplosion→level.explode(…, ExplosionInteraction.NONE)、rand→level.getRandom；S4.02 回填 EntityExplosiveMissile/EntityMissileActionable 分支，SAM 分支改判 IRadioTargetAssignable | S4.01、S4.02 |
 | PORTED | icbm/classic/content/missile/entity/CapabilityMissile.java | 去 Forge Capability 外壳（删 register/CapabilityManager），保留类名；implements IMissile, ISavable；triggerFlightLogic/launch 改用 missile.level()/getX/getY/getZ、ModSounds.MISSILE_LAUNCH + Level#playSound、RadarRegistry.add；SAVE_LOGIC 用 SaveHandler（nodeBuildableObject target/flight、nodeSavable source） | S4.01 |
@@ -446,7 +446,7 @@
 | MERGED → icbm/classic/content/reg/ModBlockEntities.java | icbm/classic/content/reg/BlockReg.java（registerTileEntity 部分） | GameRegistry.registerTileEntity(TileEntityExplosive) → Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, icbmclassic:explosive, FabricBlockEntityTypeBuilder.create(ExplosiveBlockEntity::new, <23 个平铺爆炸物方块>).build())，23 个方块共享一个类型（registry-ids.md §2）；S5.02–S5.06 的机器类型仍 TODO | S3.09 |
 | MERGED → icbm/classic/content/reg/ModEntities.java | icbm/classic/content/reg/EntityReg.java | 1.12 名称映射（missile→explosive_missile）与旧 ID 一并删除（ADR 0002）；tracking 由方块改区块；S3.07 在实体类型建好后注册 EMP 接收器（IcbmLookups.init 早于本类）；S4.05 注册 grenade/bomb_cart | S2.01、S3.02、S3.03、S3.06、S3.07、S4.05 |
 | PORTED | icbm/classic/content/reg/ExplosiveInit.java | 注册 23 个平铺化爆炸物与引信/内容规则；blast 工厂逐个换成真实实现（S3.04–S3.08 全部完成，无 todoBlast 占位）；S3.09 末影激活监听器落地（todoEnderBlockCoordSet → 读 icbmclassic:gps_data 写 ExplosiveSettings#enderTarget 并提示 icbmclassic.message.launcher.toolTargetSet/noTargetInTool）；导弹侧 todoEnderMissileCoordSet 仍为 TODO(S3.07) | S2.02、S3.04、S3.05、S3.06、S3.07、S3.08、S3.09 |
-| MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07）；S4.05 registerFormItems 按形态选真实类（GRENADE→ItemGrenade、BOMB_CART→ItemBombCart，其余仍 ExplosiveFormItem） | S2.01、S4.05 |
+| MERGED → icbm/classic/content/reg/ModItems.java | icbm/classic/content/reg/ItemReg.java | 平铺化物品注册；OreDictionary → c: 标签（S2.04/S2.07）；S4.05 registerFormItems 按形态选真实类（GRENADE→ItemGrenade、BOMB_CART→ItemBombCart，其余仍 ExplosiveFormItem）；S5.08 注册六类工具（rocket_launcher/ballistic_launcher 共用 ItemRocketLauncher）与电池 | S2.01、S4.05、S5.08 |
 | DROPPED（ADR 0002） | icbm/classic/datafix/DataFixerHelpers.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityBombCartDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | DROPPED（ADR 0002） | icbm/classic/datafix/EntityExplosiveDataFixer.java | 不迁移旧存档（ADR 0002） | — |
@@ -457,10 +457,10 @@
 | DROPPED（ADR 0002） | icbm/classic/datafix/TileRadarStationDataFixer.java | 不迁移旧存档（ADR 0002） | — |
 | PORTED | icbm/classic/lib/CalculationHelpers.java | 纯 Java，随机数参数保留 java.util.Random | S1.01（S1.03/S1.10 复用） |
 | DROPPED | icbm/classic/lib/CapabilityPrefab.java | DROPPED（无 Capability 系统） | S1.10 |
-| TODO | icbm/classic/lib/ForgeRegistryHelpers.java |  | — |
-| TODO | icbm/classic/lib/InventoryUtility.java |  | — |
-| TODO | icbm/classic/lib/LanguageUtility.java |  | — |
-| TODO | icbm/classic/lib/MapWithDefault.java |  | — |
+| DROPPED（26.3 使用 Registries/BuiltInRegistries，不存在 Forge IForgeRegistry；ported tree 无 ForgeRegistryHelpers 调用，注册访问由新 registry APIs 完成） | icbm/classic/lib/ForgeRegistryHelpers.java | Forge registry fuzzy lookup helper has no ported caller or Forge registry counterpart | S5.11 |
+| PORTED | icbm/classic/lib/InventoryUtility.java | World→Level、Vec3d→Vec3、IItemHandler 能力→Container、EntityItem→ItemEntity（setPickupDelay→setPickUpDelay）；stacksMatch* 改 ItemStack.isSameItemSameComponents，doTagsMatch 保留原始 CompoundTag | S5.01 |
+| DROPPED（ported tree 无 LanguageUtility 调用；翻译由 Component.translatable 和语言资源处理，TextInput 的坐标格式化有独立实现） | icbm/classic/lib/LanguageUtility.java | Forge-era localization/tooltip helper has no ported caller; current translation and vector formatting paths replace its needed behavior | S2.04、S2.10 |
+| DROPPED（ported tree 无 MapWithDefault 调用；1.12 命令未知子命令回退帮助行为由 Brigadier 分支处理，且 map 默认值未被移植逻辑依赖） | icbm/classic/lib/MapWithDefault.java | HashMap default-value helper has no ported caller; command routing is now Brigadier | S3.10 |
 | PORTED | icbm/classic/lib/NBTConstants.java | 纯字符串常量；log4j 用 26.3 自带的 org.apache.logging.log4j | S1.01（S1.03/S1.10 复用） |
 | PORTED | icbm/classic/lib/actions/ActionBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
 | PORTED | icbm/classic/lib/actions/ActionDataBase.java | 动作系统（ISavable + SaveHandler） | S1.08 |
@@ -493,17 +493,17 @@
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveEntity.java | ISavable；ItemEntity 掉落、ItemStack.isSameItem、level.isClientSide() | S1.10 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStack.java | 构造签名 (ItemStack, Identifier)；自定义项存档走 IBuilderRegistry#save/load；S3.09 新增静态 fromStack(ItemStack)（BlockItem#getBlock instanceof ExplosiveBlock → 爆炸 id，替代 1.12 的 ItemStack#getCapability(EXPLOSIVE_CAPABILITY)）；S4.05 fromStack 再识别扁平形态物品（ExplosiveFormItem#getExplosiveId，手雷/炸弹矿车）；构造器里「从组件读自定义项」的 TODO(S2.05) 保留给 S4.06 设置管线 | S1.10、S3.09、S4.05 |
 | PORTED | icbm/classic/lib/capability/ex/CapabilityExplosiveStatic.java | INBTSerializable→ISavable（空实现，与 1.12 一致） | S1.10 |
-| DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSData.java | DROPPED（改用 icbmclassic:gps_data 数据组件，S2.04/S5.08） | S1.10 |
-| DROPPED | icbm/classic/lib/capability/gps/CapabilityGPSDataItem.java | DROPPED（同上；物品数据组件） | S1.10 |
-| PORTED | icbm/classic/lib/capability/gps/GPSDataHelpers.java | Vec3 + Identifier 维度；TextComponent→Component.translatable、sendMessage→sendSystemMessage；S2.10 键改 icbmclassic.message.gps.*（chat.launcher.noTargetInTool → icbmclassic.message.gps.set.empty） | S1.10、S2.10 |
+| DROPPED（由 `icbmclassic:gps_data` 数据组件替代，S5.08） | icbm/classic/lib/capability/gps/CapabilityGPSData.java | 世界位置数据由 GpsData(Optional<GlobalPos>) 持久化 | S5.08 |
+| DROPPED（由 `icbmclassic:gps_data` 数据组件替代，S5.08） | icbm/classic/lib/capability/gps/CapabilityGPSDataItem.java | ItemStack capability 改为 gps_data 数据组件；组件兼容视图位于 ICBMClassicHelpers | S5.08 |
+| DROPPED（坐标卡工具提示与定位器转移流程不属于 S5.08 的六件工具，且依赖已删 LanguageUtility/全局维度查询；GPS 值由 gps_data 组件直接读写） | icbm/classic/lib/capability/gps/GPSDataHelpers.java | 旧版玩家定位器交互辅助不再使用 | S5.08 |
 | MERGED | icbm/classic/lib/capability/launcher/CapabilityMissileHolder.java | MERGED → vanilla Container 版（IItemHandlerModifiable → Container）；consumeMissile 走 IcbmLookups.MISSILE_STACK | S1.10 |
 | PORTED | icbm/classic/lib/capability/launcher/CapabilityMissileLauncher.java | 删 capability 注册；状态暂用 ActionResponses（TODO(S5.02) LauncherStatus） | S1.10 |
 | PORTED | icbm/classic/lib/capability/missile/CapabilityMissileStack.java | 实现 ICapabilityMissileStack；getMissileId 生成 icbmclassic:missile[...]；newMissile 返回 EntityExplosiveMissile 的 missileCapability 并 setStack / initHealth；删 1.12 CapabilityManager | S4.02 |
 | PORTED | icbm/classic/lib/colors/ColorB.java | 纯数学颜色类，无 MC 类型（S3.05 随 colors 爆炸移植） | S3.05 |
 | PORTED | icbm/classic/lib/colors/ColorHelper.java | 纯数学颜色工具（S3.05 随 colors 爆炸移植） | S3.05 |
 | PORTED | icbm/classic/lib/data/BoundBlockPos.java | BlockPos/Vec3 边界盒实现 | S1.05（S1.10 复用） |
-| TODO | icbm/classic/lib/data/FaceRotations.java |  | — |
-| TODO | icbm/classic/lib/data/IMachineInfo.java |  | — |
+| PORTED | icbm/classic/lib/data/FaceRotations.java | EnumFacing→Direction；CW_FACE 由序数索引，26.3 枚举序（DOWN,UP,NORTH,SOUTH,WEST,EAST）下把每张轴表放回所属面（1.12 字面量按 UP 开头的假设书写，见实现注释） | S5.01 |
+| PORTED | icbm/classic/lib/data/IMachineInfo.java | 原样移植（纯接口） | S5.01 |
 | PORTED | icbm/classic/lib/data/LazyBuilder.java | 纯 Java 惰性构建器，动作与内容复用 | S1.08（S2.02/S4 复用） |
 | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | icbm/classic/lib/energy/storage/EnergyActionType.java | DROPPED（ADR 0003/energy-fe §3：回调并入 IcbmEnergyBuffer#onChange） | S1.07 |
 | MERGED → icbm/classic/lib/energy/IcbmEnergyBuffer.java | icbm/classic/lib/energy/storage/EnergyBuffer.java | S1.07 建内部 IcbmEnergyBuffer，S6 完成门面；S6 不改接口 | S1.07 |
@@ -568,9 +568,9 @@
 | PORTED | icbm/classic/lib/radio/messages/TextMessage.java | 无类型改动 | S1.05 |
 | PORTED | icbm/classic/lib/radio/messages/TriggerActionMessage.java | 无类型改动 | S1.05 |
 | PORTED | icbm/classic/lib/radio/messages/TriggerActionTargetMessage.java | Vec3d→Vec3 | S1.05 |
-| TODO | icbm/classic/lib/recipe/ConditionOreValue.java |  | — |
-| TODO | icbm/classic/lib/recipe/ExIngredientFactory.java |  | — |
-| TODO | icbm/classic/lib/recipe/ExRecipeFactory.java |  | — |
+| DROPPED（1.12 OreDictionary 条件已改为 c: 标签/26.3 datagen 配方；ported tree 无该 Forge 条件或工厂调用） | icbm/classic/lib/recipe/ConditionOreValue.java | Forge OreDictionary recipe condition has no 26.3 caller; recipe ingredients use convention tags and datagen | S2.07、S2.08 |
+| DROPPED（1.12 自定义爆炸物 ingredient factory 仅解析 Forge JSON 工厂且处理 metadata；平铺化物品由 datagen 使用具体注册物品，ported tree 无调用） | icbm/classic/lib/recipe/ExIngredientFactory.java | Forge JSON ingredient factory is replaced by flattened item references in datagen recipes | S2.08 |
+| DROPPED（1.12 自定义 shaped recipe factory 仅供 Forge recipe factory JSON 使用；26.3 recipes 由 ICBMRecipeProvider datagen 生成，ported tree 无调用） | icbm/classic/lib/recipe/ExRecipeFactory.java | Forge shaped recipe factory has no runtime caller; datagen emits standard 26.3 recipes | S2.08 |
 | MERGED → icbm/classic/lib/saving/ISaveNode.java | icbm/classic/lib/saving/INbtSaveNode.java | 改名 ISaveNode<E>；save(E, ValueOutput)/load(E, ValueInput)，不再有 NBT 数据类型参数 | S1.03 |
 | MERGED → icbm/classic/lib/saving/SaveHandler.java | icbm/classic/lib/saving/NbtSaveHandler.java | 改名 SaveHandler；save/load 收 ValueOutput/ValueInput，新增 saveToTag/loadFromTag（TagValueOutput/TagValueInput） | S1.03 |
 | MERGED → icbm/classic/lib/saving/SaveNode.java | icbm/classic/lib/saving/NbtSaveNode.java | 改名 SaveNode<E>；泛型 NBT 数据参数改为 ValueOutput/ValueInput 两个抽象方法 | S1.03 |
@@ -597,8 +597,8 @@
 | PORTED | icbm/classic/lib/thread/WorkerThread.java | 守护线程 + ConcurrentLinkedQueue（任务+快照）；禁用 Thread.stop → volatile doRun + interrupt + join(5000) | S1.09 |
 | PORTED | icbm/classic/lib/thread/WorkerThreadManager.java | INSTANCE/线程池/killThreads（5 秒总等待 + 丢弃告警）；runningAsDev → FabricLoader#isDevelopmentEnvironment | S1.09 |
 | PORTED | icbm/classic/lib/tile/ITick.java | 纯接口，动作与方块实体 tick 复用 | S1.08（S2.02/S4 复用） |
-| TODO | icbm/classic/lib/tile/TickAction.java |  | — |
-| TODO | icbm/classic/lib/tile/TickDoOnce.java |  | — |
+| PORTED | icbm/classic/lib/tile/TickAction.java | 原样移植（仅依赖 ITick 与 java.util.function） | S5.01 |
+| PORTED | icbm/classic/lib/tile/TickDoOnce.java | 原样移植（仅依赖 ITick） | S5.01 |
 | DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTracker.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
 | DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerData.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
 | DROPPED（消费者 S1.04 已删，26.3 无引用） | icbm/classic/lib/tracker/EventTrackerEntry.java | 1.12 仅被 lib/network/PacketEvents 与 lambda/tile 使用，26.3 已转 Fabric 载荷，grep src/ 0 引用 | S4.03 |
@@ -636,36 +636,36 @@
 | DROPPED（ADR 0006） | icbm/classic/mods/jei/HeldItemMissileWrapper.java | 联动模组代码删除（ADR 0006） | — |
 | DROPPED（ADR 0006） | icbm/classic/mods/jei/JEIProxy.java | 联动模组代码删除（ADR 0006） | — |
 | DROPPED（ADR 0006） | icbm/classic/mods/mekanism/MekProxy.java | 联动模组代码删除（ADR 0006） | — |
-| TODO | icbm/classic/prefab/FakeRadioSender.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/entity/EntityICBM.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/ContainerBase.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/GuiContainerBase.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/GuiFormatHelpers.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/IGuiComponent.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/IPlayerUsing.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/NumericField.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/TextInput.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/button/DisableButton.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/button/FaceRotationButton.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/button/GuiButtonBase.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/button/RedstoneButton.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/components/SlotEnergyBar.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/slot/SlotEnergyItem.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/textbox/GuiTextFieldBase.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/tooltip/IToolTip.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/tooltip/Tooltip.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/tooltip/TooltipBase.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/gui/tooltip/TooltipTranslations.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/inventory/InventorySlot.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/inventory/InventoryWithSlots.java | 方块实体基类、库存、GUI 组件 | S5.01 |
+| PORTED | icbm/classic/prefab/FakeRadioSender.java | EntityPlayer→ServerPlayer；sendStatusMessage(comp,true)→sendOverlayMessage(Component)，TextComponentTranslation→Component.translatable | S5.01 |
+| PORTED | icbm/classic/prefab/entity/EntityICBM.java | Entity + SynchedEntityData(HEALTH/MAX_HEALTH)、attackEntityFrom→hurtServer、readEntityFromNBT→ValueInput/SaveHandler、setDead→discard、isEntityInvulnerable→isInvulnerableToBase；getYOffset 无常驻变量故 alignToBounds 按 box.minY-height。注：EntityProjectile 仍保留自身内联的 hasHealth/IWorldPosition 副本，改继承 EntityICBM 属后续步骤 | S5.01 |
+| PORTED | icbm/classic/prefab/gui/ContainerBase.java | AbstractContainerMenu；构造器补 MenuType/containerId，addPlayerInventory 用 addStandardInventorySlots(8,84)、新增通用 quickMoveStack（1.12 无 transferStackInSlot）；canInteractWith→stillValid（容器原样 / 方块实体 4 格） | S5.01 |
+| PORTED | icbm/classic/prefab/gui/GuiContainerBase.java | GUI 类移入 client 源集，包名 icbm.classic.client.prefab.gui；drawGuiContainerBackgroundLayer→extractBackground（先 super 画变暗层再画面板）、foreground→extractLabels、drawScreen→extractRenderState、tooltip→setTooltipForNextFrame；绘制全部走 GuiGraphicsExtractor（无 OpenGL） | S5.01 |
+| PORTED | icbm/classic/prefab/gui/GuiFormatHelpers.java | Vec3d→Vec3；错误键改为 S2.10 迁移后的 icbmclassic.gui.error.* | S5.01 |
+| PORTED | icbm/classic/prefab/gui/IGuiComponent.java | 接口移入 client 源集；draw* 改 GuiGraphicsExtractor，onKeyTyped(char,int)→onKeyTyped(KeyEvent)+onCharTyped(CharacterEvent)，onMouseClick→MouseButtonEvent | S5.01 |
+| PORTED | icbm/classic/prefab/gui/IPlayerUsing.java | getPlayersUsing 改 List<ServerPlayer>；addPlayerToUseList 只接受 ServerPlayer（客户端玩家不登记） | S5.01 |
+| PORTED | icbm/classic/prefab/gui/NumericField.java | 移至 client 源集；GuiTextField 基类→原版 EditBox，writeText→insertText（数字过滤）、getText/setText→getValue/setValue | S5.01 |
+| PORTED | icbm/classic/prefab/gui/TextInput.java | 移至 client 源集；基类 GuiTextFieldBase→EditBox 子类，drawTextBox→extractWidgetRenderState、drawHorizontalLine→GuiGraphicsExtractor#horizontalLine；焦点处理保留但改为与调用前状态比较（1.12 的守卫恒真，见实现注释），焦点变更仍由 EditBox#setFocused 通知 26.3 SDL 文本输入 | S5.01 |
+| PORTED | icbm/classic/prefab/gui/button/DisableButton.java | 移至 client 源集；GuiButton→AbstractButton/Button（无 buttonId），drawButton→extractContents + blit，mousePressed 的 Alt 判定→isValidClickButton；Alt/Shift 状态取 Minecraft#hasAltDown/hasShiftDown | S5.01 |
+| PORTED | icbm/classic/prefab/gui/button/FaceRotationButton.java | 移至 client 源集；同上映射，displayString→setMessage，EnumFacing→Direction，标签仍取方向名首字母（单字符，S8 审计项） | S5.01 |
+| PORTED | icbm/classic/prefab/gui/button/GuiButtonBase.java | 移至 client 源集；GuiButton→Button，actionPerformed 分发→onPress(InputWithModifiers)，extractContents 画原版精灵+标签；按钮 id 删除（26.3 用实例标识） | S5.01 |
+| PORTED | icbm/classic/prefab/gui/button/RedstoneButton.java | 移至 client 源集；drawButton→extractContents + blit，enabled/hovered→active/isMouseOver | S5.01 |
+| PORTED | icbm/classic/prefab/gui/components/SlotEnergyBar.java | 移至 client 源集；bindTexture+drawTexturedModalRect→blit(container.getBackground())，GuiScreen.isShiftKeyDown→Minecraft#hasShiftDown，TextComponentTranslation→Component.translatable，键改 S2.10 的 icbmclassic.gui.energy* | S5.01 |
+| DROPPED（1.12 全仓无调用；能量槽过滤由机器的 InventorySlot 校验器承担，原版 Slot#mayPlace 已委托 Container#canPlaceItem；物品能量在 S6.04 接 Team Reborn） | icbm/classic/prefab/gui/slot/SlotEnergyItem.java | 1.12 isItemValid 走 EnergySystem；该类在 1.12 全仓无调用者 | S5.01 |
+| PORTED | icbm/classic/prefab/gui/textbox/GuiTextFieldBase.java | 移至 client 源集；GuiTextField→原版 EditBox（26.3 用 EditBox 即自动处理 SDL 文本输入与焦点通知），只保留 host 引用；drawTextBox/onKeyTyped/onMouseClick 由原版 widget 分发承担 | S5.01 |
+| PORTED | icbm/classic/prefab/gui/tooltip/IToolTip.java | 移至 client 源集；ITextComponent→Component | S5.01 |
+| PORTED | icbm/classic/prefab/gui/tooltip/Tooltip.java | 移至 client 源集；ITextComponent→Component | S5.01 |
+| PORTED | icbm/classic/prefab/gui/tooltip/TooltipBase.java | 移至 client 源集；ITextComponent→Component，hover 延迟/命中判定原样；自绘提示框改由 GuiGraphicsExtractor#setTooltipForNextFrame 承担 | S5.01 |
+| PORTED | icbm/classic/prefab/gui/tooltip/TooltipTranslations.java | 移至 client 源集；GuiScreen.isShiftKeyDown→Minecraft#hasShiftDown，ITextComponent→Component | S5.01 |
+| PORTED | icbm/classic/prefab/inventory/InventorySlot.java | 原样移植（校验器与 tick/变更回调不变） | S5.01 |
+| PORTED | icbm/classic/prefab/inventory/InventoryWithSlots.java | ItemStackHandler→实现原版 Container（getContainerSize/getItem/setItem/removeItem/removeItemNoUpdate/clearContent/canPlaceItem/stillValid）；存档改 ISavable+ContainerHelper.saveAllItems/loadAllItems(ValueOutput/ValueInput)；getSlot(int) 改名 getSlotHandler（26.3 Container#getSlot 同名不同返回类型）；setSize/Size 删除（26.3 容器定长） | S5.01 |
 | DROPPED（Forge 工具提示框架） | icbm/classic/prefab/item/ItemBase.java | 只做 setName 与 .info 提示；26.3 物品为普通 Item，提示文本未迁移（见 S2.04 证据） | S2.04 |
-| TODO | icbm/classic/prefab/item/ItemBlockAbstract.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/item/ItemBlockSubTypes.java | 方块实体基类、库存、GUI 组件 | S5.01 |
+| DROPPED（26.3 BlockItem#useOn/#place 已包含 1.12 onItemUse 的放置行为，放置检查钩子是 protected BlockItem#canPlace(BlockPlaceContext, BlockState)（S5.06 的 EMP 塔物品直接继承 BlockItem）；工具提示框架随 ItemBase 在 S2.04 一并 DROPPED） | icbm/classic/prefab/item/ItemBlockAbstract.java | 1.12 的放置钩子由 BlockItem 的 protected canPlace/placeBlock 承担；工具提示框架随 ItemBase 一起 DROPPED | S5.01 |
+| DROPPED（ADR 0002 平铺化，26.3 无 metadata/子类型） | icbm/classic/prefab/item/ItemBlockSubTypes.java | 1.12 的 setHasSubtypes/getMetadata/getUnlocalizedName(meta) 无对应，物品与方块平铺 | S5.01 |
 | DROPPED（Forge 专用） | icbm/classic/prefab/item/ItemICBMBase.java | 只做 setCreativeTab/setName，由 Item.Properties 与 ModItems 承担 | S2.04 |
-| TODO | icbm/classic/prefab/item/ItemICBMElectrical.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/item/ItemRadio.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/item/ItemStackCapProvider.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/item/LootEntryItemStack.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/tile/BlockICBM.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/tile/IGuiTile.java | 方块实体基类、库存、GUI 组件 | S5.01 |
-| TODO | icbm/classic/prefab/tile/TileMachine.java | 方块实体基类、库存、GUI 组件 | S5.01 |
+| DROPPED（1.12 的 int 能量物品基类：getEnergy 恒返回 MAX_VALUE、discharge 为空操作；26.3 物品能量由 Team Reborn Energy 的 EnergyStorage.ITEM+DataComponent 承担，S6.04 接入） | icbm/classic/prefab/item/ItemICBMElectrical.java | 1.12 也只有 getEnergy=MAX_VALUE / discharge 空实现 | S5.01 |
+| PORTED | icbm/classic/prefab/item/ItemRadio.java | ItemBase 已 DROPPED 故直接继承 Item；频道改 icbmclassic:radio_channel 数据组件（NBTConstants.HZ 浮点回退不迁移）；1.12 onItemUseFirst 在 26.3 无钩子，改为 Item#useOn（方块不消耗交互时才触发），用 IRadio/IRadioChannelAccess 取代 RADIO_CAPABILITY | S5.01 |
+| DROPPED（Forge 能力容器；26.3 用 DataComponent（gps_data/held_item/radio_channel）+ ItemApiLookup 取代） | icbm/classic/prefab/item/ItemStackCapProvider.java | ItemRadarGun/ItemMissile/ItemBattery 的能力挂载改数据组件 | S5.01 |
+| DROPPED（26.3 战利品表由 datagen 生成（S2.07），物品堆用原版 entry + set_components 表达） | icbm/classic/prefab/item/LootEntryItemStack.java | 1.12 只在 ICBMClassic 的代码化战利品池里使用 | S5.01 |
+| PORTED | icbm/classic/prefab/tile/BlockICBM.java | BlockContainer→BaseEntityBlock（newBlockEntity 留给子类）；ROTATION_PROP→BlockStateProperties.FACING（与 S3.09 的爆炸物一致），放置朝向取玩家水平朝向；硬度/抗性 10；dropInventory+breakBlock 掉落改由 BlockEntity#preRemoveSideEffects 承担（方块层在移除后已拿不到方块实体） | S5.01 |
+| PORTED | icbm/classic/prefab/tile/IGuiTile.java | 1.12 的 getServerGuiElement/getClientGuiElement 改为 ExtendedMenuProvider<BlockPos>（getScreenOpeningData 返回 getBlockPos()）；客户端 Screen 由 MenuScreens 在 client 源集注册，main 不得引用 net.minecraft.client | S5.01 |
+| PORTED | icbm/classic/prefab/tile/TileMachine.java | TileEntity→BlockEntity；1.12 update() 拆成 serverTick(ServerLevel)/clientTick() 驱动同一 tickActions 列表；markDirty→setChanged 覆写（服务端额外 sendBlockUpdated 同步描述包）+ getUpdatePacket/getUpdateTag；shouldRefresh 删除；world/pos→getLevel()/getBlockPos() | S5.01 |

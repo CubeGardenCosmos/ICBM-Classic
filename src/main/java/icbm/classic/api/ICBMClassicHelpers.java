@@ -1,15 +1,21 @@
 package icbm.classic.api;
 
 import icbm.classic.api.caps.IExplosive;
+import icbm.classic.content.reg.ModDataComponents;
 import icbm.classic.api.caps.IGPSData;
 import icbm.classic.api.launcher.IMissileLauncher;
 import icbm.classic.api.missiles.IMissile;
 import icbm.classic.api.refs.ICBMExplosives;
 import icbm.classic.api.reg.IExplosiveData;
 import icbm.classic.lib.capability.ex.CapabilityExplosiveStack;
+import icbm.classic.lib.data.GpsData;
 import icbm.classic.lib.lookup.IcbmLookups;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -135,10 +141,71 @@ public final class ICBMClassicHelpers
      * @param stack to access
      * @return data if present, or null otherwise
      */
-    public static IGPSData getGPSData(ItemStack stack) {
-        // TODO(S2.04/S5.08) read the icbmclassic:gps_data data component (GpsData(Optional<GlobalPos>)).
-        //  The component is registered by ModDataComponents (S2.01/S2.04), so this returns null until then.
-        //  1.12 used the Forge GPS_CAPABILITY.
-        return null;
+    public static IGPSData getGPSData(ItemStack stack)
+    {
+        return stack.get(ModDataComponents.GPS_DATA) == null ? null : new GpsDataView(stack);
+    }
+
+    /** Compatibility view over the immutable GPS component; the component remains the sole storage. */
+    private static final class GpsDataView implements IGPSData
+    {
+        private final ItemStack stack;
+
+        private GpsDataView(ItemStack stack)
+        {
+            this.stack = stack;
+        }
+
+        private GlobalPos position()
+        {
+            return stack.getOrDefault(ModDataComponents.GPS_DATA, GpsData.EMPTY).pos().orElse(null);
+        }
+
+        @Override
+        public void setPosition(net.minecraft.world.phys.Vec3 position)
+        {
+            if (position == null)
+            {
+                stack.remove(ModDataComponents.GPS_DATA);
+                return;
+            }
+            GlobalPos current = position();
+            stack.set(ModDataComponents.GPS_DATA, new GpsData(GlobalPos.of(
+                    current == null ? net.minecraft.world.level.Level.OVERWORLD : current.dimension(),
+                    BlockPos.containing(position))));
+        }
+
+        @Override
+        public void setWorld(net.minecraft.world.level.Level level)
+        {
+            setWorld(level == null ? null : level.dimension().identifier());
+        }
+
+        @Override
+        public void setWorld(Identifier dimension)
+        {
+            GlobalPos current = position();
+            if (dimension == null || current == null)
+            {
+                stack.remove(ModDataComponents.GPS_DATA);
+                return;
+            }
+            stack.set(ModDataComponents.GPS_DATA, new GpsData(GlobalPos.of(
+                    ResourceKey.create(Registries.DIMENSION, dimension), current.pos())));
+        }
+
+        @Override
+        public net.minecraft.world.phys.Vec3 getPosition()
+        {
+            GlobalPos current = position();
+            return current == null ? null : net.minecraft.world.phys.Vec3.atLowerCornerOf(current.pos());
+        }
+
+        @Override
+        public Identifier getWorldId()
+        {
+            GlobalPos current = position();
+            return current == null ? null : current.dimension().identifier();
+        }
     }
 }

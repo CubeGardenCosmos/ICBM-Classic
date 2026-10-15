@@ -9,9 +9,11 @@
     ],
     "fabric-gametest": [
       "icbm.classic.test.SmokeGameTest",
+      "icbm.classic.test.regression.P1RegressionGameTests",
       "icbm.classic.test.lib.SaveHandlerGameTest",
       "icbm.classic.test.network.CodexGameTest",
       "icbm.classic.test.radio.RadioRegistryGameTest",
+      "icbm.classic.test.items.ToolItemsGameTest",
       "icbm.classic.test.radar.RadarRegistryGameTest",
       "icbm.classic.test.actions.ActionSystemGameTest",
       "icbm.classic.test.blast.ThreadedBlastFrameworkGameTest",
@@ -40,12 +42,21 @@
       "icbm.classic.test.entity.BeamSmokeGameTest",
       "icbm.classic.test.block.ExplosiveBlockGameTest",
       "icbm.classic.test.command.CommandGameTest",
+      "icbm.classic.test.items.DispenserBehaviorGameTest",
       "icbm.classic.test.entity.GrenadeBombCartGameTest",
       "icbm.classic.test.missile.MissileSystemGameTest",
       "icbm.classic.test.missile.MissileFlightGameTest",
       "icbm.classic.test.missile.MissileTrackerGameTest",
       "icbm.classic.test.missile.SamInterceptorGameTest",
-      "icbm.classic.test.entity.ClusterCargoSeatGameTest"
+      "icbm.classic.test.entity.ClusterCargoSeatGameTest",
+      "icbm.classic.test.prefab.InventoryWithSlotsGameTest",
+      "icbm.classic.test.prefab.TileMachineGameTest",
+      "icbm.classic.test.launcher.LauncherGameTest",
+      "icbm.classic.test.launcher.LauncherScreenCodexGameTest",
+      "icbm.classic.test.launcher.CruiseLauncherGameTest",
+      "icbm.classic.test.radar.RadarStationGameTest",
+      "icbm.classic.test.launcher.CruiseLauncherCodexGameTest",
+      "icbm.classic.test.emptower.EmpTowerGameTest"
     ]
   },
   "depends": {
