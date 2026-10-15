@@ -5,6 +5,9 @@ import icbm.classic.api.radio.IRadioReceiver;
 import icbm.classic.api.radio.IRadioSender;
 import icbm.classic.api.radio.messages.ITargetMessage;
 import icbm.classic.api.radio.messages.ITriggerActionMessage;
+import icbm.classic.api.radio.messages.IIncomingMissileMessage;
+import icbm.classic.content.abm.radio.InterceptOrderMessage;
+import icbm.classic.content.abm.radio.InterceptQueryMessage;
 import icbm.classic.api.radio.IRadioTargetAssignable;
 import icbm.classic.content.blocks.launcher.FiringPackage;
 import icbm.classic.content.blocks.launcher.LauncherLangs;
@@ -31,6 +34,17 @@ public class RadioCruise extends RadioTile<TileCruiseLauncher> implements IRadio
     {
         if (!canReceive(sender, packet))
         {
+            return;
+        }
+        if (packet instanceof IIncomingMissileMessage) return;
+        if (packet instanceof InterceptQueryMessage query)
+        {
+            host.launcher.offerIntercept(query);
+            return;
+        }
+        if (packet instanceof InterceptOrderMessage order)
+        {
+            host.launcher.launchIntercept(order);
             return;
         }
         if (packet instanceof ITargetMessage targetMessage)

@@ -7,6 +7,13 @@ import icbm.classic.api.launcher.ILauncherSolution;
 import icbm.classic.api.missiles.ICapabilityMissileStack;
 import icbm.classic.api.missiles.IMissile;
 import icbm.classic.api.missiles.parts.IMissileTarget;
+import icbm.classic.content.abm.ConfigAbm;
+import icbm.classic.content.abm.EntityAntiBallisticMissile;
+import icbm.classic.content.abm.InterceptEvents;
+import icbm.classic.content.abm.radio.InterceptOffer;
+import icbm.classic.content.abm.radio.InterceptOrderMessage;
+import icbm.classic.content.abm.radio.InterceptQueryMessage;
+import icbm.classic.config.machines.ConfigLauncher;
 import icbm.classic.config.missile.ConfigMissile;
 import icbm.classic.content.blocks.launcher.LauncherBaseCapability;
 import icbm.classic.content.blocks.launcher.status.FiringWithDelay;
@@ -18,6 +25,7 @@ import icbm.classic.content.missile.logic.source.cause.CausedByBlock;
 import icbm.classic.content.reg.ModItems;
 import icbm.classic.lib.energy.EnergyRules;
 import icbm.classic.lib.lookup.IcbmLookups;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -135,6 +143,51 @@ public class CLauncherCapability extends LauncherBaseCapability
             return LauncherStatus.ERROR_SPAWN;
         }
         return new LaunchedWithMissile().setMissile(missile);
+    }
+
+    public void offerIntercept(InterceptQueryMessage query)
+    {
+        final Vec3 launchPoint = getLaunchPoint();
+        if (host.getMissileStack().isEmpty()
+                || host.getMissileStack().getItem() != ModItems.ANTI_BALLISTIC_MISSILE
+                || host.getFiringPackage() != null
+                || !EnergyRules.ignoresPower() && !host.energyStorage.has(ConfigLauncher.POWER_COST)
+                || launchPoint.distanceToSqr(query.targetPos()) > (double) ConfigAbm.ENGAGEMENT_RANGE * ConfigAbm.ENGAGEMENT_RANGE)
+            return;
+        query.offer(new InterceptOffer(host.getBlockPos(), launchPoint, ConfigAbm.FLIGHT_SPEED, 0));
+    }
+
+    public void launchIntercept(InterceptOrderMessage order)
+    {
+        if (!host.getBlockPos().equals(order.launcherPos()) || host.getFiringPackage() != null
+                || host.getMissileStack().isEmpty()
+                || host.getMissileStack().getItem() != ModItems.ANTI_BALLISTIC_MISSILE
+                || !EnergyRules.ignoresPower() && !host.energyStorage.has(ConfigLauncher.POWER_COST)
+                || !(host.getLevel() instanceof ServerLevel level))
+            return;
+        final ICapabilityMissileStack missileStack = IcbmLookups.MISSILE_STACK.find(host.getMissileStack(), null);
+        if (missileStack == null) return;
+        final IMissile missile = missileStack.newMissile(level);
+        if (!(missile.getMissileEntity() instanceof EntityAntiBallisticMissile abm)) return;
+        final Vec3 launchPoint = getLaunchPoint();
+        final CausedByBlock cause = new CausedByBlock(level, host.getBlockPos(), host.getBlockState());
+        final ActionSource source = new ActionSource(level, launchPoint, cause);
+        abm.setPos(launchPoint);
+        abm.setTargetId(order.targetId());
+        missile.setMissileSource(source);
+        missile.launch();
+        if (!host.missileHolder.consumeMissile()) return;
+        if (!EnergyRules.consumeOrFree(host.energyStorage, ConfigLauncher.POWER_COST)) return;
+        if (!level.addFreshEntity(abm)) return;
+        order.markLaunched(abm.getUUID());
+        InterceptEvents.ABM_LAUNCHED.invoker().onLaunched(level, abm, order.targetId(), host.getBlockPos());
+    }
+
+    private Vec3 getLaunchPoint()
+    {
+        final BlockPos pos = host.getBlockPos();
+        return new Vec3(pos.getX() + 0.5, pos.getY() + TileCruiseLauncher.MISSILE_HOLDER_Y,
+                pos.getZ() + 0.5);
     }
 
     @Override

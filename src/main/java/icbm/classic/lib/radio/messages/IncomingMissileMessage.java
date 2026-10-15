@@ -1,18 +1,14 @@
 package icbm.classic.lib.radio.messages;
 
 import icbm.classic.api.missiles.IMissile;
-import icbm.classic.api.radio.IRadioTargetAssignable;
 import icbm.classic.api.radio.messages.IIncomingMissileMessage;
+import icbm.classic.api.radio.IRadioTargetAssignable;
 import lombok.Data;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Radio message reporting an incoming missile to the launcher network.
- * <p>
- * 1.12 read the launched missile out of the {@code LaunchedWithMissile} status and pushed the target
- * into the assigned-target missile. 26.3 keeps the message independent of the missile's concrete class
- * through {@link IRadioTargetAssignable}.
+ * Radio notification that an incoming missile is present on the channel.
  */
 @Data
 public class IncomingMissileMessage implements IIncomingMissileMessage {
@@ -57,9 +53,5 @@ public class IncomingMissileMessage implements IIncomingMissileMessage {
 
     @Override
     public void onTriggerCallback(IRadioTargetAssignable target) {
-        // 1.12: status instanceof LaunchedWithMissile -> SAM.scanLogic.setCurrentTarget(incoming entity)
-        if (target != null && missile != null) {
-            target.assignTarget(missile.getMissileEntity());
-        }
     }
 }

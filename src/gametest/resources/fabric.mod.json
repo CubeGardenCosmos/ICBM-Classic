@@ -58,6 +58,7 @@
       "icbm.classic.test.prefab.TileMachineGameTest",
       "icbm.classic.test.launcher.LauncherGameTest",
       "icbm.classic.test.launcher.LauncherScreenCodexGameTest",
+      "icbm.classic.test.launcher.LauncherInterceptGameTest",
       "icbm.classic.test.launcher.CruiseLauncherGameTest",
       "icbm.classic.test.radar.RadarStationGameTest",
       "icbm.classic.test.abm.RadarTrackGameTest",
