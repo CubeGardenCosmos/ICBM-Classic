@@ -153,6 +153,11 @@ public abstract class ResourceConfigList<CONFIG extends ResourceConfigList, CONT
         parsingIssues.clear();
     }
 
+    /** Removes programmatic default entries without affecting config-loaded matchers. */
+    public void clearDefaults() {
+        defaultMatchers.clear();
+    }
+
     private void lock() {
         this.isLocked = true;
     }

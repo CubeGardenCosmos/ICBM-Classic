@@ -108,24 +108,17 @@ public class RadarRegistryGameTest
     }
 
     @GameTest
-    public void entityFilterBlocksAdd(GameTestHelper helper)
+    public void defaultEntityFilterAllowsAdd(GameTestHelper helper)
     {
-
         final BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));
         final Entity entity = createStand(helper, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
-        final var previous = RadarRegistry.entityFilter;
-        RadarRegistry.entityFilter = ignored -> false;
-        try
-        {
-            assertThat(helper, "filtered entity rejected", false, RadarRegistry.add(entity));
-            assertThat(helper, "filtered entity not found", false, found(helper, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, entity));
-        }
-        finally
-        {
-            RadarRegistry.entityFilter = previous;
-        }
+        assertThat(helper, "default entity filter accepts entity", true, RadarRegistry.entityFilter.test(entity));
+        assertThat(helper, "entity added", true, RadarRegistry.add(entity));
+        assertThat(helper, "entity found", true,
+                found(helper, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, entity));
 
+        RadarRegistry.remove(entity);
         entity.discard();
         helper.succeed();
     }

@@ -69,6 +69,12 @@ public class GasBlastsGameTest
         return zombie;
     }
 
+    private static void resetArmorProtection()
+    {
+        ProtectiveArmorHandler.loadFromConfig();
+        ProtectiveArmorHandler.protectionValues.clearDefaults();
+    }
+
     @GameTest(maxTicks = 800)
     public void chemicalBlastPoisonsZombie(GameTestHelper helper)
     {
@@ -78,8 +84,6 @@ public class GasBlastsGameTest
 
         // the gas cloud ticks, so the effect lands after the cloud built up
         helper.startSequence()
-                // the 1.12 chemical blast applied the mod's "Chemical" poison set, which the port moved onto
-                // the registered toxin effect (see ModEffects/ContagiousPoison)
                 .thenWaitUntil(() -> helper.assertTrue(zombie.hasEffect(ModEffects.TOXIN),
                         "chemical gas did not poison the zombie (removed " + zombie.isRemoved() + ", at "
                                 + zombie.position() + ", effects " + zombie.getActiveEffects() + ")"))
@@ -89,28 +93,45 @@ public class GasBlastsGameTest
     @GameTest(maxTicks = 800)
     public void chemicalBlastSparesProtectedZombie(GameTestHelper helper)
     {
-        // 1.12 resolved the armour ratings from config; the port keeps that list, so the rating for the
-        // uniform is registered here the same way the config file would. `require_helmet` is on, so the
-        // unprotected zombie (no helmet) still gets poisoned while the armoured one does not.
-        ProtectiveArmorHandler.protectionValues.setDefaultMeta(new ItemStack(Items.IRON_HELMET), 1.0F, 1);
-        ProtectiveArmorHandler.loadFromConfig();
+        try
+        {
+            // 1.12 resolved the armour ratings from config; the port keeps that list, so the rating for the
+            // uniform is registered here the same way the config file would. `require_helmet` is on, so the
+            // unprotected zombie (no helmet) still gets poisoned while the armoured one does not.
+            ProtectiveArmorHandler.protectionValues.setDefaultMeta(new ItemStack(Items.IRON_HELMET), 1.0F, 1);
+            ProtectiveArmorHandler.loadFromConfig();
 
-        final Zombie armored = spawnZombie(helper, 4.5D, 4.5D);
-        armored.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            final Zombie armored = spawnZombie(helper, 4.5D, 4.5D);
+            armored.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
 
-        helper.assertTrue(ProtectiveArmorHandler.getProtectionRating(armored)
-                        >= ConfigMain.protectiveArmor.minProtectionChemicalGas,
-                "the test setup did not reach the protection threshold, rating was "
-                        + ProtectiveArmorHandler.getProtectionRating(armored));
+            helper.assertTrue(ProtectiveArmorHandler.getProtectionRating(armored)
+                            >= ConfigMain.protectiveArmor.minProtectionChemicalGas,
+                    "the test setup did not reach the protection threshold, rating was "
+                            + ProtectiveArmorHandler.getProtectionRating(armored));
 
-        triggerBlast(helper, "chemical");
+            triggerBlast(helper, "chemical");
 
-        // wait for the cloud to have ticked at least once, then assert nothing was applied
-        helper.startSequence()
-                .thenIdle(100)
-                .thenExecute(() -> helper.assertTrue(armored.getActiveEffects().isEmpty(),
-                        "the protected zombie was poisoned anyway, effects: " + armored.getActiveEffects()))
-                .thenSucceed();
+            // wait for the cloud to have ticked at least once, then assert nothing was applied
+            helper.startSequence()
+                    .thenIdle(100)
+                    .thenExecute(() -> {
+                        try
+                        {
+                            helper.assertTrue(armored.getActiveEffects().isEmpty(),
+                                    "the protected zombie was poisoned anyway, effects: " + armored.getActiveEffects());
+                        }
+                        finally
+                        {
+                            resetArmorProtection();
+                        }
+                    })
+                    .thenSucceed();
+        }
+        catch (RuntimeException | Error failure)
+        {
+            resetArmorProtection();
+            throw failure;
+        }
     }
 
     @GameTest(maxTicks = 800)
@@ -155,3 +176,4 @@ public class GasBlastsGameTest
         helper.succeed();
     }
 }
+

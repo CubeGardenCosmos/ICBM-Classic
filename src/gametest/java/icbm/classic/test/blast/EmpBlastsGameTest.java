@@ -144,6 +144,7 @@ public class EmpBlastsGameTest
     {
         ConfigBlast.emp.replacements.blockStates = new String[]{};
         EmpHandler.loadFromConfig();
+        EmpHandler.empBlockSwaps.clearDefaults();
     }
 
     /**
@@ -157,15 +158,20 @@ public class EmpBlastsGameTest
     {
         helper.setBlock(CENTER.below(), Blocks.STONE);
         final Creeper creeper = helper.spawn(EntityTypes.CREEPER, new Vec3(4.5D, CENTER.getY() + 1.0D, 4.5D));
-        helper.assertFalse(creeper.isPowered(), "the creeper should start unpowered");
-
-        final IActionStatus status = triggerEmp(helper);
-
-        helper.assertTrue(status == ActionResponses.COMPLETED, "emp did not report COMPLETED, was " + status);
-        helper.assertTrue(creeper.isPowered(),
-                "emp did not super charge the creeper, ALLOW_LIGHTING_CREEPER=" + ConfigBlast.emp.ALLOW_LIGHTING_CREEPER
-                        + " level=" + helper.getLevel().getClass().getSimpleName());
-        helper.succeed();
+        try
+        {
+            helper.assertFalse(creeper.isPowered(), "the creeper should start unpowered");
+            final IActionStatus status = triggerEmp(helper);
+            helper.assertTrue(status == ActionResponses.COMPLETED, "emp did not report COMPLETED, was " + status);
+            helper.assertTrue(creeper.isPowered(),
+                    "emp did not super charge the creeper, ALLOW_LIGHTING_CREEPER=" + ConfigBlast.emp.ALLOW_LIGHTING_CREEPER
+                            + " level=" + helper.getLevel().getClass().getSimpleName());
+            helper.succeed();
+        }
+        finally
+        {
+            creeper.discard();
+        }
     }
 
     /**
@@ -178,16 +184,21 @@ public class EmpBlastsGameTest
     {
         TestItemEmpReceiver.reset();
         final ItemEntity itemEntity = dropItem(helper, 4);
-
-        triggerEmp(helper);
-
-        helper.assertTrue(TestItemEmpReceiver.calls == 1,
-                "emp did not reach the item EMP receiver of the dropped item, calls: " + TestItemEmpReceiver.calls);
-        helper.assertTrue(TestItemEmpReceiver.doActionCalls == 1,
-                "emp simulated the item effect instead of applying it");
-        helper.assertTrue(itemEntity.getItem().getCount() == 3,
-                "emp did not write the changed stack back into the dropped item, stack: " + itemEntity.getItem());
-        helper.succeed();
+        try
+        {
+            triggerEmp(helper);
+            helper.assertTrue(TestItemEmpReceiver.calls == 1,
+                    "emp did not reach the item EMP receiver of the dropped item, calls: " + TestItemEmpReceiver.calls);
+            helper.assertTrue(TestItemEmpReceiver.doActionCalls == 1,
+                    "emp simulated the item effect instead of applying it");
+            helper.assertTrue(itemEntity.getItem().getCount() == 3,
+                    "emp did not write the changed stack back into the dropped item, stack: " + itemEntity.getItem());
+            helper.succeed();
+        }
+        finally
+        {
+            itemEntity.discard();
+        }
     }
 
     /**

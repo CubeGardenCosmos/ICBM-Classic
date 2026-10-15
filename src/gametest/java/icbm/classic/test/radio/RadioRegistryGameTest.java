@@ -117,72 +117,77 @@ public class RadioRegistryGameTest
     public void sameChannelReceives(GameTestHelper helper)
     {
         final Level level = helper.getLevel();
-        RadioRegistry.clear(level.dimension());
-
         final TestReceiver receiver = new TestReceiver(level, new BlockPos(1, 1, 1), "alpha");
         final TestSender sender = new TestSender(level, new BlockPos(2, 1, 1));
-
-        assertThat(helper, "receiver added", true, RadioRegistry.add(receiver));
-
-        final TriggerActionMessage packet = new TriggerActionMessage("alpha");
-        RadioRegistry.popMessage(level, sender, packet);
-
-        assertThat(helper, "received count", 1, receiver.messages);
-        assertThat(helper, "received channel", "alpha", receiver.lastMessage != null ? receiver.lastMessage.getChannel() : null);
-        assertThat(helper, "received message", true, receiver.lastMessage instanceof TriggerActionMessage);
-        helper.succeed();
+        try
+        {
+            assertThat(helper, "receiver added", true, RadioRegistry.add(receiver));
+            final TriggerActionMessage packet = new TriggerActionMessage("alpha");
+            RadioRegistry.popMessage(level, sender, packet);
+            assertThat(helper, "received count", 1, receiver.messages);
+            assertThat(helper, "received channel", "alpha", receiver.lastMessage != null ? receiver.lastMessage.getChannel() : null);
+            assertThat(helper, "received message", true, receiver.lastMessage instanceof TriggerActionMessage);
+            helper.succeed();
+        }
+        finally
+        {
+            RadioRegistry.remove(receiver);
+        }
     }
 
     @GameTest
     public void otherChannelDoesNotReceive(GameTestHelper helper)
     {
         final Level level = helper.getLevel();
-        RadioRegistry.clear(level.dimension());
-
         final TestReceiver receiver = new TestReceiver(level, new BlockPos(1, 1, 1), "alpha");
         final TestSender sender = new TestSender(level, new BlockPos(2, 1, 1));
-        RadioRegistry.add(receiver);
-
-        RadioRegistry.popMessage(level, sender, new TriggerActionMessage("beta"));
-
-        assertThat(helper, "received count", 0, receiver.messages);
-        helper.succeed();
+        try
+        {
+            RadioRegistry.add(receiver);
+            RadioRegistry.popMessage(level, sender, new TriggerActionMessage("beta"));
+            assertThat(helper, "received count", 0, receiver.messages);
+            helper.succeed();
+        }
+        finally
+        {
+            RadioRegistry.remove(receiver);
+        }
     }
 
     @GameTest
     public void emptyChannelIsNotSent(GameTestHelper helper)
     {
         final Level level = helper.getLevel();
-        RadioRegistry.clear(level.dimension());
-
         // receiver listens on the empty channel, so only the registry's rejection of EMPTY_HZ keeps it quiet
         final TestReceiver receiver = new TestReceiver(level, new BlockPos(1, 1, 1), RadioRegistry.EMPTY_HZ);
         final TestSender sender = new TestSender(level, new BlockPos(2, 1, 1));
-        RadioRegistry.add(receiver);
-
-        RadioRegistry.popMessage(level, sender, new TriggerActionMessage(RadioRegistry.EMPTY_HZ));
-
-        assertThat(helper, "received count", 0, receiver.messages);
-        helper.succeed();
+        try
+        {
+            RadioRegistry.add(receiver);
+            RadioRegistry.popMessage(level, sender, new TriggerActionMessage(RadioRegistry.EMPTY_HZ));
+            assertThat(helper, "received count", 0, receiver.messages);
+            helper.succeed();
+        }
+        finally
+        {
+            RadioRegistry.remove(receiver);
+        }
     }
 
     @GameTest
-    public void clearRemovesReceivers(GameTestHelper helper)
+    public void removeDropsReceiver(GameTestHelper helper)
     {
         final Level level = helper.getLevel();
-        RadioRegistry.clear(level.dimension());
-
         final TestReceiver receiver = new TestReceiver(level, new BlockPos(1, 1, 1), "alpha");
         final TestSender sender = new TestSender(level, new BlockPos(2, 1, 1));
         RadioRegistry.add(receiver);
 
         RadioRegistry.popMessage(level, sender, new TriggerActionMessage("alpha"));
-        assertThat(helper, "received count before clear", 1, receiver.messages);
+        assertThat(helper, "received count before remove", 1, receiver.messages);
 
-        RadioRegistry.clear(level.dimension());
-
+        RadioRegistry.remove(receiver);
         RadioRegistry.popMessage(level, sender, new TriggerActionMessage("alpha"));
-        assertThat(helper, "received count after clear", 1, receiver.messages);
+        assertThat(helper, "received count after remove", 1, receiver.messages);
         helper.succeed();
     }
 }

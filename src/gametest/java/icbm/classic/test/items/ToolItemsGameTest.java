@@ -83,17 +83,22 @@ public class ToolItemsGameTest
     public void remoteDetonatorTriggersSameChannel(GameTestHelper helper)
     {
         Level level = helper.getLevel();
-        RadioRegistry.clear(level.dimension());
         Receiver receiver = new Receiver(level, helper.absolutePos(new BlockPos(1, 1, 1)));
-        helper.assertTrue(RadioRegistry.add(receiver), "test receiver registers");
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        ItemStack stack = new ItemStack(ModItems.REMOTE_DETONATOR);
-        stack.set(ModDataComponents.RADIO_CHANNEL, "t1");
-        player.setItemInHand(InteractionHand.MAIN_HAND, stack);
-        UseItemCallback.EVENT.invoker().interact(player, level, InteractionHand.MAIN_HAND);
-        helper.assertTrue(receiver.triggerCount == 1, "same-channel receiver receives one trigger action");
-        RadioRegistry.clear(level.dimension());
-        helper.succeed();
+        try
+        {
+            helper.assertTrue(RadioRegistry.add(receiver), "test receiver registers");
+            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ItemStack stack = new ItemStack(ModItems.REMOTE_DETONATOR);
+            stack.set(ModDataComponents.RADIO_CHANNEL, "t1");
+            player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            UseItemCallback.EVENT.invoker().interact(player, level, InteractionHand.MAIN_HAND);
+            helper.assertTrue(receiver.triggerCount == 1, "same-channel receiver receives one trigger action");
+            helper.succeed();
+        }
+        finally
+        {
+            RadioRegistry.remove(receiver);
+        }
     }
 
     @GameTest
@@ -107,17 +112,27 @@ public class ToolItemsGameTest
                 net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block)));
         EntityExplosive entity = new EntityExplosive(level, new Pos(pos.getX(), pos.getY(), pos.getZ()), Direction.UP,
                 explosiveId, blockStack);
-        level.addFreshEntity(entity);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        ItemStack defuser = new ItemStack(ModItems.DEFUSER);
-        player.setItemInHand(InteractionHand.MAIN_HAND, defuser);
-        var result = AttackEntityCallback.EVENT.invoker().interact(player, level, InteractionHand.MAIN_HAND,
-                entity, new net.minecraft.world.phys.EntityHitResult(entity));
-        helper.assertTrue(result.consumesAction(), "attacking with the defuser consumes the entity interaction");
-        helper.assertTrue(entity.isRemoved(), "primed explosive entity removed");
-        helper.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, entity.getBoundingBox().inflate(1)).stream()
-                .anyMatch(drop -> ItemStack.isSameItem(drop.getItem(), blockStack)),
-                "defusing drops the explosive block stack, as the 1.12 entity capability did");
-        helper.succeed();
+        try
+        {
+            level.addFreshEntity(entity);
+            ServerPlayer player = helper.makeMockServerPlayerInLevel();
+            ItemStack defuser = new ItemStack(ModItems.DEFUSER);
+            player.setItemInHand(InteractionHand.MAIN_HAND, defuser);
+            var result = AttackEntityCallback.EVENT.invoker().interact(player, level, InteractionHand.MAIN_HAND,
+                    entity, new net.minecraft.world.phys.EntityHitResult(entity));
+            helper.assertTrue(result.consumesAction(), "attacking with the defuser consumes the entity interaction");
+            helper.assertTrue(entity.isRemoved(), "primed explosive entity removed");
+            helper.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                            entity.getBoundingBox().inflate(1)).stream()
+                            .anyMatch(drop -> ItemStack.isSameItem(drop.getItem(), blockStack)),
+                    "defusing drops the explosive block stack, as the 1.12 entity capability did");
+            helper.succeed();
+        }
+        finally
+        {
+            entity.discard();
+            level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, entity.getBoundingBox().inflate(1))
+                    .forEach(net.minecraft.world.entity.item.ItemEntity::discard);
+        }
     }
 }
