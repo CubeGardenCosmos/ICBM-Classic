@@ -87,7 +87,28 @@ class AbmMathTest
     {
         Vec3d current = new Vec3d(1, 0, 0);
         Vec3d closeDesired = new Vec3d(1, 1, 0).normalize();
-        assertEquals(closeDesired, Rotation.rotateTowards(current, closeDesired, Math.PI / 2));
+        // compare the direction, not the record: the answer is normalized internally so the last bit of a
+        // pre-normalized input can differ (same direction, 1 ulp apart)
+        Vec3d closeResult = Rotation.rotateTowards(current, closeDesired, Math.PI / 2);
+        assertEquals(1, closeResult.length(), 1e-6);
+        assertEquals(closeDesired.x(), closeResult.x(), 1e-6);
+        assertEquals(closeDesired.y(), closeResult.y(), 1e-6);
+        assertEquals(closeDesired.z(), closeResult.z(), 1e-6);
+
+        // the result of every branch is a direction (unit vector), including the "already aligned" branch
+        Vec3d alreadyAligned = Rotation.rotateTowards(current, new Vec3d(2, 0, 0), Math.PI / 2);
+        assertEquals(1, alreadyAligned.length(), 1e-6);
+        assertEquals(current, alreadyAligned);
+
+        // regression: a non unit `desired` must not leak its length into the answer, AbmGuidance scales
+        // the result by ConfigAbm.FLIGHT_SPEED and would otherwise move flight_speed * |desired| blocks
+        Vec3d nonUnitDesired = new Vec3d(0, 7, 0);
+        Vec3d normalizedDesired = nonUnitDesired.normalize();
+        Vec3d fromNonUnit = Rotation.rotateTowards(current, nonUnitDesired, Math.PI / 2);
+        assertEquals(1, fromNonUnit.length(), 1e-6);
+        assertEquals(normalizedDesired.x(), fromNonUnit.x(), 1e-6);
+        assertEquals(normalizedDesired.y(), fromNonUnit.y(), 1e-6);
+        assertEquals(normalizedDesired.z(), fromNonUnit.z(), 1e-6);
 
         Vec3d desired = new Vec3d(0, 1, 0);
         Vec3d rotated = Rotation.rotateTowards(current, desired, Math.PI / 6);

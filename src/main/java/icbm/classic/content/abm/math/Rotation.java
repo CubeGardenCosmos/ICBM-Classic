@@ -16,7 +16,10 @@ public final class Rotation
         double theta = Math.acos(clamp(a.dot(b), -1, 1));
         if (theta <= maxRadians)
         {
-            return desired;
+            // the function contract is "returns a direction": every other branch answers with a unit
+            // vector too, so the caller may scale the result by a speed (AbmGuidance does exactly that).
+            // Returning `desired` as-is made a non-unit desired input blow the caller's speed up.
+            return b;
         }
         if (theta > Math.PI - 1e-6)
         {
