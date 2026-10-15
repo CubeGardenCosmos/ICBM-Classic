@@ -427,7 +427,8 @@ public abstract class PacketCodex<RAW, TARGET>
     {
         try
         {
-            final CodexPayload payload = build(raw);
+            // Resolve receivers before building the payload: with nobody tracking the object the payload
+            // would be built and dropped. The description codex is queued every scan tick (perf-audit F5).
             final Collection<ServerPlayer> players;
             if (raw instanceof Entity entity)
             {
@@ -442,6 +443,11 @@ public abstract class PacketCodex<RAW, TARGET>
                 logError(null, null, "Cannot send packet(" + parent + ", " + name + ") to tracking players, target is not an entity or block entity: " + raw);
                 return;
             }
+            if (players.isEmpty())
+            {
+                return;
+            }
+            final CodexPayload payload = build(raw);
             players.forEach(player -> IcbmNetwork.sendToPlayer(payload, player));
         }
         catch (Exception e)
@@ -452,6 +458,11 @@ public abstract class PacketCodex<RAW, TARGET>
 
     public void sendToGuiUsers(RAW raw, Collection<ServerPlayer> players)
     {
+        // No receivers means the payload would be built and dropped, skip before building it (perf-audit F1)
+        if (players == null || players.isEmpty())
+        {
+            return;
+        }
         try
         {
             final CodexPayload payload = build(raw);

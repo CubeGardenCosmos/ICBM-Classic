@@ -40,14 +40,41 @@ public final class TrackTable
         return List.copyOf(tracks.values());
     }
 
+    /** True when the table holds no tracks at all, cheaper than copying {@link #values()} only to check emptiness */
+    public boolean isEmpty()
+    {
+        return tracks.isEmpty();
+    }
+
+    /** True when any track is a THREAT, short circuits instead of building and sorting a list (perf-audit F3) */
+    public boolean hasThreat()
+    {
+        for (RadarTrack track : tracks.values())
+        {
+            if (track.status == TrackStatus.THREAT) return true;
+        }
+        return false;
+    }
+
+    /** True when any track is ENGAGED, short circuits instead of building a list (perf-audit F3) */
+    public boolean hasEngaged()
+    {
+        for (RadarTrack track : tracks.values())
+        {
+            if (track.status == TrackStatus.ENGAGED) return true;
+        }
+        return false;
+    }
+
     public List<RadarTrack> threats()
     {
-        List<RadarTrack> threats = new ArrayList<>();
+        // Fresh list, so it is already isolated from the table; no need for a second defensive copy (perf-audit F3)
+        final List<RadarTrack> threats = new ArrayList<>();
         for (RadarTrack track : tracks.values())
         {
             if (track.status == TrackStatus.THREAT) threats.add(track);
         }
-        return List.copyOf(threats);
+        return threats;
     }
 
     /** Marks a missing contact LOST; tracks already LOST are removed on this subsequent scan. */
