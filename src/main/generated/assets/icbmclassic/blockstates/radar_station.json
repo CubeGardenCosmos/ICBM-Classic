@@ -1,0 +1,204 @@
+{
+  "variants": {
+    "facing=down,redstone=false,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=down,redstone=false,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=down,redstone=false,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=down,redstone=false,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=down,redstone=true,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=down,redstone=true,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=down,redstone=true,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=down,redstone=true,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 180
+    },
+    "facing=east,redstone=false,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,redstone=false,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,redstone=false,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,redstone=false,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,redstone=true,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,redstone=true,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,redstone=true,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,redstone=true,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,redstone=false,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=north,redstone=false,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=north,redstone=false,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=north,redstone=false,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=north,redstone=true,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=north,redstone=true,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=north,redstone=true,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=north,redstone=true,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90
+    },
+    "facing=south,redstone=false,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=south,redstone=false,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=south,redstone=false,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=south,redstone=false,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=south,redstone=true,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=south,redstone=true,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=south,redstone=true,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=south,redstone=true,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 270
+    },
+    "facing=up,redstone=false,type=danger": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=up,redstone=false,type=off": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=up,redstone=false,type=on": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=up,redstone=false,type=warning": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=up,redstone=true,type=danger": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=up,redstone=true,type=off": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=up,redstone=true,type=on": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=up,redstone=true,type=warning": {
+      "model": "icbmclassic:block/radar_screen"
+    },
+    "facing=west,redstone=false,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,redstone=false,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,redstone=false,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,redstone=false,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,redstone=true,type=danger": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,redstone=true,type=off": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,redstone=true,type=on": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,redstone=true,type=warning": {
+      "model": "icbmclassic:block/radar_screen",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

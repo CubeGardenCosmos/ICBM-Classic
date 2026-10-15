@@ -4,7 +4,6 @@ import icbm.classic.lib.radar.RadarRegistry;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
@@ -62,8 +61,6 @@ public class RadarRegistryGameTest
     @GameTest
     public void entityWithinRangeIsFound(GameTestHelper helper)
     {
-        final ServerLevel level = helper.getLevel();
-        RadarRegistry.clear(level.dimension());
 
         final BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));
         final Entity entity = spawnStand(helper, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
@@ -80,8 +77,6 @@ public class RadarRegistryGameTest
     @GameTest
     public void entityOutsideRangeIsNotFound(GameTestHelper helper)
     {
-        final ServerLevel level = helper.getLevel();
-        RadarRegistry.clear(level.dimension());
 
         final BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));
         final double farX = pos.getX() + 128;
@@ -98,8 +93,6 @@ public class RadarRegistryGameTest
     @GameTest
     public void removeDropsEntity(GameTestHelper helper)
     {
-        final ServerLevel level = helper.getLevel();
-        RadarRegistry.clear(level.dimension());
 
         final BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));
         final Entity entity = spawnStand(helper, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
@@ -117,8 +110,6 @@ public class RadarRegistryGameTest
     @GameTest
     public void entityFilterBlocksAdd(GameTestHelper helper)
     {
-        final ServerLevel level = helper.getLevel();
-        RadarRegistry.clear(level.dimension());
 
         final BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));
         final Entity entity = createStand(helper, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
