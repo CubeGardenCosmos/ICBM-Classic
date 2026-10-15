@@ -136,6 +136,7 @@
   "icbmclassic.item.ballistic_launcher.info": "Fires missiles in an arc towards target. Has a 3m pre-kick and 20m y+ offset.",
   "icbmclassic.item.balloon.info": "Comical way to drop payloads",
   "icbmclassic.item.battery.info": "Used to store and transport power",
+  "item.icbmclassic.battery": "Battery",
   "icbmclassic.item.circuit.advanced.name": "Advanced Circuit",
   "icbmclassic.item.circuit.basic.name": "Basic Circuit",
   "icbmclassic.item.circuit.elite.name": "Elite Circuit",

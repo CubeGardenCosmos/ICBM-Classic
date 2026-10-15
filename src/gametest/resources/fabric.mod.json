@@ -9,6 +9,7 @@
     ],
     "fabric-gametest": [
       "icbm.classic.test.energy.EnergyTransactionGameTest",
+      "icbm.classic.test.energy.BatteryDischargeGameTest",
       "icbm.classic.test.energy.LauncherNetworkEnergyGameTest",
       "icbm.classic.test.SmokeGameTest",
       "icbm.classic.test.regression.P1RegressionGameTests",

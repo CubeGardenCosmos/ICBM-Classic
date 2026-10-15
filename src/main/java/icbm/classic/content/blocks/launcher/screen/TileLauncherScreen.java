@@ -102,6 +102,7 @@ public class TileLauncherScreen extends TileMachine implements ILauncherComponen
             tile.radioCap.ensureRegistered();
             tile.getNetworkNode().connectToTiles();
         }
+        tile.tickPower();
         tile.serverTick((ServerLevel) level);
         if (tile.screenTicks % 5 == 0 || tile.refreshStatus)
         {
@@ -116,6 +117,11 @@ public class TileLauncherScreen extends TileMachine implements ILauncherComponen
         {
             tile.fireAllLaunchers(false);
         }
+    }
+
+    public void tickPower()
+    {
+        icbm.classic.lib.energy.EnergyItemSlotHelper.dischargeInto(inventory, 0, energyStorage);
     }
 
     @Override

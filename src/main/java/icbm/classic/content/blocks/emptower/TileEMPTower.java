@@ -111,6 +111,7 @@ public class TileEMPTower extends TileMachine implements IGuiTile, IMachineInfo,
             tile.radioRegistered = true;
             tile.radioCap.ensureRegistered();
         }
+        tile.tickPower();
         tile.serverTick((ServerLevel) level);
         EnergyRules.consumeOrFree(tile.energyStorage, tile.getTickingCost());
         if (tile.isReady() && level.hasNeighborSignal(pos)) tile.fire(null);
@@ -145,6 +146,11 @@ public class TileEMPTower extends TileMachine implements IGuiTile, IMachineInfo,
             }
             above = above.above();
         }
+    }
+
+    public void tickPower()
+    {
+        icbm.classic.lib.energy.EnergyItemSlotHelper.dischargeInto(inventory, 0, energyStorage);
     }
 
     private static boolean isReservedBatteryItem(net.minecraft.world.item.ItemStack stack)

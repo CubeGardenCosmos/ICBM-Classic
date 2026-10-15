@@ -132,6 +132,11 @@ public class TileLauncherBase extends TileMachine implements ILauncherComponent,
         tickActions.add(inventory);
     }
 
+    public void tickPower()
+    {
+        icbm.classic.lib.energy.EnergyItemSlotHelper.dischargeInto(inventory, 1, energyStorage);
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity)
     {
         final TileLauncherBase be = (TileLauncherBase) blockEntity;
@@ -145,6 +150,7 @@ public class TileLauncherBase extends TileMachine implements ILauncherComponent,
             be.networkInitialized = true;
             be.launcherNode.connectToTiles();
         }
+        be.tickPower();
         be.serverTick((ServerLevel) level);
     }
 

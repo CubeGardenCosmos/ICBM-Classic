@@ -153,6 +153,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             tile.radioRegistered = true;
             tile.radio.ensureRegistered();
         }
+        tile.tickPower();
         tile.serverTick((ServerLevel) level);
         final boolean hasPower = EnergyRules.consumeOrFree(tile.energyStorage, tile.getEnergyCost());
         if (hasPower)
@@ -194,6 +195,11 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             level.setBlock(pos, visualState, Block.UPDATE_ALL);
             tile.preRadarVisualState = tile.radarVisualState;
         }
+    }
+
+    public void tickPower()
+    {
+        icbm.classic.lib.energy.EnergyItemSlotHelper.dischargeInto(inventory, 0, energyStorage);
     }
 
     private static boolean isReservedBatteryItem(ItemStack stack)

@@ -8,6 +8,7 @@ import icbm.classic.content.blocks.launcher.frame.TileLauncherFrame;
 import icbm.classic.content.blocks.launcher.network.LauncherNetwork;
 import icbm.classic.content.reg.ModBlockEntities;
 import icbm.classic.content.reg.ModBlocks;
+import icbm.classic.content.reg.ModItems;
 import icbm.classic.ICBMClassic;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -16,6 +17,7 @@ public final class EnergyApi {
     private EnergyApi() {}
 
     public static void register() {
+        EnergyStorage.ITEM.registerForItems((stack, context) -> BatteryItem.createStorage(context), ModItems.BATTERY);
         EnergyStorage.SIDED.registerForBlockEntity((be, dir) -> be.getExposedEnergy(), ModBlockEntities.LAUNCHER_BASE);
         EnergyStorage.SIDED.registerForBlockEntity((be, dir) -> be.getExposedEnergy(), ModBlockEntities.CRUISE_LAUNCHER);
         EnergyStorage.SIDED.registerForBlockEntity((be, dir) -> be.getExposedEnergy(), ModBlockEntities.LAUNCHER_SCREEN);

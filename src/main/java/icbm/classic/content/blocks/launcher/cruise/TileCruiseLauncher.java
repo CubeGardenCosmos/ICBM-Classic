@@ -143,6 +143,11 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
         return !stack.isEmpty() && BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(ICBMConstants.id("battery"));
     }
 
+    public void tickPower()
+    {
+        icbm.classic.lib.energy.EnergyItemSlotHelper.dischargeInto(inventory, 1, energyStorage);
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState state, net.minecraft.world.level.block.entity.BlockEntity blockEntity)
     {
         final TileCruiseLauncher tile = (TileCruiseLauncher) blockEntity;
@@ -158,6 +163,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
             tile.launcherNode.connectToTiles();
         }
         tile.serverTicks++;
+        tile.tickPower();
         tile.serverTick((ServerLevel) level);
         tile.deltaTime = Math.min(1.0, Math.max(0.0, (System.nanoTime() - tile.lastRotationUpdate) / 100000000.0));
         tile.lastRotationUpdate = System.nanoTime();

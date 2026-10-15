@@ -5,7 +5,7 @@ import icbm.classic.content.items.ExplosiveFormItem;
 import icbm.classic.content.items.ItemBombCart;
 import icbm.classic.content.items.ItemGrenade;
 import icbm.classic.content.items.ItemAntidote;
-import icbm.classic.content.items.ItemBattery;
+import icbm.classic.lib.energy.BatteryItem;
 import icbm.classic.content.items.ItemDefuser;
 import icbm.classic.content.items.ItemLaserDetonator;
 import icbm.classic.content.items.ItemRadarGun;
@@ -166,7 +166,7 @@ public final class ModItems
         ROCKET_LAUNCHER = RegHelper.item("rocket_launcher", p -> new ItemRocketLauncher(false, p), new Item.Properties().stacksTo(1));
         BALLISTIC_LAUNCHER = RegHelper.item("ballistic_launcher", p -> new ItemRocketLauncher(true, p), new Item.Properties().stacksTo(1));
         DEFUSER = RegHelper.item("defuser", ItemDefuser::new, new Item.Properties().stacksTo(1));
-        BATTERY = RegHelper.item("battery", ItemBattery::new, new Item.Properties().stacksTo(1));
+        BATTERY = RegHelper.item("battery", BatteryItem::new, new Item.Properties().stacksTo(1));
 
         ItemRemoteDetonator.registerUseCallback();
         ItemLaserDetonator.registerUseCallback();
