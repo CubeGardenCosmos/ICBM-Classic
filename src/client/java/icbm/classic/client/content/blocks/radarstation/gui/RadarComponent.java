@@ -82,11 +82,12 @@ public class RadarComponent implements IGuiComponent
         {
             final int px = gx + dot.x();
             final int py = gy + dot.y();
-            final int color = switch (dot.type())
+            final int color = dot.type() == RadarDotType.MARKER ? MARKER_COLOR : switch (Byte.toUnsignedInt(dot.status()))
             {
-                case MARKER -> MARKER_COLOR;
-                case HOSTILE -> HOSTILE_COLOR;
-                case INCOMING -> INCOMING_COLOR;
+                case 0 -> 0xFF00FF00;
+                case 1 -> 0xFFFFFF00;
+                case 2 -> 0xFFFF0000;
+                case 3 -> 0xFF808080;
                 default -> 0;
             };
             if (color != 0)

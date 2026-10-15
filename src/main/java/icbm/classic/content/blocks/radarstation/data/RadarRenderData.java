@@ -1,5 +1,7 @@
 package icbm.classic.content.blocks.radarstation.data;
 
+import icbm.classic.content.abm.radar.RadarTrack;
+import icbm.classic.content.abm.radar.TrackStatus;
 import icbm.classic.content.blocks.radarstation.TileRadarStation;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
@@ -41,11 +43,20 @@ public class RadarRenderData
         addDot(x - trigger, z, RadarDotType.MARKER);
         addDot(x, z + trigger, RadarDotType.MARKER);
         addDot(x, z - trigger, RadarDotType.MARKER);
-        host.getDetectedThreats().forEach(entity -> addDot(entity.getX(), entity.getZ(), RadarDotType.HOSTILE));
-        host.getIncomingThreats().forEach(entity -> addDot(entity.x(), entity.z(), RadarDotType.INCOMING));
+        for (RadarTrack track : host.getTrackTable().values())
+        {
+            if (track.status == TrackStatus.LOST) continue;
+            final RadarDotType type = track.status == TrackStatus.DETECTED
+                    ? RadarDotType.HOSTILE : RadarDotType.INCOMING;
+            addDot(track.position.x(), track.position.z(), type, (byte) track.status.ordinal());
+        }
     }
 
     public void addDot(double ex, double ez, RadarDotType type)
+    {
+        addDot(ex, ez, type, (byte) 0);
+    }
+    public void addDot(double ex, double ez, RadarDotType type, byte status)
     {
         final double deltaX = ex - (host.getBlockPos().getX() + 0.5);
         final double deltaZ = ez - (host.getBlockPos().getZ() + 0.5);
@@ -53,7 +64,7 @@ public class RadarRenderData
         final double vecZ = deltaZ / host.getDetectionRange();
         final int x = (int) Math.floor(vecX * (UV_SIZE / 2f));
         final int z = (int) Math.floor(vecZ * (UV_SIZE / 2f));
-        dots.add(new RadarRenderDot(x, z, type));
+        dots.add(new RadarRenderDot(x, z, type, status));
     }
 
     public void clear()
@@ -73,7 +84,7 @@ public class RadarRenderData
         final int dotCount = buf.readInt();
         for (int i = 0; i < dotCount; i++)
         {
-            values.add(new RadarRenderDot(buf.readInt(), buf.readInt(), RadarDotType.get(buf.readByte())));
+            values.add(new RadarRenderDot(buf.readInt(), buf.readInt(), RadarDotType.get(buf.readByte()), buf.readByte()));
         }
         return values;
     }
@@ -86,6 +97,7 @@ public class RadarRenderData
             buf.writeInt(dot.x());
             buf.writeInt(dot.y());
             buf.writeByte(dot.type().ordinal());
+            buf.writeByte(dot.status());
         });
     }
 }

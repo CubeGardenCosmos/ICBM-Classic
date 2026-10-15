@@ -10,9 +10,11 @@ import icbm.classic.content.abm.radar.RadarTrack;
 import icbm.classic.content.abm.radar.TrackStatus;
 import icbm.classic.content.abm.radar.TrackTable;
 import icbm.classic.content.abm.radar.Vectors;
+import icbm.classic.content.abm.radar.RadarDefenseMode;
 import icbm.classic.ICBMConstants;
 import icbm.classic.api.ICBMClassicHelpers;
 import icbm.classic.api.missiles.IMissile;
+import icbm.classic.api.missiles.parts.IMissileTarget;
 import icbm.classic.config.ConfigMain;
 import icbm.classic.config.machines.ConfigRadar;
 import icbm.classic.content.blocks.radarstation.data.RadarRenderData;
@@ -55,6 +57,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -75,6 +78,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     private int detectionRange = 100;
     private int triggerRange = 50;
     private boolean outputRedstone = true;
+    private RadarDefenseMode defenseMode = RadarDefenseMode.ABM_THEN_EMP;
     private final TrackTable trackTable = new TrackTable();
     private final FireControl fireControl = new FireControl();
     private final RadarRenderData radarRenderData = new RadarRenderData(this);
@@ -115,6 +119,12 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             (PacketCodexTile<TileRadarStation, TileRadarStation>) new PacketCodexTile<TileRadarStation, TileRadarStation>(REGISTRY_NAME, "range.detection", TileRadarStation.class)
                     .fromClient().nodeInt(TileRadarStation::getDetectionRange, (tile, value) -> tile.setDetectionRange(Math.max(1, Math.min(ConfigRadar.MAX_RANGE, value))))
                     .onFinished((tile, target, player) -> tile.setChanged());
+    public static final PacketCodexTile<TileRadarStation, TileRadarStation> PACKET_DEFENSE_MODE =
+            (PacketCodexTile<TileRadarStation, TileRadarStation>) new PacketCodexTile<TileRadarStation, TileRadarStation>(REGISTRY_NAME, "defense_mode", TileRadarStation.class)
+                    .fromClient().nodeInt(tile -> tile.defenseMode.ordinal(), (tile, value) -> {
+                        if (value >= 0 && value < RadarDefenseMode.values().length)
+                            tile.setDefenseMode(RadarDefenseMode.values()[value]);
+                    }).onFinished((tile, target, player) -> tile.setChanged());
     public static final PacketCodexTile<TileRadarStation, TileRadarStation> PACKET_REDSTONE_OUTPUT =
             (PacketCodexTile<TileRadarStation, TileRadarStation>) new PacketCodexTile<TileRadarStation, TileRadarStation>(REGISTRY_NAME, "redstone.output", TileRadarStation.class)
                     .fromClient().toggleBoolean(TileRadarStation::isOutputRedstone, TileRadarStation::setOutputRedstone)
@@ -127,6 +137,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
                     .nodeString(tile -> tile.radio.getChannel(), (tile, value) -> tile.radio.setChannel(value))
                     .nodeBoolean(tile -> tile.radio.isDisabled(), (tile, value) -> tile.radio.setDisabled(value))
                     .nodeBoolean(TileRadarStation::isOutputRedstone, TileRadarStation::setOutputRedstone)
+                    .nodeEnum(RadarDefenseMode.class, TileRadarStation::getDefenseMode, TileRadarStation::setDefenseMode)
                     .node(tile -> tile.radarRenderData.getDots(), (tile, dots) -> tile.radarRenderData.setDots(dots),
                             RadarRenderData::encodeDots, RadarRenderData::decodeDots);
 
@@ -147,7 +158,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     public static void registerCodexes()
     {
         PacketCodexReg.register(PACKET_DESCRIPTION, PACKET_GUI, PACKET_RADIO_HZ, PACKET_RADIO_DISABLE,
-                PACKET_TRIGGER_RANGE, PACKET_DETECTION_RANGE, PACKET_REDSTONE_OUTPUT);
+                PACKET_TRIGGER_RANGE, PACKET_DETECTION_RANGE, PACKET_REDSTONE_OUTPUT, PACKET_DEFENSE_MODE);
     }
 
 
@@ -170,15 +181,26 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         if (hasPower)
         {
             if (tile.ticks % ConfigRadar.SCAN_TICKS == 0) tile.doScan();
-            if (level instanceof ServerLevel serverLevel) tile.fireControl.tick(serverLevel, tile);
-            if (!tile.radio.getChannel().equals(RadioRegistry.EMPTY_HZ) && !tile.getIncomingThreats().isEmpty())
+            if (level instanceof ServerLevel serverLevel && (tile.defenseMode == RadarDefenseMode.ABM_ONLY
+                    || tile.defenseMode == RadarDefenseMode.ABM_THEN_EMP))
+                tile.fireControl.tick(serverLevel, tile);
+            if (tile.defenseMode == RadarDefenseMode.EMP_ONLY
+                    || tile.defenseMode == RadarDefenseMode.ABM_THEN_EMP)
             {
-                if (tile.firingCooldown > 0) tile.firingCooldown--;
-                if (tile.firingCooldown <= 0)
+                final List<RadarTrack> empTargets = tile.empTargets();
+                if (!tile.radio.getChannel().equals(RadioRegistry.EMPTY_HZ) && !empTargets.isEmpty())
                 {
-                    tile.firingCooldown = ConfigRadar.SAM_TICKS;
-                    RadioRegistry.popMessage(level, tile.radio,
-                            new IncomingMissileMessage(tile.radio.getChannel(), tile.getIncomingThreats().get(0), true));
+                    if (tile.firingCooldown > 0) tile.firingCooldown--;
+                    if (tile.firingCooldown <= 0)
+                    {
+                        tile.firingCooldown = ConfigRadar.SAM_TICKS;
+                        final Level currentLevel = tile.getLevel();
+                        final RadarTrack track = empTargets.get(0);
+                        final Entity missile = currentLevel == null ? null : currentLevel.getEntity(track.targetId);
+                        if (missile instanceof IMissile)
+                            RadioRegistry.popMessage(level, tile.radio,
+                                    new IncomingMissileMessage(tile.radio.getChannel(), (IMissile) missile, true));
+                    }
                 }
             }
         }
@@ -254,14 +276,26 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
                 track.lastSeenTick = now;
             }
 
+            final IMissileTarget target = ConfigAbm.USE_MISSILE_TARGET_DATA ? missile.getTargetData() : null;
+            final boolean useTarget = target != null && target.isValid() && target.getPosition() != null;
+            final Vec3 targetPos = useTarget ? target.getPosition() : null;
             final Prediction prediction = TrajectoryPredictor.predictImpact(position, velocity, track.acceleration,
-                    getBlockPos().getY(), ConfigAbm.PREDICTION_MAX_TICKS);
-            track.predictedImpact = prediction == null ? null : prediction.impact();
-            track.ticksToImpact = prediction == null ? Integer.MAX_VALUE : prediction.ticks();
+                    useTarget ? targetPos.y : getBlockPos().getY(), ConfigAbm.PREDICTION_MAX_TICKS);
+            if (useTarget)
+            {
+                // design §5: impact is the missile's own target; ticks still come from extrapolation
+                track.predictedImpact = Vectors.from(targetPos);
+                track.ticksToImpact = prediction != null ? prediction.ticks() : horizontalTicks(position, velocity, track.predictedImpact);
+            }
+            else
+            {
+                track.predictedImpact = prediction == null ? null : prediction.impact();
+                track.ticksToImpact = prediction == null ? Integer.MAX_VALUE : prediction.ticks();
+            }
 
             final TrackStatus nextStatus = track.status == TrackStatus.ENGAGED
                     ? TrackStatus.ENGAGED
-                    : prediction != null && horizontalDistanceSqr(prediction.impact()) <= (double) triggerRange * triggerRange
+                    : track.predictedImpact != null && horizontalDistanceSqr(track.predictedImpact) <= (double) triggerRange * triggerRange
                     ? TrackStatus.THREAT
                     : TrackStatus.DETECTED;
             track.setStatus(nextStatus, now);
@@ -282,6 +316,15 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         if (!playersUsing.isEmpty()) radarRenderData.update();
     }
 
+    /** Design §5 fallback when extrapolation finds no landing: horizontal distance over horizontal speed (min 0.1). */
+    private static int horizontalTicks(Vec3d position, Vec3d velocity, Vec3d target)
+    {
+        final double dx = target.x() - position.x();
+        final double dz = target.z() - position.z();
+        final double speed = Math.max(Math.hypot(velocity.x(), velocity.z()), 0.1);
+        return (int) Math.ceil(Math.hypot(dx, dz) / speed);
+    }
+
     private double horizontalDistanceSqr(Vec3d point)
     {
         final double dx = point.x() - (getBlockPos().getX() + 0.5);
@@ -292,6 +335,15 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     private List<RadarTrack> orderedThreats()
     {
         return trackTable.threats().stream()
+                .sorted(Comparator.comparingInt(track -> track.ticksToImpact))
+                .toList();
+    }
+    private List<RadarTrack> empTargets()
+    {
+        final boolean fallbackOnly = defenseMode == RadarDefenseMode.ABM_THEN_EMP;
+        return trackTable.values().stream()
+                .filter(track -> track.status == TrackStatus.THREAT || track.status == TrackStatus.ENGAGED)
+                .filter(track -> !fallbackOnly || track.ticksToImpact <= ConfigAbm.EMP_FALLBACK_TICKS)
                 .sorted(Comparator.comparingInt(track -> track.ticksToImpact))
                 .toList();
     }
@@ -353,13 +405,15 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
     public boolean hasIncomingMissiles()
     {
-        return !getIncomingThreats().isEmpty();
+        return !getIncomingThreats().isEmpty()
+                || trackTable.values().stream().anyMatch(track -> track.status == TrackStatus.ENGAGED);
     }
-
     public int getDetectionRange() { return detectionRange; }
     public void setDetectionRange(int value) { detectionRange = value; }
     public int getTriggerRange() { return triggerRange; }
     public void setTriggerRange(int value) { triggerRange = value; }
+    public RadarDefenseMode getDefenseMode() { return defenseMode; }
+    public void setDefenseMode(RadarDefenseMode value) { defenseMode = value; }
     public boolean isOutputRedstone() { return outputRedstone; }
     public void setOutputRedstone(boolean value) { outputRedstone = value; }
     public List<Entity> getDetectedThreats() { return detectedThreats(); }
@@ -407,6 +461,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         SAVE_LOGIC.save(this, out);
         out.putLong("energy", energyStorage.getStored());
         out.putInt("sam_delay", firingCooldown);
+        out.putString("defense_mode", defenseMode.name());
     }
 
     @Override
@@ -416,6 +471,10 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         SAVE_LOGIC.load(this, in);
         energyStorage.setStored(in.getLongOr("energy", 0));
         firingCooldown = in.getIntOr("sam_delay", 0);
+        in.getString("defense_mode").ifPresent(value -> {
+            try { defenseMode = RadarDefenseMode.valueOf(value); }
+            catch (IllegalArgumentException ignored) { defenseMode = RadarDefenseMode.ABM_THEN_EMP; }
+        });
     }
 
     private static final SaveHandler<TileRadarStation> SAVE_LOGIC = new SaveHandler<TileRadarStation>()
