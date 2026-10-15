@@ -17,13 +17,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class AbmInterceptGameTest
 {
-    private static final AtomicInteger interceptedCount = new AtomicInteger();
-    private static volatile UUID observedTarget;
-    private static volatile UUID cancelledTarget;
-    private static volatile boolean cancel;
+    private static final java.util.concurrent.ConcurrentMap<UUID, AtomicInteger> interceptedCounts =
+            new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<UUID> cancelledTargets = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final InterceptEvents.Intercepted OBSERVER = (level, abm, target, point) -> {
-        if (target.getUUID().equals(observedTarget)) interceptedCount.incrementAndGet();
-        return !cancel || !target.getUUID().equals(cancelledTarget);
+        AtomicInteger count = interceptedCounts.get(target.getUUID());
+        if (count != null) count.incrementAndGet();
+        return !cancelledTargets.contains(target.getUUID());
     };
     static { InterceptEvents.INTERCEPTED.register(OBSERVER); }
 
@@ -52,43 +52,44 @@ public class AbmInterceptGameTest
         @Override protected boolean shouldDetonateInterceptedWarhead() { return detonateWarhead; }
     }
 
-    @GameTest(maxTicks = 80, padding = 8)
+    @GameTest(maxTicks = 80, padding = 32)
     public void crossingTargetInterceptsOnceWithoutBlockDamage(GameTestHelper helper)
     {
         BlockPos ground = new BlockPos(3, 1, 3);
         helper.setBlock(ground, Blocks.STONE);
-        TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
+        TestMissile target = spawnTarget(helper, new Vec3(3.5, 6.5, 3.5));
         target.setDeltaMovement(0, 0, 1);
-        observedTarget = target.getUUID(); interceptedCount.set(0);
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), true, false);
+        interceptedCounts.put(target.getUUID(), new AtomicInteger());
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(3.5, 6.5, 5.5), new Vec3(0, 0, -4), true, false);
         helper.runAfterDelay(4, () -> {
             helper.assertTrue(target.isRemoved(), "intercepted target must be removed");
-            helper.assertTrue(interceptedCount.get() == 1, "intercept event must fire exactly once");
+            helper.assertTrue(interceptedCounts.get(target.getUUID()).get() == 1, "intercept event must fire exactly once");
+            interceptedCounts.remove(target.getUUID());
             helper.assertBlockState(ground, state -> state.is(Blocks.STONE), state -> net.minecraft.network.chat.Component.literal("visual explosion damaged ground"));
             helper.assertTrue(abm.isRemoved(), "ABM must be removed after successful interception");
             helper.succeed();
         });
     }
 
-    @GameTest(maxTicks = 80, padding = 8)
+    @GameTest(maxTicks = 80, padding = 32)
     public void listenerCanCancelInterception(GameTestHelper helper)
     {
-        TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
-        cancelledTarget = target.getUUID(); cancel = true;
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), true, false);
+        TestMissile target = spawnTarget(helper, new Vec3(3.5, 6.5, 3.5));
+        cancelledTargets.add(target.getUUID());
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(3.5, 6.5, 5.5), new Vec3(0, 0, -4), true, false);
         helper.runAfterDelay(50, () -> {
-            cancel = false;
+            cancelledTargets.remove(target.getUUID());
             helper.assertTrue(!target.isRemoved(), "cancelled intercept must leave target alive");
             helper.assertTrue(abm.isRemoved(), "ABM must self-destruct after cancelled intercept");
             helper.succeed();
         });
     }
 
-    @GameTest(maxTicks = 80, padding = 8)
+    @GameTest(maxTicks = 80, padding = 32)
     public void failedHitChanceSelfDestructs(GameTestHelper helper)
     {
-        TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), false, false);
+        TestMissile target = spawnTarget(helper, new Vec3(3.5, 6.5, 3.5));
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(3.5, 6.5, 5.5), new Vec3(0, 0, -4), false, false);
         helper.runAfterDelay(50, () -> {
             helper.assertTrue(!target.isRemoved(), "missed target must remain alive");
             helper.assertTrue(abm.isRemoved(), "ABM must self-destruct after a fuse miss");
@@ -96,25 +97,25 @@ public class AbmInterceptGameTest
         });
     }
 
-    @GameTest(maxTicks = 80, padding = 8)
+    @GameTest(maxTicks = 80, padding = 32)
     public void highSpeedCrossingResolvesFuse(GameTestHelper helper)
     {
-        TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 3.5));
+        TestMissile target = spawnTarget(helper, new Vec3(3.5, 2.0, 3.5));
         target.setDeltaMovement(0, 0, 6);
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 9.5), new Vec3(0, 0, -4), true, false);
+        spawnAbm(helper, target, new Vec3(3.5, 2.0, 5.5), new Vec3(0, 0, -4), true, false);
         helper.runAfterDelay(20, () -> {
             helper.assertTrue(target.isRemoved(), "high-speed crossing must be detected by closest approach");
             helper.succeed();
         });
     }
 
-    @GameTest(maxTicks = 80, padding = 8)
+    @GameTest(maxTicks = 80, padding = 32)
     public void targetWarheadCanDamageNearbyBlock(GameTestHelper helper)
     {
-        BlockPos stone = new BlockPos(6, 6, 6);
+        BlockPos stone = new BlockPos(4, 6, 4);
         helper.setBlock(stone, Blocks.STONE);
-        TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), true, true);
+        TestMissile target = spawnTarget(helper, new Vec3(3.5, 6.5, 3.5));
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(3.5, 6.5, 5.5), new Vec3(0, 0, -4), true, true);
         helper.runAfterDelay(5, () -> {
             helper.assertTrue(abm.isRemoved(), "ABM must be removed after a warhead-enabled intercept");
             helper.assertTrue(!helper.getBlockState(stone).is(Blocks.STONE), "target warhead should damage nearby block");
@@ -126,6 +127,12 @@ public class AbmInterceptGameTest
     {
         TestMissile target = new TestMissile(helper.getLevel());
         target.setPos(absolute(helper, position));
+        // TestMissile overrides tick() without calling super.tick(), so Entity's previous-position fields
+        // (xo/yo/zo) are never synced by baseTick. Seed them so the proximity fuse reads a valid previous
+        // position even when the fuse runs before this entity's first tick in the same level tick.
+        target.xo = target.getX();
+        target.yo = target.getY();
+        target.zo = target.getZ();
         helper.getLevel().addFreshEntity(target);
         return target;
     }

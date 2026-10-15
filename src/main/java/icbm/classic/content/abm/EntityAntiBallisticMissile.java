@@ -138,6 +138,18 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     @Override
     protected void decreaseMotion() { }
 
+    /**
+     * Interception is resolved by the proximity fuse (ABM design §8.2). Letting the projectile impact path
+     * run would destroy the ABM on contact with its target - and only if the entity happens to be traced
+     * before the fuse check in the same level tick - leaving the target alive. Ignore entity impacts so the
+     * closest-approach fuse always decides the engagement; terrain impacts keep the inherited behaviour.
+     */
+    @Override
+    protected boolean ignoreImpact(net.minecraft.world.phys.HitResult hit)
+    {
+        return hit instanceof net.minecraft.world.phys.EntityHitResult || super.ignoreImpact(hit);
+    }
+
     public void updateGuidanceRotation(Vec3 velocity)
     {
         if (velocity.horizontalDistanceSqr() > 1.0e-12)

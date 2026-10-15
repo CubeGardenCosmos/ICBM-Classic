@@ -48,9 +48,10 @@ public class RadarTrackGameTest
         final BlockPos radarPos = helper.absolutePos(localRadar);
         final TileRadarStation radar = (TileRadarStation) helper.getLevel().getBlockEntity(radarPos);
         helper.assertTrue(radar != null, "radar station block entity must be present");
-        radar.setDetectionRange(100);
+        radar.setDetectionRange(48);
         radar.setTriggerRange(10);
         radar.energyStorage.setStored(radar.energyStorage.getCapacity());
+        helper.onEachTick(() -> radar.energyStorage.setStored(radar.energyStorage.getCapacity()));
 
         final TestMissile missile = new TestMissile(helper.getLevel());
         missile.explosive.setStack(new net.minecraft.world.item.ItemStack(
@@ -64,14 +65,15 @@ public class RadarTrackGameTest
         return new Fixture(radar, radarPos, missile);
     }
 
-    @GameTest(maxTicks = 10, padding = 16)
+    @GameTest(maxTicks = 10, padding = 128)
     public void inboundMissileProducesThreatTrackAndRedstone(GameTestHelper helper)
     {
         final Fixture fixture = setup(helper, 0, 0);
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
             RadarRegistry.add(fixture.missile());
             final RadarTrack track = fixture.radar().getTrackTable().get(fixture.missile().getUUID());
-            if (track == null) return;
+            helper.assertTrue(track != null, "radar must create the expected track");
             helper.assertTrue(track.status == TrackStatus.THREAT, "impact inside protection range must be THREAT");
             helper.assertTrue(track.predictedImpact != null, "threat must have predicted impact point");
             final double dx = track.predictedImpact.x() - (fixture.pos().getX() + 0.5);
@@ -84,14 +86,15 @@ public class RadarTrackGameTest
         });
     }
 
-    @GameTest(maxTicks = 10, padding = 16)
+    @GameTest(maxTicks = 10, padding = 128)
     public void sidewaysMissileOutsideProtectionIsDetected(GameTestHelper helper)
     {
-        final Fixture fixture = setup(helper, 5, 1);
+        final Fixture fixture = setup(helper, 3, 1);
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
             RadarRegistry.add(fixture.missile());
             final RadarTrack track = fixture.radar().getTrackTable().get(fixture.missile().getUUID());
-            if (track == null) return;
+            helper.assertTrue(track != null, "radar must create the expected track");
             helper.assertTrue(track.status == TrackStatus.DETECTED,
                     "sideways trajectory landing outside protection range must remain DETECTED");
             helper.assertTrue(track.predictedImpact != null, "detected missile still records a predicted impact");
@@ -100,15 +103,21 @@ public class RadarTrackGameTest
         });
     }
 
-    @GameTest(maxTicks = 12, padding = 16)
+    @GameTest(maxTicks = 12, padding = 128)
     public void missingTargetIsLostThenRemoved(GameTestHelper helper)
     {
         final Fixture fixture = setup(helper, 0, 0);
+        final boolean[] removalChecksScheduled = { false };
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
+            if (removalChecksScheduled[0]) {
+                helper.assertTrue(false, "waiting for lost-track removal checks");
+            }
             RadarRegistry.add(fixture.missile());
             final RadarTrack existing = fixture.radar().getTrackTable().get(fixture.missile().getUUID());
-            if (existing == null) return;
+            helper.assertTrue(existing != null, "radar must create the expected track");
             fixture.missile().discard();
+            removalChecksScheduled[0] = true;
             helper.runAfterDelay(1, () -> {
                 final RadarTrack lost = fixture.radar().getTrackTable().get(fixture.missile().getUUID());
                 helper.assertTrue(lost != null && lost.status == TrackStatus.LOST,
@@ -119,6 +128,7 @@ public class RadarTrackGameTest
                     helper.succeed();
                 });
             });
+            helper.assertTrue(false, "waiting for lost-track removal checks");
         });
     }
 }

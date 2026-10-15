@@ -23,7 +23,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class LauncherInterceptGameTest
 {
-    private static final String CHANNEL = "launcher-intercept-test";
+    private static final String SCREEN_TEST_CHANNEL = "launcher-intercept-screen-test";
+    private static final String CRUISE_TEST_CHANNEL = "launcher-intercept-cruise-test";
 
     private static final class FrozenThreat extends EntityExplosiveMissile
     {
@@ -44,16 +45,17 @@ public class LauncherInterceptGameTest
 
     private record Fixture(TileRadarStation radar, FrozenThreat threat) { }
 
-    private Fixture addThreat(GameTestHelper helper, BlockPos radarLocal)
+    private Fixture addThreat(GameTestHelper helper, BlockPos radarLocal, String channel)
     {
         helper.setBlock(radarLocal, ModBlocks.RADAR_STATION);
         final BlockPos radarPos = helper.absolutePos(radarLocal);
         final TileRadarStation radar = (TileRadarStation) helper.getLevel().getBlockEntity(radarPos);
         helper.assertTrue(radar != null, "radar block entity must be present");
-        radar.setDetectionRange(100);
+        radar.setDetectionRange(48);
         radar.setTriggerRange(10);
-        radar.getRadio().setChannel(CHANNEL);
+        radar.getRadio().setChannel(channel);
         radar.energyStorage.setStored(radar.energyStorage.getCapacity());
+        helper.onEachTick(() -> radar.energyStorage.setStored(radar.energyStorage.getCapacity()));
 
         final FrozenThreat threat = new FrozenThreat(helper.getLevel());
         threat.explosive.setStack(new ItemStack(ModItems.EXPLOSIVE_MISSILES.get(ICBMExplosives.CONDENSED.getRegistryKey())));
@@ -66,7 +68,7 @@ public class LauncherInterceptGameTest
         return new Fixture(radar, threat);
     }
 
-    @GameTest(maxTicks = 240, padding = 16)
+    @GameTest(maxTicks = 240, padding = 128)
     public void incomingNotificationDoesNotFireNuclearScreenLauncher(GameTestHelper helper)
     {
         final BlockPos baseLocal = new BlockPos(1, 1, 1);
@@ -79,15 +81,19 @@ public class LauncherInterceptGameTest
         helper.assertTrue(base != null && screen != null, "launcher base and screen must be present");
         base.inventory.setItem(0, new ItemStack(ModItems.EXPLOSIVE_MISSILES.get(ICBMExplosives.NUCLEAR.getRegistryKey())));
         base.energyStorage.setStored(base.energyStorage.getCapacity());
-        screen.radioCap.setChannel(CHANNEL);
+        helper.onEachTick(() -> base.energyStorage.setStored(base.energyStorage.getCapacity()));
+        screen.radioCap.setChannel(SCREEN_TEST_CHANNEL);
 
-        final Fixture fixture = addThreat(helper, new BlockPos(5, 1, 1));
+        final Fixture fixture = addThreat(helper, new BlockPos(5, 1, 1), SCREEN_TEST_CHANNEL);
         final AABB launcherBounds = new AABB(basePos).inflate(16);
         final int initialMissiles = helper.getLevel().getEntitiesOfClass(EntityExplosiveMissile.class, launcherBounds).size();
         final long startTick = helper.getLevel().getGameTime();
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
+            base.energyStorage.setStored(base.energyStorage.getCapacity());
             RadarRegistry.add(fixture.threat());
-            if (helper.getLevel().getGameTime() - startTick < 200) return;
+            helper.assertTrue(helper.getLevel().getGameTime() - startTick >= 200,
+                    "observation window must elapse");
             final var track = fixture.radar().getTrackTable().get(fixture.threat().getUUID());
             helper.assertTrue(track != null && track.status == TrackStatus.THREAT,
                     "same-channel radar must detect the incoming missile as a threat");
@@ -101,22 +107,25 @@ public class LauncherInterceptGameTest
         });
     }
 
-    @GameTest(maxTicks = 300, padding = 16)
+    @GameTest(maxTicks = 300, padding = 128)
     public void cruiseLauncherRespondsToRadarInterceptOrder(GameTestHelper helper)
     {
-        final Fixture fixture = addThreat(helper, new BlockPos(2, 1, 2));
-        final BlockPos launcherLocal = new BlockPos(10, 1, 2);
+        final Fixture fixture = addThreat(helper, new BlockPos(2, 1, 2), CRUISE_TEST_CHANNEL);
+        final BlockPos launcherLocal = new BlockPos(5, 1, 2);
         helper.setBlock(launcherLocal, ModBlocks.CRUISE_LAUNCHER);
         final BlockPos launcherPos = helper.absolutePos(launcherLocal);
         final TileCruiseLauncher launcher = (TileCruiseLauncher) helper.getLevel().getBlockEntity(launcherPos);
         helper.assertTrue(launcher != null, "cruise launcher block entity must be present");
         launcher.inventory.setItem(0, new ItemStack(ModItems.ANTI_BALLISTIC_MISSILE));
         launcher.energyStorage.setStored(launcher.energyStorage.getCapacity());
-        launcher.radio.setChannel(CHANNEL);
+        helper.onEachTick(() -> launcher.energyStorage.setStored(launcher.energyStorage.getCapacity()));
+        launcher.radio.setChannel(CRUISE_TEST_CHANNEL);
 
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
+            launcher.energyStorage.setStored(launcher.energyStorage.getCapacity());
             RadarRegistry.add(fixture.threat());
-            if (fixture.threat().isAlive()) return;
+            helper.assertTrue(!fixture.threat().isAlive(), "threat must be intercepted");
             helper.assertTrue(launcher.getMissileStack().isEmpty(), "intercept order must consume exactly the loaded ABM");
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(EntityAntiBallisticMissile.class,
                             new AABB(launcherPos).inflate(100)).isEmpty(),

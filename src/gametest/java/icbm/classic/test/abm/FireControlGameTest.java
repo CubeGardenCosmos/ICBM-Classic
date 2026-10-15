@@ -31,7 +31,9 @@ import java.util.UUID;
 
 public class FireControlGameTest
 {
-    private static final String CHANNEL = "fire-control-test";
+    private static final String SELECTS_NEAREST_CHANNEL = "fire-control-selects-nearest";
+    private static final String LAUNCHED_ORDER_CHANNEL = "fire-control-launched-order";
+    private static final String NO_OFFER_CHANNEL = "fire-control-no-offer";
 
     private static final class TestMissile extends EntityExplosiveMissile
     {
@@ -57,22 +59,25 @@ public class FireControlGameTest
         private final BlockPos launcherPos;
         private final Vec3 launchPoint;
         private final UUID launchedAbmId;
+        private final String channel;
         private int queryCount;
         private int orderCount;
 
-        private TestReceiver(Level level, BlockPos pos, BlockPos launcherPos, Vec3 launchPoint, UUID launchedAbmId)
+        private TestReceiver(Level level, BlockPos pos, BlockPos launcherPos, Vec3 launchPoint,
+                             UUID launchedAbmId, String channel)
         {
             this.level = level;
             this.pos = pos;
             this.launcherPos = launcherPos;
             this.launchPoint = launchPoint;
             this.launchedAbmId = launchedAbmId;
+            this.channel = channel;
         }
 
         @Override
         public void onMessage(IRadioSender sender, IRadioMessage packet)
         {
-            if (!CHANNEL.equals(packet.getChannel())) return;
+            if (!channel.equals(packet.getChannel())) return;
             if (packet instanceof InterceptQueryMessage query)
             {
                 queryCount++;
@@ -94,17 +99,18 @@ public class FireControlGameTest
 
     private record Fixture(TileRadarStation radar, BlockPos pos, TestMissile missile) { }
 
-    private Fixture setup(GameTestHelper helper)
+    private Fixture setup(GameTestHelper helper, String channel)
     {
         BlockPos localPos = new BlockPos(2, 1, 2);
         helper.setBlock(localPos, ModBlocks.RADAR_STATION);
         BlockPos pos = helper.absolutePos(localPos);
         TileRadarStation radar = (TileRadarStation) helper.getLevel().getBlockEntity(pos);
         helper.assertTrue(radar != null, "radar station must be present");
-        radar.setDetectionRange(100);
+        radar.setDetectionRange(48);
         radar.setTriggerRange(10);
-        radar.getRadio().setChannel(CHANNEL);
         radar.energyStorage.setStored(radar.energyStorage.getCapacity());
+        radar.getRadio().setChannel(channel);
+        helper.onEachTick(() -> radar.energyStorage.setStored(radar.energyStorage.getCapacity()));
 
         TestMissile missile = new TestMissile(helper.getLevel());
         missile.explosive.setStack(new net.minecraft.world.item.ItemStack(
@@ -124,27 +130,30 @@ public class FireControlGameTest
         return fixture.radar().getTrackTable().get(fixture.missile().getUUID());
     }
 
-    private static TestReceiver receiver(GameTestHelper helper, BlockPos radarPos, BlockPos launcherPos, UUID launchedAbmId)
+    private static TestReceiver receiver(GameTestHelper helper, BlockPos radarPos, BlockPos launcherPos,
+                                         UUID launchedAbmId, String channel)
     {
         Vec3 launchPoint = launcherPos == null ? null
                 : new Vec3(launcherPos.getX() + 0.5, launcherPos.getY() + 1, launcherPos.getZ() + 0.5);
         return new TestReceiver(helper.getLevel(), launcherPos == null ? radarPos : launcherPos,
-                launcherPos, launchPoint, launchedAbmId);
+                launcherPos, launchPoint, launchedAbmId, channel);
     }
 
-    @GameTest(maxTicks = 100, padding = 16)
+    @GameTest(maxTicks = 100, padding = 128)
     public void selectsNearestOffer(GameTestHelper helper)
     {
-        Fixture fixture = setup(helper);
+        Fixture fixture = setup(helper, SELECTS_NEAREST_CHANNEL);
         BlockPos farPos = fixture.pos().offset(0, 0, 10);
         BlockPos nearPos = fixture.pos().offset(0, 0, 2);
-        TestReceiver far = receiver(helper, fixture.pos(), farPos, null);
-        TestReceiver near = receiver(helper, fixture.pos(), nearPos, null);
+        TestReceiver far = receiver(helper, fixture.pos(), farPos, null, SELECTS_NEAREST_CHANNEL);
+        TestReceiver near = receiver(helper, fixture.pos(), nearPos, null, SELECTS_NEAREST_CHANNEL);
         RadioRegistry.add(far);
         RadioRegistry.add(near);
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
             RadarTrack track = refreshTrack(helper, fixture);
-            if (track == null || track.status != TrackStatus.THREAT || near.orderCount == 0) return;
+            helper.assertTrue(track != null && track.status == TrackStatus.THREAT && near.orderCount > 0,
+                    "radar must create the expected threat track and nearest launcher must receive an order");
             helper.assertTrue(far.orderCount == 0, "far launcher must not receive the selected order");
             helper.assertTrue(near.orderCount == 1, "nearest launcher must receive the selected order");
             RadioRegistry.remove(far);
@@ -153,24 +162,31 @@ public class FireControlGameTest
         });
     }
 
-    @GameTest(maxTicks = 120, padding = 16)
+    @GameTest(maxTicks = 120, padding = 128)
     public void launchedOrderEngagesTrackAndHonorsReengageDelay(GameTestHelper helper)
     {
-        Fixture fixture = setup(helper);
+        Fixture fixture = setup(helper, LAUNCHED_ORDER_CHANNEL);
         EntityAntiBallisticMissile abm = new EntityAntiBallisticMissile(helper.getLevel());
         abm.setTargetId(fixture.missile().getUUID());
         helper.assertTrue(helper.getLevel().addFreshEntity(abm), "test ABM must spawn");
         BlockPos launcherPos = fixture.pos().offset(0, 0, 2);
-        TestReceiver receiver = receiver(helper, fixture.pos(), launcherPos, abm.getUUID());
+        TestReceiver receiver = receiver(helper, fixture.pos(), launcherPos, abm.getUUID(), LAUNCHED_ORDER_CHANNEL);
         RadioRegistry.add(receiver);
+        final boolean[] reengageCheckScheduled = { false };
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
+            if (reengageCheckScheduled[0]) {
+                helper.assertTrue(false, "waiting for reengage-delay checks");
+            }
             RadarTrack track = refreshTrack(helper, fixture);
-            if (track == null || track.status != TrackStatus.ENGAGED || receiver.orderCount == 0) return;
+            helper.assertTrue(track != null && track.status == TrackStatus.ENGAGED && receiver.orderCount > 0,
+                    "radar must create the expected engaged track and launcher must receive an order");
             ServerLevel level = (ServerLevel) helper.getLevel();
             helper.assertTrue(EngagementRegistry.activeCount(level, fixture.missile().getUUID()) == 1,
                     "launched ABM must be registered as active");
             int initialQueries = receiver.queryCount;
             track.setStatus(TrackStatus.THREAT, level.getGameTime());
+            reengageCheckScheduled[0] = true;
             helper.runAfterDelay(Math.max(1, ConfigAbm.REENGAGE_DELAY_TICKS - 1), () -> {
                 RadarTrack current = refreshTrack(helper, fixture);
                 helper.assertTrue(current != null, "real missile track must still exist during reengage delay");
@@ -180,18 +196,21 @@ public class FireControlGameTest
                 abm.discard();
                 helper.succeed();
             });
+            helper.assertTrue(false, "waiting for reengage-delay checks");
         });
     }
 
-    @GameTest(maxTicks = 100, padding = 16)
+    @GameTest(maxTicks = 100, padding = 128)
     public void noOfferDoesNotSendOrder(GameTestHelper helper)
     {
-        Fixture fixture = setup(helper);
-        TestReceiver receiver = receiver(helper, fixture.pos(), null, null);
+        Fixture fixture = setup(helper, NO_OFFER_CHANNEL);
+        TestReceiver receiver = receiver(helper, fixture.pos(), null, null, NO_OFFER_CHANNEL);
         RadioRegistry.add(receiver);
         helper.succeedWhen(() -> {
+            fixture.radar().energyStorage.setStored(fixture.radar().energyStorage.getCapacity());
             RadarTrack track = refreshTrack(helper, fixture);
-            if (track == null || track.status != TrackStatus.THREAT || receiver.queryCount == 0) return;
+            helper.assertTrue(track != null && track.status == TrackStatus.THREAT && receiver.queryCount > 0,
+                    "radar must create the expected threat track and query the receiver");
             helper.assertTrue(receiver.orderCount == 0, "no offer must not produce an order");
             RadioRegistry.remove(receiver);
             helper.succeed();

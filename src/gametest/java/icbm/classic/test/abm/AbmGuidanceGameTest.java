@@ -20,7 +20,7 @@ public class AbmGuidanceGameTest
         @Override public void tick() { }
     }
 
-    @GameTest(maxTicks = 100, padding = 16)
+    @GameTest(maxTicks = 100, padding = 64)
     public void noTargetReacquiresThenSelfDestructsWithoutBlockDamage(GameTestHelper helper)
     {
         BlockPos ground = new BlockPos(3, 1, 3);
@@ -29,7 +29,7 @@ public class AbmGuidanceGameTest
         EntityAntiBallisticMissile abm = new EntityAntiBallisticMissile(ModEntities.MISSILE_SAM, helper.getLevel());
         abm.setPos(groundAbs.getX() + 0.5, groundAbs.getY() + 1, groundAbs.getZ() + 0.5);
         helper.getLevel().addFreshEntity(abm);
-        helper.runAfterDelay(AbmGuidance.BOOST_TICKS + 2, () -> {
+        helper.runAfterDelay(icbm.classic.content.abm.ConfigAbm.BOOST_TICKS + 2, () -> {
             helper.assertTrue(abm.getAbmState() == AbmGuidance.AbmState.REACQUIRE,
                     "targetless ABM must enter REACQUIRE after boost");
             helper.runAfterDelay(45, () -> {
@@ -41,7 +41,7 @@ public class AbmGuidanceGameTest
         });
     }
 
-    @GameTest(maxTicks = 30, padding = 16)
+    @GameTest(maxTicks = 30, padding = 64)
     public void guideTurnsTowardTargetWithinTurnLimit(GameTestHelper helper)
     {
         EntityAntiBallisticMissile abm = new EntityAntiBallisticMissile(ModEntities.MISSILE_SAM, helper.getLevel());
@@ -49,7 +49,7 @@ public class AbmGuidanceGameTest
         abm.setPos(abmPos.getX() + 0.5, abmPos.getY() + 0.5, abmPos.getZ() + 0.5);
         abm.setDeltaMovement(4, 0, 0);
         StationaryTarget target = new StationaryTarget(helper.getLevel());
-        BlockPos targetPos = helper.absolutePos(new BlockPos(2, 3, 22));
+        BlockPos targetPos = helper.absolutePos(new BlockPos(2, 3, 6));
         target.setPos(targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5);
         helper.getLevel().addFreshEntity(target);
         abm.setTargetId(target.getUUID());
