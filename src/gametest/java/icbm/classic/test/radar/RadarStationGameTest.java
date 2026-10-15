@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneLampBlock;
 import net.minecraft.world.phys.Vec3;
@@ -69,11 +70,25 @@ public class RadarStationGameTest
         final EntityExplosiveMissile missile = new EntityExplosiveMissile(ModEntities.EXPLOSIVE_MISSILE, helper.getLevel());
         missile.explosive.setStack(new net.minecraft.world.item.ItemStack(
                 ModItems.EXPLOSIVE_MISSILES.get(ICBMExplosives.CONDENSED.getRegistryKey())));
-        missile.setPos(radarPos.getX() + 8.5, radarPos.getY() + 1.5, radarPos.getZ() + 0.5);
+        // Give the radar a stable straight-line target clear of the structure's blocks.
+        missile.setPos(radarPos.getX() + 8.5, radarPos.getY() + 15.5, radarPos.getZ() + 0.5);
+        final BlockPos missileBlockPos = missile.blockPosition();
+        for (int x = missileBlockPos.getX() - 7; x <= missileBlockPos.getX() + 1; x++)
+        {
+            for (int y = missileBlockPos.getY() - 2; y <= missileBlockPos.getY() + 2; y++)
+            {
+                for (int z = missileBlockPos.getZ() - 2; z <= missileBlockPos.getZ() + 2; z++)
+                {
+                    helper.getLevel().setBlock(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                }
+            }
+        }
+        helper.assertTrue(helper.getLevel().getBlockState(missileBlockPos).isAir(),
+                "missile must start in an empty block");
         missile.setDeltaMovement(new Vec3(-0.4, 0, 0));
         missile.setNoGravity(true);
+        missile.setFreezeMotion(true);
         helper.getLevel().addFreshEntity(missile);
-        missile.launch();
 
         helper.succeedWhen(() -> {
             helper.assertTrue(radar.hasIncomingMissiles(),
