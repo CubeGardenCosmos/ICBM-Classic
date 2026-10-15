@@ -7,7 +7,6 @@ import icbm.classic.content.abm.math.Vec3d;
 import icbm.classic.content.blocks.radarstation.TileRadarStation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -23,7 +22,7 @@ public final class AbmGuidance
     private static final double MAX_TURN_RADIANS = Math.toRadians(15.0);
     private static final double REACQUIRE_RANGE = 30;
     private static final int REACQUIRE_TIMEOUT_TICKS = 40;
-    private static final float KILL_EFFECT_POWER = 2.0F;
+    public static final float SELF_DESTRUCT_POWER = 2.0F;
 
     private AbmGuidance() { }
 
@@ -45,10 +44,7 @@ public final class AbmGuidance
             }
             case GUIDE -> guide(abm, level);
             case REACQUIRE -> reacquire(abm, level);
-            case SELF_DESTRUCT -> {
-                level.explode(abm, abm.getX(), abm.getY(), abm.getZ(), KILL_EFFECT_POWER, Level.ExplosionInteraction.NONE);
-                abm.discard();
-            }
+            case SELF_DESTRUCT -> abm.performSelfDestruct();
         }
     }
 

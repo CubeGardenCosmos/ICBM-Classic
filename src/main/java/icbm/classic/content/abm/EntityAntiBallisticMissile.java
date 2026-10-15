@@ -26,7 +26,27 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     private Vec3 targetVelocityLastTick = Vec3.ZERO;
     private Vec3 previousPositionThisTick = Vec3.ZERO;
     public Vec3 getPreviousPositionThisTick() { return previousPositionThisTick; }
-    public void selfDestruct() { setAbmState(AbmGuidance.AbmState.SELF_DESTRUCT); }
+    public void selfDestruct()
+    {
+        setAbmState(AbmGuidance.AbmState.SELF_DESTRUCT);
+        performSelfDestruct();
+    }
+
+    /** Detonates at the current position without block interaction and removes the ABM. */
+    public void performSelfDestruct()
+    {
+        if (level() instanceof net.minecraft.server.level.ServerLevel serverLevel)
+        {
+            serverLevel.explode(this, getX(), getY(), getZ(), AbmGuidance.SELF_DESTRUCT_POWER, Level.ExplosionInteraction.NONE);
+        }
+        discard();
+    }
+
+    /** Resolves the proximity fuse roll. Overridable so deterministic tests can force a hit or a miss. */
+    protected boolean rollProximityFuseHit() { return level().getRandom().nextDouble() < ConfigAbm.HIT_CHANCE; }
+
+    /** Whether an intercepted missile detonates its payload. Overridable so deterministic tests can force either branch. */
+    protected boolean shouldDetonateInterceptedWarhead() { return ConfigAbm.TARGET_WARHEAD_ON_KILL; }
 
     public void killInterceptedTarget(Entity target)
     {
@@ -37,7 +57,7 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
             selfDestruct();
             return;
         }
-        if (ConfigAbm.TARGET_WARHEAD_ON_KILL && target instanceof icbm.classic.api.missiles.IMissile missile)
+        if (shouldDetonateInterceptedWarhead() && target instanceof icbm.classic.api.missiles.IMissile missile)
             MissileKillHelper.detonate(missile, missile.getMissileSource());
         else target.discard();
         level().explode(this, point.x, point.y, point.z, ConfigAbm.KILL_EFFECT_POWER, Level.ExplosionInteraction.NONE);

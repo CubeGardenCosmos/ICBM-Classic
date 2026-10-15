@@ -60,6 +60,9 @@
       "icbm.classic.test.launcher.LauncherScreenCodexGameTest",
       "icbm.classic.test.launcher.CruiseLauncherGameTest",
       "icbm.classic.test.radar.RadarStationGameTest",
+      "icbm.classic.test.abm.RadarTrackGameTest",
+      "icbm.classic.test.abm.AbmGuidanceGameTest",
+      "icbm.classic.test.abm.AbmInterceptGameTest",
       "icbm.classic.test.launcher.CruiseLauncherCodexGameTest",
       "icbm.classic.test.emptower.EmpTowerGameTest"
     ]

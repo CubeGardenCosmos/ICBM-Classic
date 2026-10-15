@@ -15,7 +15,7 @@ public final class ProximityFuse
         Vec3 targetPrevious = new Vec3(target.xo, target.yo, target.zo);
         double distance = InterceptMath.closestApproach(toMath(previous), toMath(current), toMath(targetPrevious), toMath(target.position()));
         if (distance > ConfigAbm.PROXIMITY_RADIUS) return false;
-        if (abm.level().getRandom().nextDouble() < ConfigAbm.HIT_CHANCE) abm.killInterceptedTarget(target);
+        if (abm.rollProximityFuseHit()) abm.killInterceptedTarget(target);
         else abm.selfDestruct();
         return true;
     }

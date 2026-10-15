@@ -1,7 +1,6 @@
 package icbm.classic.test.abm;
 
 import icbm.classic.content.abm.AbmGuidance;
-import icbm.classic.content.abm.ConfigAbm;
 import icbm.classic.content.abm.EntityAntiBallisticMissile;
 import icbm.classic.content.abm.InterceptEvents;
 import icbm.classic.content.missile.entity.explosive.EntityExplosiveMissile;
@@ -34,6 +33,25 @@ public class AbmInterceptGameTest
         @Override public void tick() { xo = getX(); yo = getY(); zo = getZ(); if (getDeltaMovement().lengthSqr() > 0) setPos(position().add(getDeltaMovement())); }
     }
 
+    /**
+     * Resolves the fuse roll and warhead policy deterministically. GameTest batches run concurrently in one
+     * shared level, so mutating the global {@link icbm.classic.content.abm.ConfigAbm} here would leak into
+     * the sibling tests; overriding the per-entity hooks instead keeps every test isolated.
+     */
+    private static class TestAbm extends EntityAntiBallisticMissile
+    {
+        private final boolean fuseHit;
+        private final boolean detonateWarhead;
+        TestAbm(Level level, boolean fuseHit, boolean detonateWarhead)
+        {
+            super(ModEntities.MISSILE_SAM, level);
+            this.fuseHit = fuseHit;
+            this.detonateWarhead = detonateWarhead;
+        }
+        @Override protected boolean rollProximityFuseHit() { return fuseHit; }
+        @Override protected boolean shouldDetonateInterceptedWarhead() { return detonateWarhead; }
+    }
+
     @GameTest(maxTicks = 80, padding = 8)
     public void crossingTargetInterceptsOnceWithoutBlockDamage(GameTestHelper helper)
     {
@@ -42,7 +60,7 @@ public class AbmInterceptGameTest
         TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
         target.setDeltaMovement(0, 0, 1);
         observedTarget = target.getUUID(); interceptedCount.set(0);
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4));
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), true, false);
         helper.runAfterDelay(4, () -> {
             helper.assertTrue(target.isRemoved(), "intercepted target must be removed");
             helper.assertTrue(interceptedCount.get() == 1, "intercept event must fire exactly once");
@@ -57,7 +75,7 @@ public class AbmInterceptGameTest
     {
         TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
         cancelledTarget = target.getUUID(); cancel = true;
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4));
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), true, false);
         helper.runAfterDelay(50, () -> {
             cancel = false;
             helper.assertTrue(!target.isRemoved(), "cancelled intercept must leave target alive");
@@ -69,12 +87,9 @@ public class AbmInterceptGameTest
     @GameTest(maxTicks = 80, padding = 8)
     public void failedHitChanceSelfDestructs(GameTestHelper helper)
     {
-        double oldChance = ConfigAbm.HIT_CHANCE;
-        ConfigAbm.HIT_CHANCE = 0;
         TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4));
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), false, false);
         helper.runAfterDelay(50, () -> {
-            ConfigAbm.HIT_CHANCE = oldChance;
             helper.assertTrue(!target.isRemoved(), "missed target must remain alive");
             helper.assertTrue(abm.isRemoved(), "ABM must self-destruct after a fuse miss");
             helper.succeed();
@@ -86,7 +101,7 @@ public class AbmInterceptGameTest
     {
         TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 3.5));
         target.setDeltaMovement(0, 0, 6);
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 9.5), new Vec3(0, 0, -4));
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 9.5), new Vec3(0, 0, -4), true, false);
         helper.runAfterDelay(20, () -> {
             helper.assertTrue(target.isRemoved(), "high-speed crossing must be detected by closest approach");
             helper.succeed();
@@ -96,14 +111,11 @@ public class AbmInterceptGameTest
     @GameTest(maxTicks = 80, padding = 8)
     public void targetWarheadCanDamageNearbyBlock(GameTestHelper helper)
     {
-        boolean oldWarhead = ConfigAbm.TARGET_WARHEAD_ON_KILL;
-        ConfigAbm.TARGET_WARHEAD_ON_KILL = true;
         BlockPos stone = new BlockPos(6, 6, 6);
         helper.setBlock(stone, Blocks.STONE);
         TestMissile target = spawnTarget(helper, new Vec3(5.5, 6.5, 5.5));
-        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4));
+        EntityAntiBallisticMissile abm = spawnAbm(helper, target, new Vec3(5.5, 6.5, 7.5), new Vec3(0, 0, -4), true, true);
         helper.runAfterDelay(5, () -> {
-            ConfigAbm.TARGET_WARHEAD_ON_KILL = oldWarhead;
             helper.assertTrue(abm.isRemoved(), "ABM must be removed after a warhead-enabled intercept");
             helper.assertTrue(!helper.getBlockState(stone).is(Blocks.STONE), "target warhead should damage nearby block");
             helper.succeed();
@@ -118,9 +130,9 @@ public class AbmInterceptGameTest
         return target;
     }
 
-    private static EntityAntiBallisticMissile spawnAbm(GameTestHelper helper, TestMissile target, Vec3 position, Vec3 velocity)
+    private static EntityAntiBallisticMissile spawnAbm(GameTestHelper helper, TestMissile target, Vec3 position, Vec3 velocity, boolean fuseHit, boolean detonateWarhead)
     {
-        EntityAntiBallisticMissile abm = new EntityAntiBallisticMissile(ModEntities.MISSILE_SAM, helper.getLevel());
+        EntityAntiBallisticMissile abm = new TestAbm(helper.getLevel(), fuseHit, detonateWarhead);
         abm.setPos(absolute(helper, position));
         abm.setTargetId(target.getUUID());
         abm.setAbmState(AbmGuidance.AbmState.GUIDE);
