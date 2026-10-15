@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import icbm.classic.content.abm.ConfigAbm;
 import icbm.classic.config.ConfigBattery;
 import icbm.classic.config.ConfigClient;
 import icbm.classic.config.ConfigDebug;
@@ -62,6 +63,7 @@ public final class ConfigManager {
      * New config classes must be added here, otherwise they are never loaded.
      */
     public static final List<Class<?>> CONFIG_CLASSES = List.of(
+            ConfigAbm.class,          // abm
             ConfigBattery.class,      // battery
             ConfigBlast.class,        // blast
             ConfigBlocks.class,       // blocks

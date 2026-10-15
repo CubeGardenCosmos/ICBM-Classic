@@ -1,5 +1,13 @@
 package icbm.classic.content.blocks.radarstation;
 
+import icbm.classic.content.abm.ConfigAbm;
+import icbm.classic.content.abm.math.Prediction;
+import icbm.classic.content.abm.math.TrajectoryPredictor;
+import icbm.classic.content.abm.math.Vec3d;
+import icbm.classic.content.abm.radar.RadarTrack;
+import icbm.classic.content.abm.radar.TrackStatus;
+import icbm.classic.content.abm.radar.TrackTable;
+import icbm.classic.content.abm.radar.Vectors;
 import icbm.classic.ICBMConstants;
 import icbm.classic.api.ICBMClassicHelpers;
 import icbm.classic.api.missiles.IMissile;
@@ -43,14 +51,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.Orientation;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiTile, IPlayerUsing
@@ -64,8 +73,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     private int detectionRange = 100;
     private int triggerRange = 50;
     private boolean outputRedstone = true;
-    private final List<Entity> detectedThreats = new ArrayList<>();
-    private final List<IMissile> incomingThreats = new ArrayList<>();
+    private final TrackTable trackTable = new TrackTable();
     private final RadarRenderData radarRenderData = new RadarRenderData(this);
     public final IcbmEnergyBuffer energyStorage = new IcbmEnergyBuffer(
             () -> ConfigRadar.POWER_CAPACITY, () -> ConfigRadar.POWER_CAPACITY).onChange(this::setChanged);
@@ -159,21 +167,20 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         if (hasPower)
         {
             if (tile.ticks % ConfigRadar.SCAN_TICKS == 0) tile.doScan();
-            if (!tile.radio.getChannel().equals(RadioRegistry.EMPTY_HZ) && !tile.incomingThreats.isEmpty())
+            if (!tile.radio.getChannel().equals(RadioRegistry.EMPTY_HZ) && !tile.getIncomingThreats().isEmpty())
             {
                 if (tile.firingCooldown > 0) tile.firingCooldown--;
                 if (tile.firingCooldown <= 0)
                 {
                     tile.firingCooldown = ConfigRadar.SAM_TICKS;
                     RadioRegistry.popMessage(level, tile.radio,
-                            new IncomingMissileMessage(tile.radio.getChannel(), tile.incomingThreats.get(0), true));
+                            new IncomingMissileMessage(tile.radio.getChannel(), tile.getIncomingThreats().get(0), true));
                 }
             }
         }
         else
         {
-            tile.incomingThreats.clear();
-            tile.detectedThreats.clear();
+            tile.trackTable.clear();
         }
 
         final boolean shouldBeOn = hasPower && tile.hasIncomingMissiles();
@@ -209,31 +216,97 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
     private void doScan()
     {
-        incomingThreats.clear();
-        detectedThreats.clear();
         descriptionPacketSender.doNext();
         radarRenderData.clear();
         final Level level = getLevel();
         if (level == null) return;
+
+        final long now = level.getGameTime();
+        final Set<UUID> seen = new HashSet<>();
         final List<Entity> entities = RadarRegistry.getAllLivingObjectsWithin(level,
                 getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5,
                 Math.min(detectionRange, ConfigRadar.MAX_RANGE));
         for (Entity entity : entities)
         {
-            if (isThreat(entity))
+            if (!isThreat(entity)) continue;
+            final IMissile missile = ICBMClassicHelpers.getMissile(entity);
+            if (missile == null || missile.getTicksInAir() <= 1) continue;
+
+            final UUID targetId = entity.getUUID();
+            seen.add(targetId);
+            final Vec3d position = Vectors.from(entity.position());
+            final Vec3d velocity = Vectors.from(entity.getDeltaMovement());
+            RadarTrack track = trackTable.get(targetId);
+            if (track == null)
             {
-                final IMissile missile = ICBMClassicHelpers.getMissile(entity);
-                if (missile != null && missile.getTicksInAir() > 1)
-                {
-                    if (isMissileGoingToHit(missile)) incomingThreats.add(missile);
-                    else detectedThreats.add(entity);
-                }
+                track = trackTable.create(targetId, position, velocity, now);
             }
+            else
+            {
+                final long elapsedTicks = Math.max(1, now - track.lastSeenTick);
+                track.acceleration = velocity.sub(track.velocity).scale(1.0 / elapsedTicks);
+                track.position = position;
+                track.velocity = velocity;
+                track.lastSeenTick = now;
+            }
+
+            final Prediction prediction = TrajectoryPredictor.predictImpact(position, velocity, track.acceleration,
+                    getBlockPos().getY(), ConfigAbm.PREDICTION_MAX_TICKS);
+            track.predictedImpact = prediction == null ? null : prediction.impact();
+            track.ticksToImpact = prediction == null ? Integer.MAX_VALUE : prediction.ticks();
+
+            final TrackStatus nextStatus = track.status == TrackStatus.ENGAGED
+                    ? TrackStatus.ENGAGED
+                    : prediction != null && horizontalDistanceSqr(prediction.impact()) <= (double) triggerRange * triggerRange
+                    ? TrackStatus.THREAT
+                    : TrackStatus.DETECTED;
+            track.setStatus(nextStatus, now);
+            trackTable.update(track);
         }
-        final Comparator<Entity> distance = Comparator.comparingDouble(this::distance);
-        incomingThreats.sort((a, b) -> distance.compare(a.getMissileEntity(), b.getMissileEntity()));
-        detectedThreats.sort(distance);
+
+        for (RadarTrack track : trackTable.values())
+        {
+            if (!seen.contains(track.targetId)) trackTable.markLost(track.targetId, now);
+        }
+        trackTable.purgeLost(now);
         if (!playersUsing.isEmpty()) radarRenderData.update();
+    }
+
+    private double horizontalDistanceSqr(Vec3d point)
+    {
+        final double dx = point.x() - (getBlockPos().getX() + 0.5);
+        final double dz = point.z() - (getBlockPos().getZ() + 0.5);
+        return dx * dx + dz * dz;
+    }
+
+    private List<RadarTrack> orderedThreats()
+    {
+        return trackTable.threats().stream()
+                .sorted(Comparator.comparingInt(track -> track.ticksToImpact))
+                .toList();
+    }
+
+    private List<IMissile> incomingThreats()
+    {
+        final Level level = getLevel();
+        if (level == null) return List.of();
+        return orderedThreats().stream()
+                .map(track -> level.getEntity(track.targetId))
+                .filter(IMissile.class::isInstance)
+                .map(IMissile.class::cast)
+                .toList();
+    }
+
+    private List<Entity> detectedThreats()
+    {
+        final Level level = getLevel();
+        if (level == null) return List.of();
+        return trackTable.values().stream()
+                .filter(track -> track.status == TrackStatus.DETECTED)
+                .map(track -> level.getEntity(track.targetId))
+                .filter(entity -> entity != null && !entity.isRemoved())
+                .sorted(Comparator.comparingDouble(this::distance))
+                .toList();
     }
 
     private double distance(Entity entity)
@@ -247,27 +320,20 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
                 && ICBMClassicHelpers.getExplosive(entity) != null;
     }
 
-    public boolean isMissileGoingToHit(IMissile missile)
-    {
-        if (missile == null || missile.getMissileEntity() == null || missile.getMissileEntity().isRemoved()) return false;
-        final Entity entity = missile.getMissileEntity();
-        final Vec3 current = new Vec3(missile.x(), missile.y(), missile.z());
-        final Vec3 radar = new Vec3(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ());
-        return current.add(entity.getDeltaMovement()).distanceTo(radar) < current.distanceTo(radar);
-    }
 
     public EnumRadarState getRadarState()
     {
         if (isClient()) return radarVisualState;
         if (!energyStorage.has(getEnergyCost())) return EnumRadarState.OFF;
-        if (!incomingThreats.isEmpty()) return EnumRadarState.DANGER;
-        if (!detectedThreats.isEmpty()) return EnumRadarState.WARNING;
+        if (!getIncomingThreats().isEmpty()) return EnumRadarState.DANGER;
+        if (!getDetectedThreats().isEmpty()) return EnumRadarState.WARNING;
         return EnumRadarState.ON;
     }
 
     public int getStrongRedstonePower(Direction side)
     {
-        return outputRedstone ? Math.min(15, incomingThreats.size()) : 0;
+        return outputRedstone ? Math.min(15, trackTable.threats().size()
+                + (int) trackTable.values().stream().filter(track -> track.status == TrackStatus.ENGAGED).count()) : 0;
     }
 
     public int getEnergyCost()
@@ -277,7 +343,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
     public boolean hasIncomingMissiles()
     {
-        return !incomingThreats.isEmpty();
+        return !getIncomingThreats().isEmpty();
     }
 
     public int getDetectionRange() { return detectionRange; }
@@ -286,8 +352,9 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     public void setTriggerRange(int value) { triggerRange = value; }
     public boolean isOutputRedstone() { return outputRedstone; }
     public void setOutputRedstone(boolean value) { outputRedstone = value; }
-    public List<Entity> getDetectedThreats() { return detectedThreats; }
-    public List<IMissile> getIncomingThreats() { return incomingThreats; }
+    public List<Entity> getDetectedThreats() { return detectedThreats(); }
+    public List<IMissile> getIncomingThreats() { return incomingThreats(); }
+    public TrackTable getTrackTable() { return trackTable; }
     public RadarRenderData getRadarRenderData() { return radarRenderData; }
     public RadioRadar getRadio() { return radio; }
     @Override public List<ServerPlayer> getPlayersUsing() { return playersUsing; }
