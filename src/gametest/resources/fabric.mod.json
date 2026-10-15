@@ -12,6 +12,7 @@
       "icbm.classic.test.energy.EmpDrainGameTest",
       "icbm.classic.test.energy.BatteryDischargeGameTest",
       "icbm.classic.test.energy.LauncherNetworkEnergyGameTest",
+      "icbm.classic.test.energy.EnergyInteropGameTest",
       "icbm.classic.test.SmokeGameTest",
       "icbm.classic.test.regression.P1RegressionGameTests",
       "icbm.classic.test.lib.SaveHandlerGameTest",
