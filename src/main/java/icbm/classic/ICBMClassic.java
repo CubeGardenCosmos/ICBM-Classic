@@ -57,6 +57,7 @@ import icbm.classic.lib.thread.BlockEditQueue;
 import icbm.classic.lib.thread.WorkerThreadManager;
 import icbm.classic.lib.world.ProjectileBlockInteraction;
 import icbm.classic.network.IcbmNetwork;
+import icbm.classic.lib.energy.EnergyApi;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
@@ -116,6 +117,9 @@ public final class ICBMClassic implements ModInitializer {
         TileRadarStation.registerCodexes();
         ModCreativeTabs.register();
         IcbmNetwork.registerPayloads();
+
+        // S6: expose Team Reborn Energy after the content registrations (overview §5 item 8).
+        EnergyApi.register();
 
         // Command tree (S3.10): 1.12 registered a CommandEntryPoint("icbm", ICBMCommands.ICBM_COMMAND) with
         // the Forge command registry during pre init; Fabric's CommandRegistrationCallback replaces that
