@@ -67,6 +67,7 @@
       "icbm.classic.test.abm.FireControlGameTest",
       "icbm.classic.test.abm.DefenseModeGameTest",
       "icbm.classic.test.abm.SimulatedMissileGameTest",
+      "icbm.classic.test.abm.AbmScenarioGameTest",
       "icbm.classic.test.launcher.CruiseLauncherCodexGameTest",
       "icbm.classic.test.emptower.EmpTowerGameTest"
     ]

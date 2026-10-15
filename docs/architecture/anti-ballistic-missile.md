@@ -314,3 +314,26 @@ GameTest 结构模板（`.nbt`）放在 `src/gametest/resources/data/icbmclassic
 | EMP 兜底 | `ABM_THEN_EMP`，发射台没装 ABM，有 EMP 塔 | 在 `ticksToImpact <= 40` 时 EMP 塔放电 |
 | 燃料耗尽自毁 | 发射 ABM 后立刻删除目标、`reacquire_range=0` | ABM 在 `reacquire_timeout_ticks` 后自毁，不落地 |
 | 跨雷达去重 | 2 部不同频道雷达，各配 1 座发射台 | 同一目标在飞 ABM ≤ 1 |
+
+### 11.1 S7.10 实施结果（缩尺与覆盖对照）
+
+**缩尺**（依据 `docs/implementation/evidence/S7.07.md` 的实测约束）：只有结构原点所在的区块列被 tick
+实体，`@GameTest(padding)` 与 `ServerLevel#setChunkForced` 都不能扩大它，因此「雷达东 80 格」不可行。
+实施时**高度 60 格原样保留**（区块列的 y 轴不受限），**水平 80 格缩到 4 格**，来袭速度取 1 格/tick；
+发射点/展开点全部落在 `|local| ≲ 6` 内。缩尺只改变接敌几何，不改变 boost/制导/近炸任何生产逻辑。
+
+**覆盖对照**（新增类 `icbm.classic.test.abm.AbmScenarioGameTest`，登记于 `src/gametest/resources/fabric.mod.json`）：
+
+| 场景 | 自动化位置 |
+| --- | --- |
+| 单目标拦截 | 新增 `singleIncomingMissileIsInterceptedWithoutRadarDamage`（400 tick 预算、方块未破坏、INTERCEPTED=1）+ 既有 `LauncherInterceptGameTest#cruiseLauncherRespondsToRadarInterceptOrder`、`SimulatedMissileGameTest#defaultReentryIsIntercepted` |
+| 不越权齐射 | 新增 `threeLaunchersCommitAtMostOneInterceptorPerTarget` |
+| 落点在外不交战 | 新增 `impactOutsideProtectionRangeIsDetectedButNotEngaged`（有发射台在场，验证「不发射」）+ 既有 `RadarTrackGameTest#sidewaysMissileOutsideProtectionIsDetected`（航迹保持 DETECTED） |
+| EMP 兜底 | 既有 `DefenseModeGameTest#abmThenEmpWaitsForFallbackThreshold`、`#abmOnlyDoesNotDischargeEmpTower`（未重写） |
+| 燃料耗尽自毁 | 新增 `abmSelfDestructsWhenFuelRunsOut`（fuel_ticks 路径）+ `interceptorSelfDestructsWhenItsTargetIsLost`（发射后删除目标）+ 既有 `AbmGuidanceGameTest#noTargetReacquiresThenSelfDestructsWithoutBlockDamage` |
+| 跨雷达去重 | 新增 `crossRadarEngagementKeepsOneInterceptorPerTarget` |
+
+**确定性断言**：S7.08 §8 已证明「击毁归属」（ABM 近炸 vs 来袭导弹先撞上 ABM）取决于同一 tick 的实体
+顺序，因此新增场景的来袭导弹夹具不跑继承的投射物 tick（不会反向射线命中 ABM），近炸成为唯一解算路径；
+场景断言只覆盖「目标被解决 / 拦截弹数量不超过上限 / 拦截记录恰好一次」等确定性结果。
+实测数据见 `docs/implementation/evidence/S7.10.md`。
