@@ -18,7 +18,6 @@ public class LauncherNetwork {
     private final HashSet<LauncherNode> components = new HashSet<>();
     private final LinkedList<LauncherEntry> launchers = new LinkedList<>();
     public final NetworkInventory inventory = new NetworkInventory(this);
-    public final NetworkEnergyStorage energyStorage = new NetworkEnergyStorage(this);
 
     public HashSet<LauncherNode> getComponents() {
         return components;
@@ -28,9 +27,6 @@ public class LauncherNetwork {
         return launchers;
     }
 
-    public NetworkEnergyStorage getEnergyStorage() {
-        return energyStorage;
-    }
 
     public void invalidate(LauncherNode source) {
         final HashSet<LauncherNode> oldComponents = new HashSet<>(components);
