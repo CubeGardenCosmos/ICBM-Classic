@@ -24,6 +24,29 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
     private int ticksInState;
     private int fuelLeft = AbmGuidance.FUEL_TICKS;
     private Vec3 targetVelocityLastTick = Vec3.ZERO;
+    private Vec3 previousPositionThisTick = Vec3.ZERO;
+    public Vec3 getPreviousPositionThisTick() { return previousPositionThisTick; }
+    public void selfDestruct() { setAbmState(AbmGuidance.AbmState.SELF_DESTRUCT); }
+
+    public void killInterceptedTarget(Entity target)
+    {
+        if (!(level() instanceof net.minecraft.server.level.ServerLevel serverLevel)) return;
+        Vec3 point = position();
+        if (!InterceptEvents.INTERCEPTED.invoker().onIntercept(serverLevel, this, target, point))
+        {
+            selfDestruct();
+            return;
+        }
+        if (ConfigAbm.TARGET_WARHEAD_ON_KILL && target instanceof icbm.classic.api.missiles.IMissile missile)
+            MissileKillHelper.detonate(missile, missile.getMissileSource());
+        else target.discard();
+        level().explode(this, point.x, point.y, point.z, ConfigAbm.KILL_EFFECT_POWER, Level.ExplosionInteraction.NONE);
+        level().playSound(null, point.x, point.y, point.z, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE,
+                net.minecraft.sounds.SoundSource.BLOCKS, 4.0F, 0.7F);
+        EngagementRegistry.markIntercepted(serverLevel, target.getUUID());
+        discard();
+    }
+
     private boolean hasTargetVelocity;
 
     public EntityAntiBallisticMissile(EntityType<? extends EntityAntiBallisticMissile> type, Level level)
@@ -64,7 +87,13 @@ public class EntityAntiBallisticMissile extends EntityMissile<EntityAntiBallisti
             AbmGuidance.tick(this);
             if (isRemoved()) return;
         }
+        previousPositionThisTick = position();
         super.tick();
+        if (!level().isClientSide() && !isRemoved() && getAbmState() == AbmGuidance.AbmState.GUIDE)
+        {
+            Entity target = getTargetId() == null ? null : level().getEntity(getTargetId());
+            if (target != null && target.isAlive()) ProximityFuse.check(this, target);
+        }
     }
 
     @Override
