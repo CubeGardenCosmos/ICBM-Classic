@@ -19,6 +19,7 @@ import icbm.classic.content.missile.logic.source.cause.CausedByBlock;
 import icbm.classic.content.missile.logic.targeting.BasicTargetData;
 import icbm.classic.lib.data.IMachineInfo;
 import icbm.classic.lib.energy.IcbmEnergyBuffer;
+import icbm.classic.lib.energy.ExposedEnergyStorage;
 import icbm.classic.lib.network.lambda.PacketCodexReg;
 import icbm.classic.lib.network.lambda.tile.PacketCodexTile;
 import icbm.classic.lib.radio.RadioRegistry;
@@ -56,6 +57,13 @@ public class TileLauncherScreen extends TileMachine implements ILauncherComponen
     private Vec3 target = Vec3.ZERO;
     public final IcbmEnergyBuffer energyStorage = new IcbmEnergyBuffer(
             () -> ConfigLauncher.POWER_CAPACITY, () -> ConfigLauncher.POWER_CAPACITY).onChange(this::setChanged);
+    private ExposedEnergyStorage exposed;
+
+    public ExposedEnergyStorage getExposedEnergy()
+    {
+        if (exposed == null) exposed = new ExposedEnergyStorage(energyStorage, this::setChanged);
+        return exposed;
+    }
     public final InventoryWithSlots inventory = new InventoryWithSlots(1)
             .withChangeCallback((slot, stack) -> setChanged())
             .withSlot(new InventorySlot(0, TileLauncherScreen::isReservedBatteryItem));

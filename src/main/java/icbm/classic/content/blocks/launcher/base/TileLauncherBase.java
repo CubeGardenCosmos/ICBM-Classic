@@ -17,6 +17,7 @@ import icbm.classic.lib.network.lambda.tile.PacketCodexTile;
 import icbm.classic.lib.capability.launcher.CapabilityMissileHolder;
 import icbm.classic.lib.data.IMachineInfo;
 import icbm.classic.lib.energy.IcbmEnergyBuffer;
+import icbm.classic.lib.energy.ExposedEnergyStorage;
 import icbm.classic.lib.saving.SaveHandler;
 import icbm.classic.lib.tile.TickAction;
 import icbm.classic.prefab.inventory.InventorySlot;
@@ -55,6 +56,13 @@ public class TileLauncherBase extends TileMachine implements ILauncherComponent,
 {
     public final IcbmEnergyBuffer energyStorage = new IcbmEnergyBuffer(
             () -> ConfigLauncher.POWER_CAPACITY, () -> ConfigLauncher.POWER_CAPACITY).onChange(this::setChanged);
+    private ExposedEnergyStorage exposed;
+
+    public ExposedEnergyStorage getExposedEnergy()
+    {
+        if (exposed == null) exposed = new ExposedEnergyStorage(energyStorage, this::setChanged);
+        return exposed;
+    }
     public final InventoryWithSlots inventory = new InventoryWithSlots(2)
             .withChangeCallback((slot, stack) -> setChanged())
             .withSlot(new InventorySlot(0, ICBMClassicHelpers::isMissile)

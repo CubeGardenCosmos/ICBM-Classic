@@ -13,6 +13,7 @@ import icbm.classic.lib.actions.fields.ActionFieldProvider;
 import icbm.classic.lib.data.IMachineInfo;
 import icbm.classic.lib.energy.EnergyRules;
 import icbm.classic.lib.energy.IcbmEnergyBuffer;
+import icbm.classic.lib.energy.ExposedEnergyStorage;
 import icbm.classic.lib.network.lambda.PacketCodexReg;
 import icbm.classic.lib.network.lambda.tile.PacketCodexTile;
 import icbm.classic.lib.radio.RadioRegistry;
@@ -61,6 +62,13 @@ public class TileEMPTower extends TileMachine implements IGuiTile, IMachineInfo,
     public final IcbmEnergyBuffer energyStorage = new IcbmEnergyBuffer(
             () -> (long) getFiringCost() + (long) getTickingCost() * ConfigEmpTower.ENERGY_COST_TICKING_CAP,
             () -> ConfigEmpTower.ENERGY_INPUT).onChange(this::setChanged);
+    private ExposedEnergyStorage exposed;
+
+    public ExposedEnergyStorage getExposedEnergy()
+    {
+        if (exposed == null) exposed = new ExposedEnergyStorage(energyStorage, this::setChanged);
+        return exposed;
+    }
     public final InventoryWithSlots inventory = new InventoryWithSlots(1)
             .withChangeCallback((slot, stack) -> setChanged())
             .withSlot(new InventorySlot(0, TileEMPTower::isReservedBatteryItem));

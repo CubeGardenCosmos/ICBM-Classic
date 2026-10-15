@@ -8,6 +8,7 @@
       "icbm.classic.test.TestModInitializer"
     ],
     "fabric-gametest": [
+      "icbm.classic.test.energy.EnergyTransactionGameTest",
       "icbm.classic.test.SmokeGameTest",
       "icbm.classic.test.regression.P1RegressionGameTests",
       "icbm.classic.test.lib.SaveHandlerGameTest",
