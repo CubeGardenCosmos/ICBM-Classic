@@ -301,7 +301,7 @@
   "item.icbmclassic:saltpeter_ball.name": null,
   "item.icbmclassic:sulfurDust.info": "icbmclassic.item.sulfur_dust.info",
   "item.icbmclassic:sulfurDust.name": null,
-  "item.icbmclassic:surface_to_air_missile.info": "icbmclassic.item.surface_to_air_missile.info",
+  "item.icbmclassic:surface_to_air_missile.info": "icbmclassic.item.anti_ballistic_missile.info",
   "item.icbmclassic:surface_to_air_missile.name": null,
   "item.icbmclassic:wire.copper.name": null,
   "item.icbmclassic:wire.gold.name": null,

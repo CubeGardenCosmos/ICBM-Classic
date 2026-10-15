@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
  * {@code _bomblet} and the OreDictionary names become {@code c:} tags (S2.07) or vanilla items/tags.
  * <p>
  * Recipes whose output is not registered yet (tools, machines, launcher parts, battery, balloon, parachute,
- * cluster/held item/anti ballistic missiles) are listed in the evidence file with the step that ports them
+ * cluster/held item missiles) are listed in the evidence file with the step that ports them
  * instead of being generated here, and the 1.12 fallback variants that only exist for "other mod is absent"
  * (uranium, mekanism, carbon dust) are replaced by their vanilla variants where 1.12 shipped one.
  */
@@ -75,6 +75,7 @@ public class ICBMRecipeProvider extends FabricRecipeProvider
             materials();
             explosiveBlocks();
             flatForms();
+            missileSpecials();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////
@@ -432,6 +433,19 @@ public class ICBMRecipeProvider extends FabricRecipeProvider
                         .unlockedBy("has_empty_bomblet", has(ModItems.EMPTY_BOMBLET))
                         .save(output, key(ExplosiveForm.BOMBLET.idFor(explosive)));
             }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // 1.12 recipes/missile/special/missile.anti_ballistic.json: circuitBasic / condensed / missile module
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void missileSpecials()
+        {
+            ShapedRecipeBuilder.shaped(items, RecipeCategory.COMBAT, ModItems.ANTI_BALLISTIC_MISSILE)
+                    .define('c', ModItems.BASIC_CIRCUIT).define('e', block("condensed")).define('m', ModItems.MISSILE_MODULE)
+                    .pattern("c").pattern("e").pattern("m")
+                    .unlockedBy("has_missile_module", has(ModItems.MISSILE_MODULE))
+                    .save(output, key("anti_ballistic_missile"));
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,7 @@
 package icbm.classic.content.abm;
 
 import icbm.classic.config.core.ConfigEntry;
+import icbm.classic.config.core.ConfigRange;
 import icbm.classic.config.core.IcbmConfig;
 
 @IcbmConfig(file = "abm")
@@ -16,7 +17,26 @@ public class ConfigAbm
     public static int FIRE_CONTROL_INTERVAL_TICKS = 10;
     @ConfigEntry(name = "reengage_delay_ticks", comment = "Minimum ticks between orders for one target")
     public static int REENGAGE_DELAY_TICKS = 40;
-    public static final float FLIGHT_SPEED = 4.0F;
+    @ConfigEntry(name = "emp_fallback_ticks", comment = "Impact-time threshold for EMP fallback in ABM_THEN_EMP mode")
+    public static int EMP_FALLBACK_TICKS = 40;
+    @ConfigEntry(name = "flight_speed", comment = "ABM guidance-phase speed in blocks per tick")
+    @ConfigRange(min = 0.0001, max = 10)
+    public static float FLIGHT_SPEED = 4.0F;
+    @ConfigEntry(name = "boost_ticks", comment = "Duration of the vertical boost phase in ticks")
+    @ConfigRange(min = 0, max = Integer.MAX_VALUE)
+    public static int BOOST_TICKS = 10;
+    @ConfigEntry(name = "boost_speed", comment = "Vertical speed during the boost phase in blocks per tick")
+    @ConfigRange(min = 0, max = 10)
+    public static float BOOST_SPEED = 1.5F;
+    @ConfigEntry(name = "max_turn_degrees", comment = "Maximum guidance turn per tick in degrees")
+    @ConfigRange(min = 0, max = 180)
+    public static float MAX_TURN_DEGREES = 15.0F;
+    @ConfigEntry(name = "reacquire_range", comment = "Search radius in blocks for a new target after losing the current one")
+    @ConfigRange(min = 0, max = 512)
+    public static int REACQUIRE_RANGE = 30;
+    @ConfigEntry(name = "reacquire_timeout_ticks", comment = "Ticks without a target before the ABM self-destructs")
+    @ConfigRange(min = 0, max = Integer.MAX_VALUE)
+    public static int REACQUIRE_TIMEOUT_TICKS = 40;
     @ConfigEntry(name = "proximity_radius", comment = "Distance at which an ABM proximity fuse resolves")
     public static double PROXIMITY_RADIUS = 2.5;
     @ConfigEntry(name = "hit_chance", comment = "Chance for an ABM proximity fuse to destroy its target")

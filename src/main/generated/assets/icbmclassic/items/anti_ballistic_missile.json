@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "icbmclassic:item/missiles/surface_to_air"
+    "model": "icbmclassic:item/missiles/anti_ballistic_missile"
   }
 }

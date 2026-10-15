@@ -16,11 +16,6 @@ public final class AbmGuidance
 {
     public enum AbmState { BOOST, GUIDE, REACQUIRE, SELF_DESTRUCT }
 
-    public static final int BOOST_TICKS = 10;
-    public static final double BOOST_SPEED = 1.5;
-    private static final double MAX_TURN_RADIANS = Math.toRadians(15.0);
-    private static final double REACQUIRE_RANGE = 30;
-    private static final int REACQUIRE_TIMEOUT_TICKS = 40;
     public static final float SELF_DESTRUCT_POWER = 2.0F;
 
     private AbmGuidance() { }
@@ -33,9 +28,9 @@ public final class AbmGuidance
         switch (abm.getAbmState())
         {
             case BOOST -> {
-                abm.setDeltaMovement(0, BOOST_SPEED, 0);
+                abm.setDeltaMovement(0, ConfigAbm.BOOST_SPEED, 0);
                 abm.incrementTicksInState();
-                if (abm.getTicksInState() >= BOOST_TICKS)
+                if (abm.getTicksInState() >= ConfigAbm.BOOST_TICKS)
                 {
                     abm.setAbmState(AbmState.GUIDE);
                     if (abm.getTargetId() == null) abm.setAbmState(AbmState.REACQUIRE);
@@ -64,7 +59,7 @@ public final class AbmGuidance
         if (intercept != null) aim = toMinecraft(intercept.aim());
         Vec3 current = abm.getDeltaMovement();
         Vec3 direction = current.lengthSqr() < 1.0e-12 ? aim.subtract(position).normalize() : current.normalize();
-        Vec3 rotated = toMinecraft(Rotation.rotateTowards(toMath(direction), toMath(aim.subtract(position)), MAX_TURN_RADIANS)).scale(ConfigAbm.FLIGHT_SPEED);
+        Vec3 rotated = toMinecraft(Rotation.rotateTowards(toMath(direction), toMath(aim.subtract(position)), Math.toRadians(ConfigAbm.MAX_TURN_DEGREES))).scale(ConfigAbm.FLIGHT_SPEED);
         abm.setDeltaMovement(rotated);
         abm.updateGuidanceRotation(rotated);
         abm.incrementTicksInState();
@@ -75,7 +70,7 @@ public final class AbmGuidance
         abm.incrementTicksInState();
         if (abm.getTicksInState() % 10 == 0)
         {
-            AABB search = abm.getBoundingBox().inflate(REACQUIRE_RANGE);
+            AABB search = abm.getBoundingBox().inflate(ConfigAbm.REACQUIRE_RANGE);
             Entity nearest = level.getEntities(abm, search, TileRadarStation::isThreat).stream()
                     .min(Comparator.comparingDouble(abm::distanceToSqr)).orElse(null);
             if (nearest != null)
@@ -85,7 +80,7 @@ public final class AbmGuidance
                 return;
             }
         }
-        if (abm.getTicksInState() >= REACQUIRE_TIMEOUT_TICKS) abm.setAbmState(AbmState.SELF_DESTRUCT);
+        if (abm.getTicksInState() >= ConfigAbm.REACQUIRE_TIMEOUT_TICKS) abm.setAbmState(AbmState.SELF_DESTRUCT);
     }
 
     private static Vec3d toMath(Vec3 v) { return new Vec3d(v.x, v.y, v.z); }
