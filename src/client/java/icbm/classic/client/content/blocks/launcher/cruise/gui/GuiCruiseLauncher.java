@@ -4,7 +4,7 @@ import icbm.classic.ICBMConstants;
 import icbm.classic.client.prefab.gui.GuiContainerBase;
 import icbm.classic.client.prefab.gui.TextInput;
 import icbm.classic.client.prefab.gui.button.DisableButton;
-import icbm.classic.client.prefab.gui.components.SlotEnergyBar;
+import icbm.classic.client.gui.widget.EnergyBar;
 import icbm.classic.client.prefab.gui.tooltip.TooltipTranslations;
 import icbm.classic.content.blocks.launcher.LauncherLangs;
 import icbm.classic.content.blocks.launcher.cruise.TileCruiseLauncher;
@@ -46,8 +46,7 @@ public class GuiCruiseLauncher extends GuiContainerBase<ContainerCruiseLauncher>
                 () -> TileCruiseLauncher.PACKET_LAUNCH.sendToServer(tile),
                 () -> !tile.launcher.preCheckLaunch(new icbm.classic.content.missile.logic.targeting.BasicTargetData(tile.getTarget()), null).isBlocking());
         addRenderableWidget(launchButton.widget());
-        addComponent(new SlotEnergyBar(141, 66, () -> (int) tile.energyStorage.getStored(),
-                () -> (int) tile.energyStorage.getCapacity()).withActionCost(tile::getFiringCost));
+        addComponent(new EnergyBar(141, 66, menu::getEnergyStored, menu::getEnergyCapacity));
         addComponent(new TooltipTranslations(119, 16, 14, 14, LauncherLangs.TRANSLATION_TOOLTIP_RADIO).withDelay(1));
         addComponent(new DisableButton(leftPos + 119, topPos + 16, tile.radio::isDisabled)
                 .setAction(() -> TileCruiseLauncher.PACKET_RADIO_DISABLE.sendToServer(tile)));

@@ -14,6 +14,7 @@ public class ContainerRadarStation extends ContainerBase<TileRadarStation>
     public ContainerRadarStation(int id, Inventory playerInventory, TileRadarStation tile)
     {
         super(ModMenus.RADAR_STATION, id, playerInventory, tile);
+        addEnergyData(tile.energyStorage);
         addSlot(new Slot(tile.inventory, 0, 141, 47)
         {
             @Override

@@ -5,7 +5,7 @@ import icbm.classic.client.prefab.gui.GuiContainerBase;
 import icbm.classic.client.prefab.gui.TextInput;
 import icbm.classic.client.prefab.gui.button.DisableButton;
 import icbm.classic.client.prefab.gui.tooltip.TooltipTranslations;
-import icbm.classic.client.prefab.gui.components.SlotEnergyBar;
+import icbm.classic.client.gui.widget.EnergyBar;
 import icbm.classic.content.blocks.launcher.LauncherLangs;
 import icbm.classic.content.blocks.launcher.screen.TileLauncherScreen;
 import icbm.classic.content.blocks.launcher.screen.gui.ContainerLaunchScreen;
@@ -48,8 +48,7 @@ public class GuiLauncherScreen extends GuiContainerBase<ContainerLaunchScreen> i
         addRenderableWidget(Button.builder(Component.translatable("icbmclassic.gui.launcher_screen.launch"),
                 button -> TileLauncherScreen.PACKET_LAUNCH.sendToServer(tile))
                 .bounds(leftPos + 24, topPos + 38, 48, 20).build());
-        addComponent(new SlotEnergyBar(141, 66, () -> (int) tile.energyStorage.getStored(),
-                () -> (int) tile.energyStorage.getCapacity()));
+        addComponent(new EnergyBar(141, 66, menu::getEnergyStored, menu::getEnergyCapacity));
     }
 
     @Override

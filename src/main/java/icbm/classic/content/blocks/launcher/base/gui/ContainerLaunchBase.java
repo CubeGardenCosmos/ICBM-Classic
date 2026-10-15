@@ -13,6 +13,7 @@ public class ContainerLaunchBase extends ContainerBase<TileLauncherBase>
     public ContainerLaunchBase(int id, Inventory playerInventory, TileLauncherBase tile)
     {
         super(ModMenus.LAUNCHER_BASE, id, playerInventory, tile);
+        addEnergyData(tile.energyStorage);
         addSlot(new Slot(tile.inventory, 0, 88, 47));
         addSlot(new Slot(tile.inventory, 1, 141, 47));
         addPlayerInventory(playerInventory, 7, 84);

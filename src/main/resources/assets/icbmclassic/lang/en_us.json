@@ -103,6 +103,8 @@
   "icbmclassic.gui.emp_tower.name": "EMP Tower",
   "icbmclassic.gui.emp_tower.power": "Firing Safety: \n \t  Charging... %1$s",
   "icbmclassic.gui.emp_tower.ready": "Ready to fire",
+  "icbmclassic.energy.stored": "Energy: %s",
+  "icbmclassic.energy.unit": "FE",
   "icbmclassic.gui.energy": "Energy: %1$s / %2$s FE",
   "icbmclassic.gui.energy.withAction": "Energy: %1$s / %2$s FE \n Action: %4$s FE",
   "icbmclassic.gui.energy.withCost": "Energy: %1$s / %2$s FE \n Upkeep: %3$s FE/t",

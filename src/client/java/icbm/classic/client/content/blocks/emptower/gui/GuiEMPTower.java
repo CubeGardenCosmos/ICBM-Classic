@@ -4,7 +4,7 @@ import icbm.classic.ICBMConstants;
 import icbm.classic.client.prefab.gui.GuiContainerBase;
 import icbm.classic.client.prefab.gui.TextInput;
 import icbm.classic.client.prefab.gui.button.DisableButton;
-import icbm.classic.client.prefab.gui.components.SlotEnergyBar;
+import icbm.classic.client.gui.widget.EnergyBar;
 import icbm.classic.client.prefab.gui.tooltip.TooltipTranslations;
 import icbm.classic.content.blocks.emptower.TileEMPTower;
 import icbm.classic.content.blocks.emptower.gui.ContainerEMPTower;
@@ -40,8 +40,7 @@ public class GuiEMPTower extends GuiContainerBase<ContainerEMPTower> implements 
                 value -> TileEMPTower.PACKET_RADIO_HZ.sendToServer(tile)));
         addComponent(new DisableButton(leftPos + 119, topPos + 16, tile.getRadio()::isDisabled)
                 .setAction(() -> TileEMPTower.PACKET_RADIO_DISABLE.sendToServer(tile)));
-        addComponent(new SlotEnergyBar(141, 66, () -> (int) tile.energyStorage.getStored(),
-                () -> (int) tile.energyStorage.getCapacity()).withTickingCost(tile::getTickingCost).withActionCost(tile::getFiringCost));
+        addComponent(new EnergyBar(141, 66, menu::getEnergyStored, menu::getEnergyCapacity));
         addComponent(new TooltipTranslations(119, 16, 14, 14,
                 Component.translatable("icbmclassic.gui.tooltip.radio.channel")));
         addComponent(new TooltipTranslations(2, 16, 14, 14,

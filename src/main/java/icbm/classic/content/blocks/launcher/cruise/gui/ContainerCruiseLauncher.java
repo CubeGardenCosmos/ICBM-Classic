@@ -13,6 +13,7 @@ public class ContainerCruiseLauncher extends ContainerBase<TileCruiseLauncher>
     public ContainerCruiseLauncher(int id, Inventory playerInventory, TileCruiseLauncher tile)
     {
         super(ModMenus.CRUISE_LAUNCHER, id, playerInventory, tile);
+        addEnergyData(tile.energyStorage);
         addSlot(new Slot(tile.inventory, 0, 88, 47));
         addSlot(new Slot(tile.inventory, 1, 141, 47));
         addPlayerInventory(playerInventory, 7, 84);

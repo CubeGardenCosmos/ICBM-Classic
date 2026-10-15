@@ -7,7 +7,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import icbm.classic.lib.energy.IcbmEnergyBuffer;
 
 /**
  * Base menu of the ICBM machines, 1.12 {@code icbm.classic.prefab.gui.ContainerBase} ported onto
@@ -37,6 +39,8 @@ public class ContainerBase<H> extends AbstractContainerMenu
     protected Container inventory;
     protected Player player;
     protected H host;
+    private long syncedEnergyStored;
+    private long syncedEnergyCapacity;
 
     protected ContainerBase(MenuType<?> type, int id, Inventory playerInventory)
     {
@@ -77,6 +81,64 @@ public class ContainerBase<H> extends AbstractContainerMenu
         {
             using.addPlayerToUseList(playerInventory.player);
         }
+    }
+
+    /**
+     * Synchronizes the machine's long FE values to clients using four vanilla int data slots.
+     * Indices 0/1 are stored low/high and 2/3 are capacity low/high.
+     */
+    protected void addEnergyData(IcbmEnergyBuffer buffer)
+    {
+        addDataSlots(new ContainerData()
+        {
+            @Override
+            public int get(int index)
+            {
+                final long value;
+                if (player.level().isClientSide())
+                {
+                    value = index < 2 ? syncedEnergyStored : syncedEnergyCapacity;
+                }
+                else
+                {
+                    value = index < 2 ? buffer.getStored() : buffer.getCapacity();
+                }
+                return (int) (value >>> ((index & 1) * 32));
+            }
+
+            @Override
+            public void set(int index, int value)
+            {
+                final long current = index < 2 ? syncedEnergyStored : syncedEnergyCapacity;
+                final long updated = index % 2 == 0
+                        ? (current & 0xFFFFFFFF00000000L) | (value & 0xFFFFFFFFL)
+                        : ((long) value << 32) | (current & 0xFFFFFFFFL);
+                if (index < 2)
+                {
+                    syncedEnergyStored = updated;
+                }
+                else
+                {
+                    syncedEnergyCapacity = updated;
+                }
+            }
+
+            @Override
+            public int getCount()
+            {
+                return 4;
+            }
+        });
+    }
+
+    public long getEnergyStored()
+    {
+        return syncedEnergyStored;
+    }
+
+    public long getEnergyCapacity()
+    {
+        return syncedEnergyCapacity;
     }
 
     /** 1.12 {@code onContainerClosed(player)} */

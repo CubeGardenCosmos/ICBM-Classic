@@ -14,6 +14,7 @@ public class ContainerEMPTower extends ContainerBase<TileEMPTower>
     public ContainerEMPTower(int id, Inventory playerInventory, TileEMPTower tile)
     {
         super(ModMenus.EMP_TOWER, id, playerInventory, tile);
+        addEnergyData(tile.energyStorage);
         addSlot(new Slot(tile.inventory, 0, 141, 47)
         {
             @Override

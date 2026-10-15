@@ -13,6 +13,7 @@ public class ContainerLaunchScreen extends ContainerBase<TileLauncherScreen>
     public ContainerLaunchScreen(int id, Inventory playerInventory, TileLauncherScreen tile)
     {
         super(ModMenus.LAUNCHER_SCREEN, id, playerInventory, tile);
+        addEnergyData(tile.energyStorage);
         addSlot(new Slot(tile.inventory, 0, 141, 47));
         addPlayerInventory(playerInventory, 7, 84);
     }

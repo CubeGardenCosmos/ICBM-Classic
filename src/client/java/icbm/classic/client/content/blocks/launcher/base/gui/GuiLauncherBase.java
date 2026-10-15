@@ -4,7 +4,7 @@ import icbm.classic.ICBMConstants;
 import icbm.classic.client.prefab.gui.GuiContainerBase;
 import icbm.classic.client.prefab.gui.TextInput;
 import icbm.classic.client.prefab.gui.button.FaceRotationButton;
-import icbm.classic.client.prefab.gui.components.SlotEnergyBar;
+import icbm.classic.client.gui.widget.EnergyBar;
 import icbm.classic.content.blocks.launcher.base.TileLauncherBase;
 import icbm.classic.content.blocks.launcher.base.gui.ContainerLaunchBase;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -44,8 +44,7 @@ public class GuiLauncherBase extends GuiContainerBase<ContainerLaunchBase> imple
                 value -> TileLauncherBase.PACKET_FIRING_DELAY.sendToServer(tile)));
         addComponent(new FaceRotationButton(leftPos + 157, topPos + 3, tile::getLaunchDirection,
                 tile::getSeatSide, tile::setSeatSide, () -> TileLauncherBase.PACKET_SEAT_ROTATION.sendToServer(tile)));
-        addComponent(new SlotEnergyBar(141, 66, () -> (int) tile.energyStorage.getStored(),
-                () -> (int) tile.energyStorage.getCapacity()).withActionCost(tile::getFiringCost));
+        addComponent(new EnergyBar(141, 66, menu::getEnergyStored, menu::getEnergyCapacity));
     }
 
     @Override
